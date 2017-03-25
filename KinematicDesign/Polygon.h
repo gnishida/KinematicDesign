@@ -20,7 +20,6 @@ namespace canvas {
 		void addPoint(const glm::dvec2& point);
 		void updateByNewPoint(const glm::dvec2& point);
 		bool hit(const glm::dvec2& point) const;
-		//void translate(const glm::dvec2& vec);
 		void resize(const glm::dvec2& scale, int resize_type);
 		BoundingBox boundingBox() const;
 	};

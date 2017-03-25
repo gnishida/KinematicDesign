@@ -9,7 +9,6 @@ namespace canvas {
 	Shape::Shape() {
 		selected = false;
 		currently_drawing = true;
-		//angle = 0;
 		model_mat = glm::dmat4x4();
 	}
 	
@@ -51,16 +50,6 @@ namespace canvas {
 		transform.translate(-c.x, -c.y);
 	}
 
-	glm::dvec2 Shape::getOrigin() const{
-		return origin;
-	}
-
-	/*
-	double Shape::getAngle() const {
-		return angle;
-	}
-	*/
-
 	glm::dvec2 Shape::getCenter() const {
 		return boundingBox().center();
 	}
@@ -73,17 +62,9 @@ namespace canvas {
 	
 	glm::dvec2 Shape::localCoordinate(const glm::dvec2& point) const {
 		return glm::dvec2(glm::inverse(model_mat) * glm::dvec4(point, 0, 1));
-		/*
-		glm::dvec2 c = boundingBox().center();
-		return kinematics::rotatePoint(point - origin - c, -angle) + c;
-		*/
 	}
 
 	glm::dvec2 Shape::worldCoordinate(const glm::dvec2& point) const {
 		return glm::dvec2(model_mat * glm::dvec4(point, 0, 1));
-		/*
-		glm::dvec2 c = boundingBox().center();
-		return kinematics::rotatePoint(point - c, angle) + origin + c;
-		*/
 	}
 }

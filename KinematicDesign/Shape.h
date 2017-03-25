@@ -38,7 +38,6 @@ namespace canvas {
 		void translate(const glm::dvec2& vec);
 		virtual void resize(const glm::dvec2& scale, int resize_type) = 0;
 		void rotate(double angle);
-		glm::dvec2 getOrigin() const;
 		glm::dvec2 getCenter() const;
 		virtual BoundingBox boundingBox() const = 0;
 		glm::dvec2 getRotationMarkerPosition() const;
