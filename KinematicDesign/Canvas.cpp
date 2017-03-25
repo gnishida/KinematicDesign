@@ -22,7 +22,6 @@ namespace canvas {
 		mode = MODE_MOVE;
 		layers.resize(2);
 		layer_id = 0;
-		drawing_shape = false;
 
 		animation_timer = NULL;
 		simulation_speed = 0.01;
@@ -44,11 +43,13 @@ namespace canvas {
 
 	void Canvas::unselectAll() {
 		layers[layer_id].unselectAll();
+		current_shape.reset();
 		update();
 	}
 
 	void Canvas::deleteSelectedShapes() {
 		layers[layer_id].deleteSelectedShapes();
+		current_shape.reset();
 		update();
 	}
 
@@ -58,7 +59,7 @@ namespace canvas {
 
 	void Canvas::pasteCopiedShapes() {
 		layers[layer_id].pasteCopiedShapes(copied_shapes);
-
+		current_shape.reset();
 		mode = MODE_MOVE;
 		update();
 	}
@@ -71,8 +72,9 @@ namespace canvas {
 
 	void Canvas::setLayer(int layer_id) {
 		if (this->layer_id != layer_id) {
-			
-				this->layer_id = layer_id;
+			layers[this->layer_id].unselectAll();
+			this->layer_id = layer_id;
+			current_shape.reset();
 			update();
 		}
 	}
@@ -112,6 +114,9 @@ namespace canvas {
 
 		// select 1st layer to display
 		layer_id = 0;
+
+		// no currently drawing shape
+		current_shape.reset();
 
 		update();
 	}
@@ -231,24 +236,26 @@ namespace canvas {
 
 		painter.fillRect(0, 0, width(), height(), QColor(255, 255, 255));
 
-		// if the current layer is 1, layer 0 is also rendered as background
-		if (layer_id > 0) {
-			for (int l = 0; l < layer_id; ++l) {
-				for (int i = 0; i < layers[l].shapes.size(); ++i) {
-					layers[l].shapes[i]->draw(painter);
-				}
-				painter.setPen(QColor(255, 255, 255, 128));
-				painter.setBrush(QColor(255, 255, 255, 128));
-				painter.drawRect(0, 0, width(), height());
+		// render unselected layers as background
+		for (int l = 0; l < layer_id; ++l) {
+			if (l == layer_id) continue;
+			for (int i = 0; i < layers[l].shapes.size(); ++i) {
+				layers[l].shapes[i]->draw(painter);
 			}
 		}
 
+		painter.setPen(QColor(255, 255, 255, 160));
+		painter.setBrush(QColor(255, 255, 255, 160));
+		painter.drawRect(0, 0, width(), height());
+
+		// render selected layer
 		for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 			layers[layer_id].shapes[i]->draw(painter);
 		}
 
+		// render currently drawing shape
 		if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
-			if (drawing_shape) {
+			if (current_shape) {
 				current_shape->draw(painter);
 			}
 		}
@@ -321,26 +328,24 @@ namespace canvas {
 			unselectAll();
 		}
 		else if (mode == MODE_RECTANGLE) {
-			if (drawing_shape) {
+			if (current_shape) {
 				// do nothing
 			}
 			else {
 				// start drawing a rectangle
 				unselectAll();
-				drawing_shape = true;
 				current_shape = boost::shared_ptr<Shape>(new Rectangle(glm::dvec2(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
 		}
 		else if (mode == MODE_POLYGON) {
-			if (drawing_shape) {
+			if (current_shape) {
 				current_shape->addPoint(current_shape->localCoordinate(glm::dvec2(e->x(), e->y())));
 			}
 			else {
 				// start drawing a polygon
 				unselectAll();
-				drawing_shape = true;
 				current_shape = boost::shared_ptr<Shape>(new Polygon(glm::dvec2(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
@@ -398,7 +403,7 @@ namespace canvas {
 			update();
 		}
 		else if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
-			if (drawing_shape) {
+			if (current_shape) {
 				current_shape->updateByNewPoint(current_shape->localCoordinate(glm::dvec2(e->x(), e->y())));
 				update();
 			}
@@ -413,9 +418,8 @@ namespace canvas {
 
 	void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
 		if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
-			if (drawing_shape) {
+			if (current_shape) {
 				// The shape is created.
-				drawing_shape = false;
 				current_shape->completeDrawing();
 				current_shape->select();
 				layers[layer_id].shapes.push_back(current_shape);
@@ -447,7 +451,7 @@ namespace canvas {
 		switch (e->key()) {
 		case Qt::Key_Escape:
 			if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
-				drawing_shape = false;
+				current_shape.reset();
 				setMouseTracking(false);
 				update();
 			}

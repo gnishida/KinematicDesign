@@ -28,7 +28,6 @@ namespace canvas {
 
 		int mode;
 		glm::dvec2 prev_mouse_pt;
-		bool drawing_shape;
 		boost::shared_ptr<canvas::Shape> current_shape;
 		std::vector<Layer> layers;
 		int layer_id;
