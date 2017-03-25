@@ -361,7 +361,6 @@ namespace canvas {
 				current_shape->complete();
 				current_shape->select();
 				shapes.push_back(current_shape);
-				setMouseTracking(false);
 			}
 		}
 		else if (mode == MODE_POLYGON) {
@@ -371,9 +370,10 @@ namespace canvas {
 				current_shape->complete();
 				current_shape->select();
 				shapes.push_back(current_shape);
-				setMouseTracking(false);
 			}
 		}
+
+		setMouseTracking(false);
 
 		update();
 	}
@@ -396,6 +396,7 @@ namespace canvas {
 		case Qt::Key_Escape:
 			if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
 				drawing_shape = false;
+				setMouseTracking(false);
 				update();
 			}
 			break;
