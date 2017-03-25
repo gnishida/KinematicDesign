@@ -9,7 +9,7 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
-private:
+public:
 	Ui::MainWindowClass ui;
 	canvas::Canvas* canvas;
 
@@ -23,11 +23,14 @@ protected:
 
 public slots:
 	void onNew();
+	void onOpen();
+	void onSave();
 	void onCopy();
 	void onPaste();
 	void onDelete();
 	void onSelectAll();
 	void onModeChanged();
+	void onLayerChanged();
 };
 
 #endif // MAINWINDOW_H

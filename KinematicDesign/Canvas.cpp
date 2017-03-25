@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QTextStream>
-#include <QDomDocument>
+#include <QDate>
 #include <QResizeEvent>
 #include <QtWidgets/QApplication>
 #include "Rectangle.h"
@@ -20,6 +20,8 @@ namespace canvas {
 		shiftPressed = false;
 
 		mode = MODE_MOVE;
+		layers.resize(2);
+		layer_id = 0;
 		drawing_shape = false;
 
 		animation_timer = NULL;
@@ -30,50 +32,32 @@ namespace canvas {
 	}
 
 	void Canvas::clear() {
-		shapes.clear();
+		layers[layer_id].clear();
 		update();
 	}
 
 	void Canvas::selectAll() {
-		for (int i = 0; i < shapes.size(); ++i) {
-			shapes[i]->select();
-		}
+		layers[layer_id].selectAll();
 		mode = MODE_MOVE;
 		update();
 	}
 
 	void Canvas::unselectAll() {
-		for (int i = 0; i < shapes.size(); ++i) {
-			shapes[i]->unselect();
-		}
+		layers[layer_id].unselectAll();
 		update();
 	}
 
 	void Canvas::deleteSelectedShapes() {
-		for (int i = shapes.size() - 1; i >= 0; --i) {
-			if (shapes[i]->isSelected()) {
-				shapes.erase(shapes.begin() + i);
-			}
-		}
+		layers[layer_id].deleteSelectedShapes();
 		update();
 	}
 
 	void Canvas::copySelectedShapes() {
-		copied_shapes.clear();
-		for (int i = 0; i < shapes.size(); ++i) {
-			if (shapes[i]->isSelected()) {
-				copied_shapes.push_back(shapes[i]->clone());
-			}
-		}
+		layers[layer_id].copySelectedShapes(copied_shapes);
 	}
 
 	void Canvas::pasteCopiedShapes() {
-		unselectAll();
-		for (int i = 0; i < copied_shapes.size(); ++i) {
-			boost::shared_ptr<Shape> shape = copied_shapes[i]->clone();
-			shape->select();
-			shapes.push_back(shape);
-		}
+		layers[layer_id].pasteCopiedShapes(copied_shapes);
 
 		mode = MODE_MOVE;
 		update();
@@ -85,18 +69,76 @@ namespace canvas {
 		update();
 	}
 
-	void Canvas::open(const QString& filename) {
-		kinematics.load(filename);
+	void Canvas::setLayer(int layer_id) {
+		if (this->layer_id != layer_id) {
+			
+				this->layer_id = layer_id;
+			update();
+		}
+	}
 
-		// Since the direction of the speed might be inverted due to the dead zone,
-		// we need to recover the original speed when a new object is loaded.
-		simulation_speed = 0.01;
+	void Canvas::open(const QString& filename) {
+		QFile file(filename);
+		if (!file.open(QFile::ReadOnly | QFile::Text)) throw "Fild cannot open.";
+
+		QDomDocument doc;
+		doc.setContent(&file);
+
+		QDomElement root = doc.documentElement();
+		if (root.tagName() != "design")	throw "Invalid file format.";
+
+		// clear the data
+		layers.clear();
+		selected_shape.reset();
+		mode = MODE_MOVE;
+
+		QDomNode node = root.firstChild();
+		while (!node.isNull()) {
+			if (node.toElement().tagName() == "layers") {
+				QDomNode layer_node = node.firstChild();
+				while (!layer_node.isNull()) {
+					if (layer_node.toElement().tagName() == "layer") {
+						Layer layer;
+						layer.load(layer_node.toElement());
+						layers.push_back(layer);
+					}
+
+					layer_node = layer_node.nextSibling();
+				}
+			}
+
+			node = node.nextSibling();
+		}
+
+		// select 1st layer to display
+		layer_id = 0;
 
 		update();
 	}
 
 	void Canvas::save(const QString& filename) {
-		kinematics.save(filename);
+		QFile file(filename);
+		if (!file.open(QFile::WriteOnly)) throw "File cannot open.";
+
+		QDomDocument doc;
+
+		// set root node
+		QDomElement root = doc.createElement("design");
+		root.setAttribute("author", "Gen Nishida");
+		root.setAttribute("version", "1.0");
+		root.setAttribute("date", QDate::currentDate().toString("MM/dd/yyyy"));
+		doc.appendChild(root);
+
+		// write layers
+		QDomElement layers_node = doc.createElement("layers");
+		root.appendChild(layers_node);
+		for (int i = 0; i < layers.size(); ++i) {
+			QDomElement layer_node = layers[i].toXml(doc);
+			layers_node.appendChild(layer_node);
+		}
+
+		QTextStream out(&file);
+		doc.save(out, 4);
 	}
 
 	void Canvas::run() {
@@ -187,8 +229,22 @@ namespace canvas {
 	void Canvas::paintEvent(QPaintEvent *e) {
 		QPainter painter(this);
 
-		for (int i = 0; i < shapes.size(); ++i) {
-			shapes[i]->draw(painter);
+		painter.fillRect(0, 0, width(), height(), QColor(255, 255, 255));
+
+		// if the current layer is 1, layer 0 is also rendered as background
+		if (layer_id > 0) {
+			for (int l = 0; l < layer_id; ++l) {
+				for (int i = 0; i < layers[l].shapes.size(); ++i) {
+					layers[l].shapes[i]->draw(painter);
+				}
+				painter.setPen(QColor(255, 255, 255, 128));
+				painter.setBrush(QColor(255, 255, 255, 128));
+				painter.drawRect(0, 0, width(), height());
+			}
+		}
+
+		for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+			layers[layer_id].shapes[i]->draw(painter);
 		}
 
 		if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
@@ -208,13 +264,13 @@ namespace canvas {
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
 
 			// hit test for rotation marker
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (glm::length(shapes[i]->getRotationMarkerPosition() - shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (glm::length(layers[layer_id].shapes[i]->getRotationMarkerPosition() - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
 					mode = MODE_ROTATION;
-					selected_shape = shapes[i];
-					if (!shapes[i]->isSelected()) {
+					selected_shape = layers[layer_id].shapes[i];
+					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
-						shapes[i]->select();
+						layers[layer_id].shapes[i]->select();
 					}
 					update();
 					return;
@@ -222,25 +278,25 @@ namespace canvas {
 			}
 
 			// hit test for resize marker
-			for (int i = 0; i < shapes.size(); ++i) {
-				BoundingBox bbox = shapes[i]->boundingBox();
-				if (glm::length(bbox.minPt - shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				BoundingBox bbox = layers[layer_id].shapes[i]->boundingBox();
+				if (glm::length(bbox.minPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
 					mode = MODE_RESIZE_TOP_LEFT;
-					selected_shape = shapes[i];
-					if (!shapes[i]->isSelected()) {
+					selected_shape = layers[layer_id].shapes[i];
+					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
-						shapes[i]->select();
+						layers[layer_id].shapes[i]->select();
 					}
 					update();
 					return;
 				}
 
-				if (glm::length(bbox.maxPt - shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+				if (glm::length(bbox.maxPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
 					mode = MODE_RESIZE_BOTTOM_RIGHT;
-					selected_shape = shapes[i];
-					if (!shapes[i]->isSelected()) {
+					selected_shape = layers[layer_id].shapes[i];
+					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
-						shapes[i]->select();
+						layers[layer_id].shapes[i]->select();
 					}
 					update();
 					return;
@@ -248,14 +304,14 @@ namespace canvas {
 			}
 
 			// hit test for the shape
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (shapes[i]->hit(glm::dvec2(e->x(), e->y()))) {
-					if (!shapes[i]->isSelected()) {
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->hit(glm::dvec2(e->x(), e->y()))) {
+					if (!layers[layer_id].shapes[i]->isSelected()) {
 						if (!ctrlPressed) {
 							// If ctrl is not pressed, then deselect all other shapes.
 							unselectAll();
 						}
-						shapes[i]->select();
+						layers[layer_id].shapes[i]->select();
 					}
 					update();
 					return;
@@ -273,6 +329,7 @@ namespace canvas {
 				unselectAll();
 				drawing_shape = true;
 				current_shape = boost::shared_ptr<Shape>(new Rectangle(glm::dvec2(e->x(), e->y())));
+				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
 		}
@@ -285,6 +342,7 @@ namespace canvas {
 				unselectAll();
 				drawing_shape = true;
 				current_shape = boost::shared_ptr<Shape>(new Polygon(glm::dvec2(e->x(), e->y())));
+				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
 		}
@@ -295,9 +353,9 @@ namespace canvas {
 	void Canvas::mouseMoveEvent(QMouseEvent* e) {
 		if (mode == MODE_MOVE) {
 			glm::dvec2 dir = glm::dvec2(e->x(), e->y()) - prev_mouse_pt;
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (shapes[i]->isSelected()) {
-					shapes[i]->translate(dir);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->translate(dir);
 				}
 			}
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
@@ -307,9 +365,9 @@ namespace canvas {
 			glm::dvec2 dir1 = prev_mouse_pt - selected_shape->worldCoordinate(selected_shape->getCenter());
 			glm::dvec2 dir2 = glm::dvec2(e->x(), e->y()) - selected_shape->worldCoordinate(selected_shape->getCenter());
 			double theta = atan2(dir2.y, dir2.x) - atan2(dir1.y, dir1.x);
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (shapes[i]->isSelected()) {
-					shapes[i]->rotate(theta);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->rotate(theta);
 				}
 			}
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
@@ -319,9 +377,9 @@ namespace canvas {
 			glm::dvec2 dir1 = selected_shape->boundingBox().minPt - selected_shape->boundingBox().maxPt;
 			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - selected_shape->boundingBox().maxPt;
 			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (shapes[i]->isSelected()) {
-					shapes[i]->resize(scale, Shape::RESIZE_TOP_LEFT);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_TOP_LEFT);
 				}
 			}
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
@@ -331,9 +389,9 @@ namespace canvas {
 			glm::dvec2 dir1 = selected_shape->boundingBox().maxPt - selected_shape->boundingBox().minPt;
 			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - selected_shape->boundingBox().minPt;
 			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
-			for (int i = 0; i < shapes.size(); ++i) {
-				if (shapes[i]->isSelected()) {
-					shapes[i]->resize(scale, Shape::RESIZE_BOTTOM_RIGHT);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_BOTTOM_RIGHT);
 				}
 			}
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
@@ -354,22 +412,16 @@ namespace canvas {
 	}
 
 	void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
-		if (mode == MODE_RECTANGLE) {
+		if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
 			if (drawing_shape) {
-				// The polygon is created.
+				// The shape is created.
 				drawing_shape = false;
-				current_shape->complete();
+				current_shape->completeDrawing();
 				current_shape->select();
-				shapes.push_back(current_shape);
-			}
-		}
-		else if (mode == MODE_POLYGON) {
-			if (drawing_shape) {
-				// The polygon is created.
-				drawing_shape = false;
-				current_shape->complete();
-				current_shape->select();
-				shapes.push_back(current_shape);
+				layers[layer_id].shapes.push_back(current_shape);
+				mode = MODE_MOVE;
+				current_shape.reset();
+				mainWin->ui.actionMove->setChecked(true);
 			}
 		}
 

@@ -173,6 +173,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Point.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="..\kinematics\SliderHinge.h" />
     <ClInclude Include="..\kinematics\Utils.h" />
     <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="Layer.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Rectangle.h" />

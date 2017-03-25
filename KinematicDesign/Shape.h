@@ -4,8 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <QPainter>
-#include <boost/shared_ptr.hpp>
+#include <QDomDocument>
 #include <QImage>
+#include <boost/shared_ptr.hpp>
 #include "BoundingBox.h"
 
 namespace canvas {
@@ -28,12 +29,18 @@ namespace canvas {
 
 		virtual boost::shared_ptr<Shape> clone() = 0;
 		virtual void draw(QPainter& painter) const = 0;
+		virtual QDomElement toXml(QDomDocument& doc) const = 0;
+		void loadModelMat(QDomNode& node);
+		void loadTransform(QDomNode& node);
+		QDomElement toModelMatXml(QDomDocument& doc) const;
+		QDomElement toTransformXml(QDomDocument& doc) const;
 		virtual void addPoint(const glm::dvec2& point) = 0;
 		virtual void updateByNewPoint(const glm::dvec2& point) = 0;
 		void select();
 		void unselect();
 		bool isSelected() const;
-		void complete();
+		void startDrawing();
+		void completeDrawing();
 		virtual bool hit(const glm::dvec2& point) const = 0;
 		void translate(const glm::dvec2& vec);
 		virtual void resize(const glm::dvec2& scale, int resize_type) = 0;

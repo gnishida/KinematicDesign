@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
@@ -9,10 +10,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	groupMode->addAction(ui.actionPolygon);
 	ui.actionMove->setChecked(true);
 
+	QActionGroup* groupLayer = new QActionGroup(this);
+	groupLayer->addAction(ui.actionLayer1);
+	groupLayer->addAction(ui.actionLayer2);
+	ui.actionLayer1->setChecked(true);
+
 	canvas = new canvas::Canvas(this);
 	setCentralWidget(canvas);
 
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
+	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
+	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionCopy, SIGNAL(triggered()), this, SLOT(onCopy()));
 	connect(ui.actionPaste, SIGNAL(triggered()), this, SLOT(onPaste()));
@@ -21,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionMove, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionRectangle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionLayer1, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
+	connect(ui.actionLayer2, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
 }
 
 MainWindow::~MainWindow() {
@@ -36,6 +46,20 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e) {
 
 void MainWindow::onNew() {
 	canvas->clear();
+}
+
+void MainWindow::onOpen() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Design file..."), "", tr("Design Files (*.xml)"));
+	if (filename.isEmpty()) return;
+
+	canvas->open(filename);
+}
+
+void MainWindow::onSave() {
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save Design file..."), "", tr("Design Files (*.xml)"));
+	if (filename.isEmpty()) return;
+
+	canvas->save(filename);
 }
 
 void MainWindow::onCopy() {
@@ -65,4 +89,13 @@ void MainWindow::onModeChanged() {
 		canvas->setMode(canvas::Canvas::MODE_POLYGON);
 	}
 	update();
+}
+
+void MainWindow::onLayerChanged() {
+	if (ui.actionLayer1->isChecked()) {
+		canvas->setLayer(0);
+	}
+	else if (ui.actionLayer2->isChecked()) {
+		canvas->setLayer(1);
+	}
 }

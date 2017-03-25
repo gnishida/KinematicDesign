@@ -8,12 +8,13 @@
 #include <Kinematics.h>
 #include "Utils.h"
 #include "Shape.h"
+#include "Layer.h"
 #include <QTimer>
 
 class MainWindow;
 
 namespace canvas {
-
+	
 	class Canvas : public QWidget {
 		Q_OBJECT
 
@@ -29,7 +30,8 @@ namespace canvas {
 		glm::dvec2 prev_mouse_pt;
 		bool drawing_shape;
 		boost::shared_ptr<canvas::Shape> current_shape;
-		std::vector<boost::shared_ptr<canvas::Shape>> shapes;
+		std::vector<Layer> layers;
+		int layer_id;
 		boost::shared_ptr<canvas::Shape> selected_shape;
 		std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
 		
@@ -48,6 +50,7 @@ namespace canvas {
 		void copySelectedShapes();
 		void pasteCopiedShapes();
 		void setMode(int mode);
+		void setLayer(int layer_id);
 		void open(const QString& filename);
 		void save(const QString& filename);
 		void run();

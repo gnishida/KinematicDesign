@@ -55,9 +55,17 @@
     <addaction name="separator"/>
     <addaction name="actionSelectAll"/>
    </widget>
+   <widget class="QMenu" name="menuLayer">
+    <property name="title">
+     <string>Layer</string>
+    </property>
+    <addaction name="actionLayer1"/>
+    <addaction name="actionLayer2"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuMode"/>
+   <addaction name="menuLayer"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -167,6 +175,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionLayer1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Layer 1</string>
+   </property>
+  </action>
+  <action name="actionLayer2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Layer 2</string>
    </property>
   </action>
  </widget>

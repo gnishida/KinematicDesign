@@ -39,11 +39,14 @@ public:
     QAction *actionSelectAll;
     QAction *actionOpen;
     QAction *actionSave;
+    QAction *actionLayer1;
+    QAction *actionLayer2;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuMode;
     QMenu *menuEdit;
+    QMenu *menuLayer;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -81,6 +84,12 @@ public:
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         actionSave = new QAction(MainWindowClass);
         actionSave->setObjectName(QStringLiteral("actionSave"));
+        actionLayer1 = new QAction(MainWindowClass);
+        actionLayer1->setObjectName(QStringLiteral("actionLayer1"));
+        actionLayer1->setCheckable(true);
+        actionLayer2 = new QAction(MainWindowClass);
+        actionLayer2->setObjectName(QStringLiteral("actionLayer2"));
+        actionLayer2->setCheckable(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -93,6 +102,8 @@ public:
         menuMode->setObjectName(QStringLiteral("menuMode"));
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menuLayer = new QMenu(menuBar);
+        menuLayer->setObjectName(QStringLiteral("menuLayer"));
         MainWindowClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindowClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -104,6 +115,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
         menuBar->addAction(menuMode->menuAction());
+        menuBar->addAction(menuLayer->menuAction());
         menuFile->addAction(actionNew);
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
@@ -121,6 +133,8 @@ public:
         menuEdit->addAction(actionDelete);
         menuEdit->addSeparator();
         menuEdit->addAction(actionSelectAll);
+        menuLayer->addAction(actionLayer1);
+        menuLayer->addAction(actionLayer2);
 
         retranslateUi(MainWindowClass);
 
@@ -152,9 +166,12 @@ public:
         actionOpen->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+O", 0));
         actionSave->setText(QApplication::translate("MainWindowClass", "Save", 0));
         actionSave->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+S", 0));
+        actionLayer1->setText(QApplication::translate("MainWindowClass", "Layer 1", 0));
+        actionLayer2->setText(QApplication::translate("MainWindowClass", "Layer 2", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
+        menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", 0));
     } // retranslateUi
 
 };

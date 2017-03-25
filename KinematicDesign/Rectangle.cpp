@@ -18,6 +18,27 @@ namespace canvas {
 		height = 0;
 	}
 
+	Rectangle::Rectangle(QDomNode& node) : Shape() {
+		origin.x = node.toElement().attribute("origin_x").toDouble();
+		origin.y = node.toElement().attribute("origin_y").toDouble();
+
+		QDomNode params_node = node.firstChild();
+		while (!params_node.isNull()) {
+			if (params_node.toElement().tagName() == "model_mat") {
+				loadModelMat(params_node);
+			}
+			if (params_node.toElement().tagName() == "transform") {
+				loadTransform(params_node);
+			}
+			else if (params_node.toElement().tagName() == "params") {
+				width = params_node.toElement().attribute("width").toDouble();
+				height = params_node.toElement().attribute("height").toDouble();
+			}
+
+			params_node = params_node.nextSibling();
+		}
+	}
+
 	Rectangle::~Rectangle() {
 	}
 
@@ -65,6 +86,25 @@ namespace canvas {
 		}
 
 		painter.restore();
+	}
+
+	QDomElement Rectangle::toXml(QDomDocument& doc) const {
+		QDomElement shape_node = doc.createElement("shape");
+		shape_node.setAttribute("type", "rectangle");
+		shape_node.setAttribute("origin_x", origin.x);
+		shape_node.setAttribute("origin_y", origin.y);
+
+		QDomElement model_mat_node = toModelMatXml(doc);
+		shape_node.appendChild(model_mat_node);
+		QDomElement transform_node = toTransformXml(doc);
+		shape_node.appendChild(transform_node);
+
+		QDomElement params_node = doc.createElement("params");
+		params_node.setAttribute("width", width);
+		params_node.setAttribute("height", height);
+		shape_node.appendChild(params_node);
+
+		return shape_node;
 	}
 
 	void Rectangle::addPoint(const glm::dvec2& point) {

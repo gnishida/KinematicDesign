@@ -15,6 +15,21 @@ namespace canvas {
 		current_point = glm::dvec2();
 	}
 
+	Polygon::Polygon(QDomNode& node) : Shape() {
+		origin.x = node.toElement().attribute("origin_x").toDouble();
+		origin.y = node.toElement().attribute("origin_y").toDouble();
+
+		QDomNode point_node = node.firstChild();
+		while (!point_node.isNull()) {
+			double x = point_node.toElement().attribute("x").toDouble();
+			double y = point_node.toElement().attribute("y").toDouble();
+
+			points.push_back(glm::dvec2(x, y));
+
+			point_node = point_node.nextSibling();
+		}
+	}
+
 	Polygon::~Polygon() {
 	}
 
@@ -71,6 +86,29 @@ namespace canvas {
 		}
 
 		painter.restore();
+	}
+
+	QDomElement Polygon::toXml(QDomDocument& doc) const {
+		QDomElement shape_node = doc.createElement("shape");
+		shape_node.setAttribute("type", "polygon");
+		shape_node.setAttribute("origin_x", origin.x);
+		shape_node.setAttribute("origin_y", origin.y);
+
+		QDomElement model_mat_node = toModelMatXml(doc);
+		shape_node.appendChild(model_mat_node);
+		QDomElement transform_node = toTransformXml(doc);
+		shape_node.appendChild(transform_node);
+
+		QDomElement params_node = doc.createElement("params");
+		for (int i = 0; points.size(); ++i) {
+			QDomElement point_node = doc.createElement("point");
+			point_node.setAttribute("x", points[i].x);
+			point_node.setAttribute("y", points[i].y);
+			params_node.appendChild(point_node);
+		}
+		shape_node.appendChild(params_node);
+
+		return shape_node;
 	}
 
 	void Polygon::addPoint(const glm::dvec2& point) {
