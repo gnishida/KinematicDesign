@@ -10,7 +10,6 @@ namespace canvas {
 	Polygon::Polygon(const glm::dvec2& point) : Shape() {
 		points.push_back(glm::dvec2());
 		model_mat = glm::translate(model_mat, glm::dvec3(point, 0));
-		transform.translate(point.x, point.y);
 
 		current_point = glm::dvec2();
 	}
@@ -20,9 +19,6 @@ namespace canvas {
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "model_mat") {
 				loadModelMat(params_node);
-			}
-			else if (params_node.toElement().tagName() == "transform") {
-				loadTransform(params_node);
 			}
 			else if (params_node.toElement().tagName() == "point") {
 				double x = params_node.toElement().attribute("x").toDouble();
@@ -45,7 +41,7 @@ namespace canvas {
 	void Polygon::draw(QPainter& painter) const {
 		painter.save();
 
-		painter.setTransform(transform);
+		painter.setTransform(getQTransform());
 
 		if (selected || currently_drawing) {
 			painter.setPen(QPen(QColor(0, 0, 255), 2));
@@ -99,8 +95,6 @@ namespace canvas {
 
 		QDomElement model_mat_node = toModelMatXml(doc);
 		shape_node.appendChild(model_mat_node);
-		QDomElement transform_node = toTransformXml(doc);
-		shape_node.appendChild(transform_node);
 
 		for (int i = 0; i < points.size(); ++i) {
 			QDomElement point_node = doc.createElement("point");
@@ -135,7 +129,12 @@ namespace canvas {
 
 		if (resize_type == RESIZE_TOP_LEFT) {
 			model_mat = glm::translate(model_mat, glm::dvec3(bbox.width() - bbox.width() * scale.x, bbox.height() - bbox.height() * scale.y, 0));
-			transform.translate(bbox.width() - bbox.width() * scale.x, bbox.height() - bbox.height() * scale.y);
+		}
+		else if (resize_type == RESIZE_TOP_RIGHT) {
+			model_mat = glm::translate(model_mat, glm::dvec3(0, bbox.height() - bbox.height() * scale.y, 0));
+		}
+		else if (resize_type == RESIZE_BOTTOM_LEFT) {
+			model_mat = glm::translate(model_mat, glm::dvec3(bbox.width() - bbox.width() * scale.x, 0, 0));
 		}
 		else if (resize_type == RESIZE_BOTTOM_RIGHT) {
 			// do nothing

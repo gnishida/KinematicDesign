@@ -228,7 +228,7 @@ namespace canvas {
 		painter.fillRect(0, 0, width(), height(), QColor(255, 255, 255));
 
 		// render unselected layers as background
-		for (int l = 0; l < layer_id; ++l) {
+		for (int l = 0; l < layers.size(); ++l) {
 			if (l == layer_id) continue;
 			for (int i = 0; i < layers[l].shapes.size(); ++i) {
 				layers[l].shapes[i]->draw(painter);
@@ -280,6 +280,28 @@ namespace canvas {
 				BoundingBox bbox = layers[layer_id].shapes[i]->boundingBox();
 				if (glm::length(bbox.minPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
 					mode = MODE_RESIZE_TOP_LEFT;
+					selected_shape = layers[layer_id].shapes[i];
+					if (!layers[layer_id].shapes[i]->isSelected()) {
+						unselectAll();
+						layers[layer_id].shapes[i]->select();
+					}
+					update();
+					return;
+				}
+
+				if (glm::length(glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					mode = MODE_RESIZE_TOP_RIGHT;
+					selected_shape = layers[layer_id].shapes[i];
+					if (!layers[layer_id].shapes[i]->isSelected()) {
+						unselectAll();
+						layers[layer_id].shapes[i]->select();
+					}
+					update();
+					return;
+				}
+
+				if (glm::length(glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					mode = MODE_RESIZE_BOTTOM_LEFT;
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -370,8 +392,9 @@ namespace canvas {
 			update();
 		}
 		else if (mode == MODE_RESIZE_TOP_LEFT) {
-			glm::dvec2 dir1 = selected_shape->boundingBox().minPt - selected_shape->boundingBox().maxPt;
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - selected_shape->boundingBox().maxPt;
+			BoundingBox bbox = selected_shape->boundingBox();
+			glm::dvec2 dir1 = bbox.minPt - bbox.maxPt;
+			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - bbox.maxPt;
 			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->isSelected()) {
@@ -381,9 +404,36 @@ namespace canvas {
 			prev_mouse_pt = glm::dvec2(e->x(), e->y());
 			update();
 		}
+		else if (mode == MODE_RESIZE_TOP_RIGHT) {
+			BoundingBox bbox = selected_shape->boundingBox();
+			glm::dvec2 dir1 = glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - glm::dvec2(bbox.minPt.x, bbox.maxPt.y);
+			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - glm::dvec2(bbox.minPt.x, bbox.maxPt.y);
+			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_TOP_RIGHT);
+				}
+			}
+			prev_mouse_pt = glm::dvec2(e->x(), e->y());
+			update();
+		}
+		else if (mode == MODE_RESIZE_BOTTOM_LEFT) {
+			BoundingBox bbox = selected_shape->boundingBox();
+			glm::dvec2 dir1 = glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - glm::dvec2(bbox.maxPt.x, bbox.minPt.y);
+			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - glm::dvec2(bbox.maxPt.x, bbox.minPt.y);
+			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
+			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
+				if (layers[layer_id].shapes[i]->isSelected()) {
+					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_BOTTOM_LEFT);
+				}
+			}
+			prev_mouse_pt = glm::dvec2(e->x(), e->y());
+			update();
+		}
 		else if (mode == MODE_RESIZE_BOTTOM_RIGHT) {
-			glm::dvec2 dir1 = selected_shape->boundingBox().maxPt - selected_shape->boundingBox().minPt;
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - selected_shape->boundingBox().minPt;
+			BoundingBox bbox = selected_shape->boundingBox();
+			glm::dvec2 dir1 = bbox.maxPt - bbox.minPt;
+			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - bbox.minPt;
 			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->isSelected()) {

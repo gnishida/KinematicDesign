@@ -19,7 +19,6 @@ namespace canvas {
 		bool selected;
 		bool currently_drawing;
 		glm::dmat4x4 model_mat;
-		QTransform transform;
 		static QImage rotation_marker;
 
 	public:
@@ -30,9 +29,8 @@ namespace canvas {
 		virtual void draw(QPainter& painter) const = 0;
 		virtual QDomElement toXml(QDomDocument& doc) const = 0;
 		void loadModelMat(QDomNode& node);
-		void loadTransform(QDomNode& node);
 		QDomElement toModelMatXml(QDomDocument& doc) const;
-		QDomElement toTransformXml(QDomDocument& doc) const;
+		QTransform getQTransform() const;
 		virtual void addPoint(const glm::dvec2& point) = 0;
 		virtual void updateByNewPoint(const glm::dvec2& point) = 0;
 		void select();

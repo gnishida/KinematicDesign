@@ -24,20 +24,6 @@ namespace canvas {
 		}
 	}
 
-	void Shape::loadTransform(QDomNode& node) {
-		double m11 = node.toElement().attribute("m11").toDouble();
-		double m12 = node.toElement().attribute("m12").toDouble();
-		double m13 = node.toElement().attribute("m13").toDouble();
-		double m21 = node.toElement().attribute("m21").toDouble();
-		double m22 = node.toElement().attribute("m22").toDouble();
-		double m23 = node.toElement().attribute("m23").toDouble();
-		double m31 = node.toElement().attribute("m31").toDouble();
-		double m32 = node.toElement().attribute("m32").toDouble();
-		double m33 = node.toElement().attribute("m33").toDouble();
-
-		transform.setMatrix(m11, m12, m13, m21, m22, m23, m31, m32, m33);
-	}
-
 	QDomElement Shape::toModelMatXml(QDomDocument& doc) const {
 		QDomElement model_mat_node = doc.createElement("model_mat");
 		for (int i = 0; i < 4; ++i) {
@@ -50,19 +36,10 @@ namespace canvas {
 		return model_mat_node;
 	}
 
-	QDomElement Shape::toTransformXml(QDomDocument& doc) const {
-		QDomElement transform_node = doc.createElement("transform");
-		transform_node.setAttribute("m11", transform.m11());
-		transform_node.setAttribute("m12", transform.m12());
-		transform_node.setAttribute("m13", transform.m13());
-		transform_node.setAttribute("m21", transform.m21());
-		transform_node.setAttribute("m22", transform.m22());
-		transform_node.setAttribute("m23", transform.m23());
-		transform_node.setAttribute("m31", transform.m31());
-		transform_node.setAttribute("m32", transform.m32());
-		transform_node.setAttribute("m33", transform.m33());
-
-		return transform_node;
+	QTransform Shape::getQTransform() const {
+		QTransform trans;
+		trans.setMatrix(model_mat[0][0], model_mat[0][1], model_mat[0][3], model_mat[1][0], model_mat[1][1], model_mat[1][3], model_mat[3][0], model_mat[3][1], model_mat[3][3]);
+		return trans;
 	}
 
 	void Shape::select() {
@@ -87,10 +64,6 @@ namespace canvas {
 
 	void Shape::translate(const glm::dvec2& vec) {
 		model_mat = glm::translate(glm::dmat4x4(), glm::dvec3(vec, 0)) * model_mat;
-
-		QTransform tr;
-		tr.translate(vec.x, vec.y);
-		transform = transform * tr;
 	}
 
 	void Shape::rotate(double angle) {
@@ -99,9 +72,6 @@ namespace canvas {
 		model_mat = glm::translate(model_mat, glm::dvec3(c, 0));
 		model_mat = glm::rotate(model_mat, angle, glm::dvec3(0, 0, 1));
 		model_mat = glm::translate(model_mat, glm::dvec3(-c, 0));
-		transform.translate(c.x, c.y);
-		transform.rotate(angle / kinematics::M_PI * 180);
-		transform.translate(-c.x, -c.y);
 	}
 
 	glm::dvec2 Shape::getCenter() const {

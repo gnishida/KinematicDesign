@@ -11,7 +11,6 @@ namespace canvas {
 
 	Rectangle::Rectangle(const glm::dvec2& point) : Shape() {
 		model_mat = glm::translate(model_mat, glm::dvec3(point, 0));
-		transform.translate(point.x, point.y);
 		width = 0;
 		height = 0;
 	}
@@ -21,9 +20,6 @@ namespace canvas {
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "model_mat") {
 				loadModelMat(params_node);
-			}
-			else if (params_node.toElement().tagName() == "transform") {
-				loadTransform(params_node);
 			}
 			else if (params_node.toElement().tagName() == "params") {
 				width = params_node.toElement().attribute("width").toDouble();
@@ -44,7 +40,7 @@ namespace canvas {
 	void Rectangle::draw(QPainter& painter) const {
 		painter.save();
 
-		painter.setTransform(transform);
+		painter.setTransform(getQTransform());
 
 		if (selected || currently_drawing) {
 			painter.setPen(QPen(QColor(0, 0, 255), 2));
@@ -89,8 +85,6 @@ namespace canvas {
 
 		QDomElement model_mat_node = toModelMatXml(doc);
 		shape_node.appendChild(model_mat_node);
-		QDomElement transform_node = toTransformXml(doc);
-		shape_node.appendChild(transform_node);
 
 		QDomElement params_node = doc.createElement("params");
 		params_node.setAttribute("width", width);
@@ -128,7 +122,12 @@ namespace canvas {
 	void Rectangle::resize(const glm::dvec2& scale, int resize_type) {
 		if (resize_type == RESIZE_TOP_LEFT) {
 			model_mat = glm::translate(model_mat, glm::dvec3(width - width * scale.x, height - height * scale.y, 0));
-			transform.translate(width - width * scale.x, height - height * scale.y);
+		}
+		else if (resize_type == RESIZE_TOP_RIGHT) {
+			model_mat = glm::translate(model_mat, glm::dvec3(0, height - height * scale.y, 0));
+		}
+		else if (resize_type == RESIZE_BOTTOM_LEFT) {
+			model_mat = glm::translate(model_mat, glm::dvec3(width - width * scale.x, 0, 0));
 		}
 		else if (resize_type == RESIZE_BOTTOM_RIGHT) {
 			// do nothing
