@@ -1,12 +1,10 @@
-<design version="1.0" author="Gen Nishida" date="03/25/2017">
-    <layers>
-        <layer>
-            <shape origin_x="0" type="rectangle" origin_y="0">
-                <model_mat m13="0" m30="261" m00="1" m21="0" m22="1" m03="0" m23="0" m02="0" m10="0" m11="1" m20="0" m12="0" m01="0" m31="348" m33="1" m32="0"/>
-                <transform m13="0" m21="0" m22="1" m23="0" m11="1" m12="0" m31="261" m33="1" m32="348"/>
-                <params width="246" height="73"/>
-            </shape>
-        </layer>
-        <layer/>
-    </layers>
+<design version="1.0" date="03/25/2017" author="Gen Nishida">
+    <layer>
+        <shape type="rectangle">
+            <model_mat m20="0" m32="0" m10="0" m31="345" m12="0" m02="0" m00="1" m11="1" m21="0" m33="1" m23="0" m03="0" m01="0" m30="257" m13="0" m22="1"/>
+            <transform m32="345" m31="257" m12="0" m11="1" m21="0" m33="1" m23="0" m13="0" m22="1"/>
+            <params height="89" width="218"/>
+        </shape>
+    </layer>
+    <layer/>
 </design>

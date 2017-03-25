@@ -18,7 +18,6 @@ namespace canvas {
 	protected:
 		bool selected;
 		bool currently_drawing;
-		glm::dvec2 origin;
 		glm::dmat4x4 model_mat;
 		QTransform transform;
 		static QImage rotation_marker;

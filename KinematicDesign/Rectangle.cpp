@@ -5,13 +5,11 @@
 namespace canvas {
 
 	Rectangle::Rectangle() : Shape() {
-		origin = glm::dvec2();
 		width = 0;
 		height = 0;
 	}
 
 	Rectangle::Rectangle(const glm::dvec2& point) : Shape() {
-		origin = glm::dvec2();
 		model_mat = glm::translate(model_mat, glm::dvec3(point, 0));
 		transform.translate(point.x, point.y);
 		width = 0;
@@ -19,15 +17,12 @@ namespace canvas {
 	}
 
 	Rectangle::Rectangle(QDomNode& node) : Shape() {
-		origin.x = node.toElement().attribute("origin_x").toDouble();
-		origin.y = node.toElement().attribute("origin_y").toDouble();
-
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "model_mat") {
 				loadModelMat(params_node);
 			}
-			if (params_node.toElement().tagName() == "transform") {
+			else if (params_node.toElement().tagName() == "transform") {
 				loadTransform(params_node);
 			}
 			else if (params_node.toElement().tagName() == "params") {
@@ -91,8 +86,6 @@ namespace canvas {
 	QDomElement Rectangle::toXml(QDomDocument& doc) const {
 		QDomElement shape_node = doc.createElement("shape");
 		shape_node.setAttribute("type", "rectangle");
-		shape_node.setAttribute("origin_x", origin.x);
-		shape_node.setAttribute("origin_y", origin.y);
 
 		QDomElement model_mat_node = toModelMatXml(doc);
 		shape_node.appendChild(model_mat_node);
