@@ -94,22 +94,15 @@ namespace canvas {
 		selected_shape.reset();
 		mode = MODE_MOVE;
 
-		QDomNode node = root.firstChild();
-		while (!node.isNull()) {
-			if (node.toElement().tagName() == "layers") {
-				QDomNode layer_node = node.firstChild();
-				while (!layer_node.isNull()) {
-					if (layer_node.toElement().tagName() == "layer") {
-						Layer layer;
-						layer.load(layer_node.toElement());
-						layers.push_back(layer);
-					}
-
-					layer_node = layer_node.nextSibling();
-				}
+		QDomNode layer_node = root.firstChild();
+		while (!layer_node.isNull()) {
+			if (layer_node.toElement().tagName() == "layer") {
+				Layer layer;
+				layer.load(layer_node.toElement());
+				layers.push_back(layer);
 			}
 
-			node = node.nextSibling();
+			layer_node = layer_node.nextSibling();
 		}
 
 		// select 1st layer to display
@@ -135,11 +128,9 @@ namespace canvas {
 		doc.appendChild(root);
 
 		// write layers
-		QDomElement layers_node = doc.createElement("layers");
-		root.appendChild(layers_node);
 		for (int i = 0; i < layers.size(); ++i) {
 			QDomElement layer_node = layers[i].toXml(doc);
-			layers_node.appendChild(layer_node);
+			root.appendChild(layer_node);
 		}
 
 		QTextStream out(&file);
