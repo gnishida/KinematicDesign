@@ -19,9 +19,13 @@ namespace canvas {
 		ctrlPressed = false;
 		shiftPressed = false;
 
-		mode = MODE_MOVE;
+		mode = MODE_SELECT;
 		layers.resize(2);
 		layer_id = 0;
+		operation.reset();
+		current_shape.reset();
+
+		history.push(layers);
 
 		animation_timer = NULL;
 		simulation_speed = 0.01;
@@ -31,13 +35,15 @@ namespace canvas {
 	}
 
 	void Canvas::clear() {
-		layers[layer_id].clear();
+		for (int i = 0; i < layers.size(); ++i) {
+			layers[i].clear();
+		}
 		update();
 	}
 
 	void Canvas::selectAll() {
 		layers[layer_id].selectAll();
-		mode = MODE_MOVE;
+		mode = MODE_SELECT;
 		update();
 	}
 
@@ -53,6 +59,24 @@ namespace canvas {
 		update();
 	}
 
+	void Canvas::undo() {
+		try {
+			layers = history.undo();
+			update();
+		}
+		catch (char* ex) {
+		}
+	}
+
+	void Canvas::redo() {
+		try {
+			layers = history.redo();
+			update();
+		}
+		catch (char* ex) {
+		}
+	}
+
 	void Canvas::copySelectedShapes() {
 		layers[layer_id].copySelectedShapes(copied_shapes);
 	}
@@ -60,7 +84,7 @@ namespace canvas {
 	void Canvas::pasteCopiedShapes() {
 		layers[layer_id].pasteCopiedShapes(copied_shapes);
 		current_shape.reset();
-		mode = MODE_MOVE;
+		mode = MODE_SELECT;
 		update();
 	}
 
@@ -94,7 +118,7 @@ namespace canvas {
 		// clear the data
 		layers.clear();
 		selected_shape.reset();
-		mode = MODE_MOVE;
+		mode = MODE_SELECT;
 
 		QDomNode layer_node = root.firstChild();
 		while (!layer_node.isNull()) {
@@ -260,10 +284,11 @@ namespace canvas {
 		// This is necessary to get key event occured even after the user selects a menu.
 		setFocus();
 
-		if (mode == MODE_MOVE) {
+		if (mode == MODE_SELECT) {
 			// hit test for rotation marker
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (glm::length(layers[layer_id].shapes[i]->getRotationMarkerPosition() - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					// start rotating
 					mode = MODE_ROTATION;
 					operation = boost::shared_ptr<Operation>(new RotateOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(layers[layer_id].shapes[i]->getCenter())));
 					selected_shape = layers[layer_id].shapes[i];
@@ -280,6 +305,7 @@ namespace canvas {
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				BoundingBox bbox = layers[layer_id].shapes[i]->boundingBox();
 				if (glm::length(bbox.minPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					// start resizing
 					mode = MODE_RESIZE;
 					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(bbox.maxPt)));
 					selected_shape = layers[layer_id].shapes[i];
@@ -292,6 +318,7 @@ namespace canvas {
 				}
 
 				if (glm::length(glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					// start resizing
 					mode = MODE_RESIZE;
 					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(glm::dvec2(bbox.minPt.x, bbox.maxPt.y))));
 					selected_shape = layers[layer_id].shapes[i];
@@ -304,6 +331,7 @@ namespace canvas {
 				}
 
 				if (glm::length(glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					// start resizing
 					mode = MODE_RESIZE;
 					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(glm::dvec2(bbox.maxPt.x, bbox.minPt.y))));
 					selected_shape = layers[layer_id].shapes[i];
@@ -316,6 +344,7 @@ namespace canvas {
 				}
 
 				if (glm::length(bbox.maxPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
+					// start resizing
 					mode = MODE_RESIZE;
 					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(bbox.minPt)));
 					selected_shape = layers[layer_id].shapes[i];
@@ -331,6 +360,8 @@ namespace canvas {
 			// hit test for the shape
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->hit(glm::dvec2(e->x(), e->y()))) {
+					// start moving
+					mode = MODE_MOVE;
 					operation = boost::shared_ptr<Operation>(new MoveOperation(glm::dvec2(e->x(), e->y())));
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						if (!ctrlPressed) {
@@ -422,8 +453,9 @@ namespace canvas {
 	}
 
 	void Canvas::mouseReleaseEvent(QMouseEvent* e) {
-		if (mode == MODE_ROTATION || mode == MODE_RESIZE) {
-			mode = MODE_MOVE;
+		if (mode == MODE_MOVE || mode == MODE_ROTATION || mode == MODE_RESIZE) {
+			history.push(layers);
+			mode = MODE_SELECT;
 		}
 	}
 
@@ -434,8 +466,10 @@ namespace canvas {
 				current_shape->completeDrawing();
 				current_shape->select();
 				layers[layer_id].shapes.push_back(current_shape);
-				mode = MODE_MOVE;
+				mode = MODE_SELECT;
+				history.push(layers);
 				current_shape.reset();
+				operation.reset();
 				mainWin->ui.actionMove->setChecked(true);
 			}
 		}

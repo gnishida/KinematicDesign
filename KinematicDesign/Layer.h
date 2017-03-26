@@ -13,6 +13,7 @@ namespace canvas {
 		std::vector<boost::shared_ptr<Shape>> shapes;
 
 	public:
+		Layer clone() const;
 		void load(QDomElement& node);
 		void clear();
 		void selectAll();

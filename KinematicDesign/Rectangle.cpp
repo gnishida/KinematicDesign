@@ -33,7 +33,7 @@ namespace canvas {
 	Rectangle::~Rectangle() {
 	}
 
-	boost::shared_ptr<Shape> Rectangle::clone() {
+	boost::shared_ptr<Shape> Rectangle::clone() const {
 		return boost::shared_ptr<Shape>(new Rectangle(*this));
 	}
 

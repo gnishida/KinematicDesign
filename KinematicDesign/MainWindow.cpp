@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
+	connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(onUndo()));
+	connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(onRedo()));
 	connect(ui.actionCopy, SIGNAL(triggered()), this, SLOT(onCopy()));
 	connect(ui.actionPaste, SIGNAL(triggered()), this, SLOT(onPaste()));
 	connect(ui.actionDelete, SIGNAL(triggered()), this, SLOT(onDelete()));
@@ -60,6 +62,14 @@ void MainWindow::onSave() {
 	if (filename.isEmpty()) return;
 
 	canvas->save(filename);
+}
+
+void MainWindow::onUndo() {
+	canvas->undo();
+}
+
+void MainWindow::onRedo() {
+	canvas->redo();
 }
 
 void MainWindow::onCopy() {

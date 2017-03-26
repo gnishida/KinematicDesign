@@ -11,6 +11,7 @@
 #include "Layer.h"
 #include <QTimer>
 #include "Operation.h"
+#include "History.h"
 
 class MainWindow;
 
@@ -20,7 +21,7 @@ namespace canvas {
 		Q_OBJECT
 
 	public:
-		static enum { MODE_MOVE = 0, MODE_ROTATION, MODE_RESIZE, MODE_POLYGON, MODE_RECTANGLE, MODE_CIRCLE };
+		static enum { MODE_SELECT = 0, MODE_MOVE, MODE_ROTATION, MODE_RESIZE, MODE_POLYGON, MODE_RECTANGLE, MODE_CIRCLE };
 
 	private:
 		MainWindow* mainWin;
@@ -34,6 +35,7 @@ namespace canvas {
 		int layer_id;
 		boost::shared_ptr<canvas::Shape> selected_shape;
 		std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
+		History history;
 		
 		kinematics::Kinematics kinematics;
 		QTimer* animation_timer;
@@ -47,6 +49,8 @@ namespace canvas {
 		void selectAll();
 		void unselectAll();
 		void deleteSelectedShapes();
+		void undo();
+		void redo();
 		void copySelectedShapes();
 		void pasteCopiedShapes();
 		void setMode(int mode);

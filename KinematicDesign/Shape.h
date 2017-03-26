@@ -25,7 +25,7 @@ namespace canvas {
 		Shape();
 		~Shape();
 
-		virtual boost::shared_ptr<Shape> clone() = 0;
+		virtual boost::shared_ptr<Shape> clone() const = 0;
 		virtual void draw(QPainter& painter) const = 0;
 		virtual QDomElement toXml(QDomDocument& doc) const = 0;
 		void loadModelMat(QDomNode& node);

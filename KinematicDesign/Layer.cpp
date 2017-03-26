@@ -4,6 +4,14 @@
 
 namespace canvas {
 
+	Layer Layer::clone() const {
+		Layer copied_layer;
+		for (int i = 0; i < shapes.size(); ++i) {
+			copied_layer.shapes.push_back(shapes[i]->clone());
+		}
+		return copied_layer;
+	}
+
 	void Layer::load(QDomElement& node) {
 		QDomNode shape_node = node.firstChild();
 		while (!shape_node.isNull()) {

@@ -34,7 +34,7 @@ namespace canvas {
 	Polygon::~Polygon() {
 	}
 
-	boost::shared_ptr<Shape> Polygon::clone() {
+	boost::shared_ptr<Shape> Polygon::clone() const {
 		return boost::shared_ptr<Shape>(new Polygon(*this));
 	}
 

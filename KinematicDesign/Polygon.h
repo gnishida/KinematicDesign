@@ -16,7 +16,7 @@ namespace canvas {
 		Polygon(QDomNode& node);
 		~Polygon();
 
-		boost::shared_ptr<Shape> clone();
+		boost::shared_ptr<Shape> clone() const;
 		void draw(QPainter& painter) const;
 		QDomElement toXml(QDomDocument& doc) const;
 		void addPoint(const glm::dvec2& point);
