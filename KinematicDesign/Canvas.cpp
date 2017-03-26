@@ -65,9 +65,11 @@ namespace canvas {
 	}
 
 	void Canvas::setMode(int mode) {
-		this->mode = mode;
-		unselectAll();
-		update();
+		if (this->mode != mode) {
+			this->mode = mode;
+			unselectAll();
+			update();
+		}
 	}
 
 	void Canvas::setLayer(int layer_id) {
@@ -332,7 +334,7 @@ namespace canvas {
 					operation = boost::shared_ptr<Operation>(new MoveOperation(glm::dvec2(e->x(), e->y())));
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						if (!ctrlPressed) {
-							// If ctrl is not pressed, then deselect all other shapes.
+							// If CTRL is not pressed, then deselect all other shapes.
 							unselectAll();
 						}
 						layers[layer_id].shapes[i]->select();
