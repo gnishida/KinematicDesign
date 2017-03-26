@@ -119,19 +119,8 @@ namespace canvas {
 	}
 	
 	
-	void Rectangle::resize(const glm::dvec2& scale, int resize_type) {
-		if (resize_type == RESIZE_TOP_LEFT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(width - width * scale.x, height - height * scale.y, 0));
-		}
-		else if (resize_type == RESIZE_TOP_RIGHT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(0, height - height * scale.y, 0));
-		}
-		else if (resize_type == RESIZE_BOTTOM_LEFT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(width - width * scale.x, 0, 0));
-		}
-		else if (resize_type == RESIZE_BOTTOM_RIGHT) {
-			// do nothing
-		}
+	void Rectangle::resize(const glm::dvec2& scale, const glm::dvec2& resize_center) {
+		model_mat = glm::translate(model_mat, glm::dvec3(resize_center.x * (1.0 - scale.x), resize_center.y * (1.0 - scale.y), 0));
 
 		width *= scale.x;
 		height *= scale.y;

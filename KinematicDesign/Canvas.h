@@ -10,6 +10,7 @@
 #include "Shape.h"
 #include "Layer.h"
 #include <QTimer>
+#include "Operation.h"
 
 class MainWindow;
 
@@ -19,7 +20,7 @@ namespace canvas {
 		Q_OBJECT
 
 	public:
-		static enum { MODE_MOVE = 0, MODE_ROTATION, MODE_RESIZE_TOP_LEFT, MODE_RESIZE_TOP_RIGHT, MODE_RESIZE_BOTTOM_LEFT, MODE_RESIZE_BOTTOM_RIGHT, MODE_POLYGON, MODE_RECTANGLE, MODE_CIRCLE };
+		static enum { MODE_MOVE = 0, MODE_ROTATION, MODE_RESIZE, MODE_POLYGON, MODE_RECTANGLE, MODE_CIRCLE };
 
 	private:
 		MainWindow* mainWin;
@@ -27,7 +28,7 @@ namespace canvas {
 		bool shiftPressed;
 
 		int mode;
-		glm::dvec2 prev_mouse_pt;
+		boost::shared_ptr<Operation> operation;
 		boost::shared_ptr<canvas::Shape> current_shape;
 		std::vector<Layer> layers;
 		int layer_id;

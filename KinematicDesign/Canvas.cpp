@@ -259,12 +259,11 @@ namespace canvas {
 		setFocus();
 
 		if (mode == MODE_MOVE) {
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
-
 			// hit test for rotation marker
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (glm::length(layers[layer_id].shapes[i]->getRotationMarkerPosition() - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
 					mode = MODE_ROTATION;
+					operation = boost::shared_ptr<Operation>(new RotateOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(layers[layer_id].shapes[i]->getCenter())));
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -279,7 +278,8 @@ namespace canvas {
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				BoundingBox bbox = layers[layer_id].shapes[i]->boundingBox();
 				if (glm::length(bbox.minPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
-					mode = MODE_RESIZE_TOP_LEFT;
+					mode = MODE_RESIZE;
+					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(bbox.maxPt)));
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -290,7 +290,8 @@ namespace canvas {
 				}
 
 				if (glm::length(glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
-					mode = MODE_RESIZE_TOP_RIGHT;
+					mode = MODE_RESIZE;
+					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(glm::dvec2(bbox.minPt.x, bbox.maxPt.y))));
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -301,7 +302,8 @@ namespace canvas {
 				}
 
 				if (glm::length(glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
-					mode = MODE_RESIZE_BOTTOM_LEFT;
+					mode = MODE_RESIZE;
+					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(glm::dvec2(bbox.maxPt.x, bbox.minPt.y))));
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -312,7 +314,8 @@ namespace canvas {
 				}
 
 				if (glm::length(bbox.maxPt - layers[layer_id].shapes[i]->localCoordinate(glm::dvec2(e->x(), e->y()))) < 10) {
-					mode = MODE_RESIZE_BOTTOM_RIGHT;
+					mode = MODE_RESIZE;
+					operation = boost::shared_ptr<Operation>(new ResizeOperation(glm::dvec2(e->x(), e->y()), layers[layer_id].shapes[i]->worldCoordinate(bbox.minPt)));
 					selected_shape = layers[layer_id].shapes[i];
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						unselectAll();
@@ -326,6 +329,7 @@ namespace canvas {
 			// hit test for the shape
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->hit(glm::dvec2(e->x(), e->y()))) {
+					operation = boost::shared_ptr<Operation>(new MoveOperation(glm::dvec2(e->x(), e->y())));
 					if (!layers[layer_id].shapes[i]->isSelected()) {
 						if (!ctrlPressed) {
 							// If ctrl is not pressed, then deselect all other shapes.
@@ -370,77 +374,41 @@ namespace canvas {
 
 	void Canvas::mouseMoveEvent(QMouseEvent* e) {
 		if (mode == MODE_MOVE) {
-			glm::dvec2 dir = glm::dvec2(e->x(), e->y()) - prev_mouse_pt;
+			boost::shared_ptr<MoveOperation> op = boost::static_pointer_cast<MoveOperation>(operation);
+			glm::dvec2 dir = glm::dvec2(e->x(), e->y()) - op->pivot;
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->isSelected()) {
 					layers[layer_id].shapes[i]->translate(dir);
 				}
 			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
+			op->pivot = glm::dvec2(e->x(), e->y());
 			update();
 		}
 		else if (mode == MODE_ROTATION) {
-			glm::dvec2 dir1 = prev_mouse_pt - selected_shape->worldCoordinate(selected_shape->getCenter());
-			glm::dvec2 dir2 = glm::dvec2(e->x(), e->y()) - selected_shape->worldCoordinate(selected_shape->getCenter());
+			boost::shared_ptr<RotateOperation> op = boost::static_pointer_cast<RotateOperation>(operation);
+			glm::dvec2 dir1 = op->pivot - op->rotation_center;
+			glm::dvec2 dir2 = glm::dvec2(e->x(), e->y()) - op->rotation_center;
 			double theta = atan2(dir2.y, dir2.x) - atan2(dir1.y, dir1.x);
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->isSelected()) {
 					layers[layer_id].shapes[i]->rotate(theta);
 				}
 			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
+			op->pivot = glm::dvec2(e->x(), e->y());
 			update();
 		}
-		else if (mode == MODE_RESIZE_TOP_LEFT) {
-			BoundingBox bbox = selected_shape->boundingBox();
-			glm::dvec2 dir1 = bbox.minPt - bbox.maxPt;
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - bbox.maxPt;
+		else if (mode == MODE_RESIZE) {
+			boost::shared_ptr<ResizeOperation> op = boost::static_pointer_cast<ResizeOperation>(operation);
+			glm::dvec2 resize_center = selected_shape->localCoordinate(op->resize_center);
+			glm::dvec2 dir1 = selected_shape->localCoordinate(op->pivot) - resize_center;
+			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - resize_center;
 			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
 			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
 				if (layers[layer_id].shapes[i]->isSelected()) {
-					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_TOP_LEFT);
+					layers[layer_id].shapes[i]->resize(scale, resize_center);
 				}
 			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
-			update();
-		}
-		else if (mode == MODE_RESIZE_TOP_RIGHT) {
-			BoundingBox bbox = selected_shape->boundingBox();
-			glm::dvec2 dir1 = glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - glm::dvec2(bbox.minPt.x, bbox.maxPt.y);
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - glm::dvec2(bbox.minPt.x, bbox.maxPt.y);
-			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
-			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
-				if (layers[layer_id].shapes[i]->isSelected()) {
-					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_TOP_RIGHT);
-				}
-			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
-			update();
-		}
-		else if (mode == MODE_RESIZE_BOTTOM_LEFT) {
-			BoundingBox bbox = selected_shape->boundingBox();
-			glm::dvec2 dir1 = glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - glm::dvec2(bbox.maxPt.x, bbox.minPt.y);
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - glm::dvec2(bbox.maxPt.x, bbox.minPt.y);
-			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
-			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
-				if (layers[layer_id].shapes[i]->isSelected()) {
-					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_BOTTOM_LEFT);
-				}
-			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
-			update();
-		}
-		else if (mode == MODE_RESIZE_BOTTOM_RIGHT) {
-			BoundingBox bbox = selected_shape->boundingBox();
-			glm::dvec2 dir1 = bbox.maxPt - bbox.minPt;
-			glm::dvec2 dir2 = selected_shape->localCoordinate(glm::dvec2(e->x(), e->y())) - bbox.minPt;
-			glm::dvec2 scale(dir2.x / dir1.x, dir2.y / dir1.y);
-			for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
-				if (layers[layer_id].shapes[i]->isSelected()) {
-					layers[layer_id].shapes[i]->resize(scale, Shape::RESIZE_BOTTOM_RIGHT);
-				}
-			}
-			prev_mouse_pt = glm::dvec2(e->x(), e->y());
+			op->pivot = glm::dvec2(e->x(), e->y());
 			update();
 		}
 		else if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
@@ -452,7 +420,7 @@ namespace canvas {
 	}
 
 	void Canvas::mouseReleaseEvent(QMouseEvent* e) {
-		if (mode == MODE_ROTATION || mode == MODE_RESIZE_TOP_LEFT || mode == MODE_RESIZE_TOP_RIGHT || mode == MODE_RESIZE_BOTTOM_LEFT || mode == MODE_RESIZE_BOTTOM_RIGHT) {
+		if (mode == MODE_ROTATION || mode == MODE_RESIZE) {
 			mode = MODE_MOVE;
 		}
 	}

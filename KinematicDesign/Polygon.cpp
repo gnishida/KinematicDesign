@@ -124,25 +124,14 @@ namespace canvas {
 		return kinematics::pointWithinPolygon(pt, points);
 	}
 		
-	void Polygon::resize(const glm::dvec2& scale, int resize_type) {
+	void Polygon::resize(const glm::dvec2& scale, const glm::dvec2& resize_center) {
 		BoundingBox bbox = boundingBox();
-
-		if (resize_type == RESIZE_TOP_LEFT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(bbox.width() - bbox.width() * scale.x, bbox.height() - bbox.height() * scale.y, 0));
-		}
-		else if (resize_type == RESIZE_TOP_RIGHT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(0, bbox.height() - bbox.height() * scale.y, 0));
-		}
-		else if (resize_type == RESIZE_BOTTOM_LEFT) {
-			model_mat = glm::translate(model_mat, glm::dvec3(bbox.width() - bbox.width() * scale.x, 0, 0));
-		}
-		else if (resize_type == RESIZE_BOTTOM_RIGHT) {
-			// do nothing
-		}
-
+		glm::dvec2 offset(resize_center.x * (1.0 - scale.x), resize_center.y * (1.0 - scale.y));
+		model_mat = glm::translate(model_mat, glm::dvec3(offset, 0));
+				
 		for (int i = 0; i < points.size(); ++i) {
-			points[i].x = (points[i].x - bbox.minPt.x) * scale.x + bbox.minPt.x;
-			points[i].y = (points[i].y - bbox.minPt.y) * scale.y + bbox.minPt.y;
+			points[i].x = (points[i].x - resize_center.x) * scale.x + resize_center.x - offset.x;
+			points[i].y = (points[i].y - resize_center.y) * scale.y + resize_center.y - offset.y;
 		}
 	}
 

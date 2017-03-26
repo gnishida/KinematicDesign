@@ -176,6 +176,7 @@
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Operation.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Rectangle.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="..\kinematics\Utils.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="Operation.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Rectangle.h" />
