@@ -6,7 +6,7 @@
 namespace kinematics {
 
 	class Gear : public Joint {
-	private:
+	public:
 		glm::dvec2 center;
 		double radius;
 		double speed;
@@ -14,11 +14,10 @@ namespace kinematics {
 		double prev_phase;
 
 	public:
-		Gear(int id, const glm::dvec2& pos, double radius, double speed, double phase);
+		Gear(int id, bool ground, const glm::dvec2& pos, double radius, double speed, double phase);
+		Gear(const glm::dvec2& pos, double radius, double speed, double phase);
 		Gear(QDomElement& node);
 
-		void saveState();
-		void restoreState();
 		void draw(QPainter& painter);
 		void stepForward(double step_size);
 		bool forwardKinematics();

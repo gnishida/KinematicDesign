@@ -111,6 +111,14 @@ namespace canvas {
 		current_point = point;
 	}
 
+	std::vector<glm::dvec2> Polygon::getPoints() const {
+		std::vector<glm::dvec2> pts;
+		for (int i = 0; i < points.size(); ++i) {
+			pts.push_back(worldCoordinate(points[i]));
+		}
+		return pts;
+	}
+
 	void Polygon::updateByNewPoint(const glm::dvec2& point) {
 		current_point = point;
 	}

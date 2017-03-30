@@ -11,6 +11,8 @@
 #include "Rectangle.h"
 #include "Polygon.h"
 #include "MainWindow.h"
+#include "PinJoint.h"
+#include "LinkageSolver.h"
 
 namespace canvas {
 
@@ -38,6 +40,9 @@ namespace canvas {
 		for (int i = 0; i < layers.size(); ++i) {
 			layers[i].clear();
 		}
+		selected_shape.reset();
+		initial_diagrams.clear();
+		kinematics.diagram.clear();
 		update();
 	}
 
@@ -105,9 +110,20 @@ namespace canvas {
 		}
 	}
 
+	void Canvas::initialKinematicDiagram() {
+		initial_diagrams = kinematics::LinkageSolver::initialKinematicDiagram(layers);
+		update();
+	}
+
+	void Canvas::solveInverse() {
+		kinematics.diagram = kinematics::LinkageSolver::solve(initial_diagrams);
+		initial_diagrams.clear();
+		update();
+	}
+
 	void Canvas::open(const QString& filename) {
 		QFile file(filename);
-		if (!file.open(QFile::ReadOnly | QFile::Text)) throw "Fild cannot open.";
+		if (!file.open(QFile::ReadOnly | QFile::Text)) throw "File cannot open.";
 
 		QDomDocument doc;
 		doc.setContent(&file);
@@ -118,6 +134,8 @@ namespace canvas {
 		// clear the data
 		layers.clear();
 		selected_shape.reset();
+		initial_diagrams.clear();
+		kinematics.diagram.clear();
 		mode = MODE_SELECT;
 
 		QDomNode layer_node = root.firstChild();
@@ -261,6 +279,21 @@ namespace canvas {
 			}
 		}
 
+		// draw diagrams
+		painter.setPen(QPen(QColor(0, 0, 0, 255), 3));
+		painter.setBrush(QColor(0, 0, 0, 255));
+		for (int l = 0; l < initial_diagrams.size(); ++l) {
+			if (l == layer_id) continue;
+			for (int j = 0; j < initial_diagrams[l].links.size(); ++j) {
+				QPolygonF polygon;
+				for (int k = 0; k < initial_diagrams[l].links[j]->joints.size(); ++k) {
+					polygon.push_back(QPointF(initial_diagrams[l].links[j]->joints[k]->pos.x, 800 - initial_diagrams[l].links[j]->joints[k]->pos.y));
+					painter.drawEllipse(QPointF(initial_diagrams[l].links[j]->joints[k]->pos.x, 800 - initial_diagrams[l].links[j]->joints[k]->pos.y), 4, 4);
+				}
+				painter.drawPolygon(polygon);
+			}
+		}
+
 		painter.setPen(QColor(255, 255, 255, 160));
 		painter.setBrush(QColor(255, 255, 255, 160));
 		painter.drawRect(0, 0, width(), height());
@@ -274,6 +307,31 @@ namespace canvas {
 		if (mode == MODE_RECTANGLE || mode == MODE_POLYGON) {
 			if (current_shape) {
 				current_shape->draw(painter);
+			}
+		}
+
+		// draw initial diagrams
+		if (initial_diagrams.size() > 0) {
+			for (int j = 0; j < initial_diagrams[layer_id].links.size(); ++j) {
+				QPolygonF polygon;
+				for (int k = 0; k < initial_diagrams[layer_id].links[j]->joints.size(); ++k) {
+					polygon.push_back(QPointF(initial_diagrams[layer_id].links[j]->joints[k]->pos.x, 800 - initial_diagrams[layer_id].links[j]->joints[k]->pos.y));
+				}
+				painter.setPen(QPen(QColor(0, 0, 0, 255), 3));
+				painter.setBrush(QColor(0, 0, 0, 0));
+				painter.drawPolygon(polygon);
+
+				for (int k = 0; k < initial_diagrams[layer_id].links[j]->joints.size(); ++k) {
+					if (initial_diagrams[layer_id].links[j]->joints[k]->ground) {
+						painter.setPen(QPen(QColor(0, 0, 255, 255), 3));
+						painter.setBrush(QColor(0, 0, 255, 255));
+					}
+					else {
+						painter.setPen(QPen(QColor(0, 0, 0, 255), 3));
+						painter.setBrush(QColor(0, 0, 0, 255));
+					}
+					painter.drawEllipse(QPointF(initial_diagrams[layer_id].links[j]->joints[k]->pos.x, 800 - initial_diagrams[layer_id].links[j]->joints[k]->pos.y), 4, 4);
+				}
 			}
 		}
 

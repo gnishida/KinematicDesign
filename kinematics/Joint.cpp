@@ -1,9 +1,9 @@
 #include "Joint.h"
+#include "Link.h"
 
 namespace kinematics {
 
 	Joint::Joint() {
-		driver = false;
 		ground = false;
 		determined = false;
 	}

@@ -98,6 +98,15 @@ namespace canvas {
 		// do nothing
 	}
 
+	std::vector<glm::dvec2> Rectangle::getPoints() const {
+		std::vector<glm::dvec2> points;
+		points.push_back(worldCoordinate(glm::dvec2(0, 0)));
+		points.push_back(worldCoordinate(glm::dvec2(width, 0)));
+		points.push_back(worldCoordinate(glm::dvec2(width, height)));
+		points.push_back(worldCoordinate(glm::dvec2(0, height)));
+		return points;
+	}
+
 	void Rectangle::updateByNewPoint(const glm::dvec2& point) {
 		width = point.x;
 		height = point.y;

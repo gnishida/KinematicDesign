@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <boost/shared_ptr.hpp>
 #include <Kinematics.h>
+#include "KinematicDiagram.h"
 #include "Utils.h"
 #include "Shape.h"
 #include "Layer.h"
@@ -36,7 +37,9 @@ namespace canvas {
 		boost::shared_ptr<canvas::Shape> selected_shape;
 		std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
 		History history;
-		
+
+		std::vector<kinematics::KinematicDiagram> initial_diagrams;
+
 		kinematics::Kinematics kinematics;
 		QTimer* animation_timer;
 		float simulation_speed;
@@ -55,6 +58,8 @@ namespace canvas {
 		void pasteCopiedShapes();
 		void setMode(int mode);
 		void setLayer(int layer_id);
+		void initialKinematicDiagram();
+		void solveInverse();
 		void open(const QString& filename);
 		void save(const QString& filename);
 		void run();

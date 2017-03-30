@@ -4,7 +4,13 @@
 
 namespace kinematics {
 
-	Link::Link(bool driver) {
+	Link::Link(int id) {
+		this->id = id;
+		this->driver = false;
+	}
+
+	Link::Link(int id, bool driver) {
+		this->id = id;
 		this->driver = driver;
 	}
 
@@ -18,9 +24,18 @@ namespace kinematics {
 		else return false;
 	}
 
+	bool Link::isGrounded() {
+		int count = 0;
+		for (int i = 0; i < joints.size(); ++i) {
+			if (joints[i]->ground) count++;
+		}
+
+		if (count >= 2) return true;
+		else return false;
+	}
+
 	void Link::addJoint(boost::shared_ptr<Joint> joint) {
 		joints.push_back(joint);
-		original_shape[joint->id] = joint->pos;
 	}
 
 	void Link::rotate(const glm::dvec2& rotation_center, double angle) {

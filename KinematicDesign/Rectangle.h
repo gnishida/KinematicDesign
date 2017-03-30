@@ -21,6 +21,7 @@ namespace canvas {
 		void draw(QPainter& painter) const;
 		QDomElement toXml(QDomDocument& doc) const;
 		void addPoint(const glm::dvec2& point);
+		std::vector<glm::dvec2> getPoints() const;
 		void updateByNewPoint(const glm::dvec2& point);
 		bool hit(const glm::dvec2& point) const;
 		void resize(const glm::dvec2& scale, const glm::dvec2& resize_center);

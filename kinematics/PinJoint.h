@@ -7,11 +7,11 @@ namespace kinematics {
 
 	class PinJoint : public Joint {
 	public:
-		PinJoint(int id, const glm::dvec2& pos);
+		PinJoint(const glm::dvec2& pos);
+		PinJoint(bool ground, const glm::dvec2& pos);
+		PinJoint(int id, bool ground, const glm::dvec2& pos);
 		PinJoint(QDomElement& node);
 
-		void saveState();
-		void restoreState();
 		void draw(QPainter& painter);
 		void stepForward(double step_size);
 		bool forwardKinematics();

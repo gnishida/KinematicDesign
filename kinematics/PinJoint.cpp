@@ -4,27 +4,33 @@
 
 namespace kinematics {
 
-	PinJoint::PinJoint(int id, const glm::dvec2& pos) : Joint() {
+	PinJoint::PinJoint(const glm::dvec2& pos) : Joint() {
+		this->id = -1;
+		this->type = TYPE_PIN;
+		this->ground = false;
+		this->pos = pos;
+	}
+
+	PinJoint::PinJoint(bool ground, const glm::dvec2& pos) : Joint() {
+		this->id = -1;
+		this->type = TYPE_PIN;
+		this->ground = ground;
+		this->pos = pos;
+	}
+
+	PinJoint::PinJoint(int id, bool ground, const glm::dvec2& pos) : Joint() {
 		this->id = id;
 		this->type = TYPE_PIN;
+		this->ground = ground;
 		this->pos = pos;
 	}
 
 	PinJoint::PinJoint(QDomElement& node) : Joint() {
 		id = node.attribute("id").toInt();
 		this->type = TYPE_PIN;
-		this->driver = node.attribute("driver").toLower() == "true";
 		this->ground = node.attribute("ground").toLower() == "true";
 		pos.x = node.attribute("x").toDouble();
 		pos.y = node.attribute("y").toDouble();
-	}
-
-	void PinJoint::saveState() {
-		prev_pos = pos;
-	}
-
-	void PinJoint::restoreState() {
-		pos = prev_pos;
 	}
 
 	void PinJoint::draw(QPainter& painter) {
@@ -36,12 +42,14 @@ namespace kinematics {
 	}
 
 	void PinJoint::stepForward(double step_size) {
-		for (int i = 0; i < links.size(); ++i) {
-			if (links[i]->driver) {
-				links[i]->rotate(pos, step_size);
+		if (ground) {
+			for (int i = 0; i < links.size(); ++i) {
+				if (links[i]->driver) {
+					links[i]->rotate(pos, step_size);
+				}
 			}
+			determined = true;
 		}
-		determined = true;
 	}
 
 	/**

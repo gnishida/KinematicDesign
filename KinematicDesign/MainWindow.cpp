@@ -33,6 +33,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionLayer1, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
 	connect(ui.actionLayer2, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
+	connect(ui.actionInitialKinematicDiagram, SIGNAL(triggered()), this, SLOT(onInitialKinematicDiagram()));
+	connect(ui.actionSolveInverse, SIGNAL(triggered()), this, SLOT(onSolveInverse()));
+	connect(ui.actionRun, SIGNAL(triggered()), this, SLOT(onRun()));
+	connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(onStop()));
+	connect(ui.actionStepForward, SIGNAL(triggered()), this, SLOT(onStepForward()));
+	connect(ui.actionStepBackward, SIGNAL(triggered()), this, SLOT(onStepBackward()));
 }
 
 MainWindow::~MainWindow() {
@@ -108,4 +114,28 @@ void MainWindow::onLayerChanged() {
 	else if (ui.actionLayer2->isChecked()) {
 		canvas->setLayer(1);
 	}
+}
+
+void MainWindow::onInitialKinematicDiagram() {
+	canvas->initialKinematicDiagram();
+}
+
+void MainWindow::onSolveInverse() {
+	canvas->solveInverse();
+}
+
+void MainWindow::onRun() {
+	canvas->run();
+}
+
+void MainWindow::onStop() {
+	canvas->stop();
+}
+
+void MainWindow::onStepForward() {
+	canvas->stepForward();
+}
+
+void MainWindow::onStepBackward() {
+	canvas->stepBackward();
 }

@@ -41,12 +41,19 @@ public:
     QAction *actionSave;
     QAction *actionLayer1;
     QAction *actionLayer2;
+    QAction *actionInitialKinematicDiagram;
+    QAction *actionSolveInverse;
+    QAction *actionRun;
+    QAction *actionStop;
+    QAction *actionStepForward;
+    QAction *actionStepBackward;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuMode;
     QMenu *menuEdit;
     QMenu *menuLayer;
+    QMenu *menuTool;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -90,6 +97,18 @@ public:
         actionLayer2 = new QAction(MainWindowClass);
         actionLayer2->setObjectName(QStringLiteral("actionLayer2"));
         actionLayer2->setCheckable(true);
+        actionInitialKinematicDiagram = new QAction(MainWindowClass);
+        actionInitialKinematicDiagram->setObjectName(QStringLiteral("actionInitialKinematicDiagram"));
+        actionSolveInverse = new QAction(MainWindowClass);
+        actionSolveInverse->setObjectName(QStringLiteral("actionSolveInverse"));
+        actionRun = new QAction(MainWindowClass);
+        actionRun->setObjectName(QStringLiteral("actionRun"));
+        actionStop = new QAction(MainWindowClass);
+        actionStop->setObjectName(QStringLiteral("actionStop"));
+        actionStepForward = new QAction(MainWindowClass);
+        actionStepForward->setObjectName(QStringLiteral("actionStepForward"));
+        actionStepBackward = new QAction(MainWindowClass);
+        actionStepBackward->setObjectName(QStringLiteral("actionStepBackward"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -104,6 +123,8 @@ public:
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
         menuLayer = new QMenu(menuBar);
         menuLayer->setObjectName(QStringLiteral("menuLayer"));
+        menuTool = new QMenu(menuBar);
+        menuTool->setObjectName(QStringLiteral("menuTool"));
         MainWindowClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindowClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -116,6 +137,7 @@ public:
         menuBar->addAction(menuEdit->menuAction());
         menuBar->addAction(menuMode->menuAction());
         menuBar->addAction(menuLayer->menuAction());
+        menuBar->addAction(menuTool->menuAction());
         menuFile->addAction(actionNew);
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
@@ -135,6 +157,14 @@ public:
         menuEdit->addAction(actionSelectAll);
         menuLayer->addAction(actionLayer1);
         menuLayer->addAction(actionLayer2);
+        menuTool->addAction(actionInitialKinematicDiagram);
+        menuTool->addAction(actionSolveInverse);
+        menuTool->addSeparator();
+        menuTool->addAction(actionRun);
+        menuTool->addAction(actionStop);
+        menuTool->addSeparator();
+        menuTool->addAction(actionStepForward);
+        menuTool->addAction(actionStepBackward);
 
         retranslateUi(MainWindowClass);
 
@@ -168,10 +198,19 @@ public:
         actionSave->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+S", 0));
         actionLayer1->setText(QApplication::translate("MainWindowClass", "Layer 1", 0));
         actionLayer2->setText(QApplication::translate("MainWindowClass", "Layer 2", 0));
+        actionInitialKinematicDiagram->setText(QApplication::translate("MainWindowClass", "Initial Kinematic Diagram", 0));
+        actionSolveInverse->setText(QApplication::translate("MainWindowClass", "Solve Inverse", 0));
+        actionRun->setText(QApplication::translate("MainWindowClass", "Run", 0));
+        actionStop->setText(QApplication::translate("MainWindowClass", "Stop", 0));
+        actionStepForward->setText(QApplication::translate("MainWindowClass", "Step Forward", 0));
+        actionStepForward->setShortcut(QApplication::translate("MainWindowClass", "Right", 0));
+        actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", 0));
+        actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
         menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", 0));
+        menuTool->setTitle(QApplication::translate("MainWindowClass", "Tool", 0));
     } // retranslateUi
 
 };

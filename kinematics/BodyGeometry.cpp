@@ -38,11 +38,11 @@ namespace kinematics {
 		painter.setPen(QPen(QColor(0, 0, 0), 1));
 		painter.setBrush(QBrush(QColor(0, 255, 0, 60)));
 		std::vector<glm::dvec2> actual_points = getActualPoints();
-		std::vector<QPointF> pts;
+		QPolygonF pts;
 		for (int k = 0; k < actual_points.size(); ++k) {
 			pts.push_back(QPointF(actual_points[k].x, 800 - actual_points[k].y));
 		}
-		painter.drawPolygon(pts.data(), pts.size());
+		painter.drawPolygon(pts);
 
 		painter.restore();
 

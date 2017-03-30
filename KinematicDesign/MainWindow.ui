@@ -62,10 +62,24 @@
     <addaction name="actionLayer1"/>
     <addaction name="actionLayer2"/>
    </widget>
+   <widget class="QMenu" name="menuTool">
+    <property name="title">
+     <string>Tool</string>
+    </property>
+    <addaction name="actionInitialKinematicDiagram"/>
+    <addaction name="actionSolveInverse"/>
+    <addaction name="separator"/>
+    <addaction name="actionRun"/>
+    <addaction name="actionStop"/>
+    <addaction name="separator"/>
+    <addaction name="actionStepForward"/>
+    <addaction name="actionStepBackward"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuMode"/>
    <addaction name="menuLayer"/>
+   <addaction name="menuTool"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -191,6 +205,42 @@
    </property>
    <property name="text">
     <string>Layer 2</string>
+   </property>
+  </action>
+  <action name="actionInitialKinematicDiagram">
+   <property name="text">
+    <string>Initial Kinematic Diagram</string>
+   </property>
+  </action>
+  <action name="actionSolveInverse">
+   <property name="text">
+    <string>Solve Inverse</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="text">
+    <string>Run</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionStepForward">
+   <property name="text">
+    <string>Step Forward</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
+  </action>
+  <action name="actionStepBackward">
+   <property name="text">
+    <string>Step Backward</string>
+   </property>
+   <property name="shortcut">
+    <string>Left</string>
    </property>
   </action>
  </widget>

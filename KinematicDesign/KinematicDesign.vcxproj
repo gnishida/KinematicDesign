@@ -140,6 +140,7 @@
     <ClCompile Include="..\kinematics\BodyGeometry.cpp" />
     <ClCompile Include="..\kinematics\Gear.cpp" />
     <ClCompile Include="..\kinematics\Joint.cpp" />
+    <ClCompile Include="..\kinematics\KinematicDiagram.cpp" />
     <ClCompile Include="..\kinematics\Kinematics.cpp" />
     <ClCompile Include="..\kinematics\Link.cpp" />
     <ClCompile Include="..\kinematics\PinJoint.cpp" />
@@ -175,6 +176,7 @@
     </ClCompile>
     <ClCompile Include="History.cpp" />
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="LinkageSolver.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Operation.cpp" />
@@ -227,6 +229,7 @@
     <ClInclude Include="..\kinematics\BodyGeometry.h" />
     <ClInclude Include="..\kinematics\Gear.h" />
     <ClInclude Include="..\kinematics\Joint.h" />
+    <ClInclude Include="..\kinematics\KinematicDiagram.h" />
     <ClInclude Include="..\kinematics\Kinematics.h" />
     <ClInclude Include="..\kinematics\Link.h" />
     <ClInclude Include="..\kinematics\PinJoint.h" />
@@ -235,6 +238,7 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="LinkageSolver.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Polygon.h" />

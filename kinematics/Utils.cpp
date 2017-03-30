@@ -111,6 +111,36 @@ namespace kinematics {
 		}
 	}
 
+	glm::dvec2 lineLineIntersection(const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, const glm::dvec2& p4) {
+		glm::dvec2 u = p2 - p1;
+		glm::dvec2 v = p4 - p3;
+
+		if (glm::length(u) == 0 || glm::length(v) == 0) {
+			throw "No intersection";
+		}
+
+		double numer = v.x * (p3.y - p1.y) + v.y * (p1.x - p3.x);
+		double denom = u.y * v.x - u.x * v.y;
+
+		if (denom == 0.0)  {
+			throw "Non intersection";
+		}
+
+		double t0 = numer / denom;
+
+		glm::dvec2 ipt = p1 + t0 * u;
+		glm::dvec2 tmp = ipt - p3;
+		double t1;
+		if (glm::dot(tmp, v) > 0.0) {
+			t1 = glm::length(tmp) / glm::length(v);
+		}
+		else {
+			t1 = -1.0 * glm::length(tmp) / glm::length(v);
+		}
+
+		return p1 + (p2 - p1) * t0;
+	}
+
 	bool polygonPolygonIntersection(const std::vector<glm::dvec2>& polygon1, const std::vector<glm::dvec2>& polygon2) {
 		// make the polygons closed
 		std::vector<glm::dvec2> closed_polygon1 = polygon1;

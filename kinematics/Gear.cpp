@@ -4,9 +4,21 @@
 
 namespace kinematics {
 
-	Gear::Gear(int id, const glm::dvec2& center, double radius, double speed, double phase) : Joint() {
+	Gear::Gear(int id, bool ground, const glm::dvec2& center, double radius, double speed, double phase) : Joint() {
 		this->id = id;
 		this->type = TYPE_GEAR;
+		this->ground = ground;
+		this->center = center;
+		this->radius = radius;
+		this->speed = speed;
+		this->phase = phase;
+		this->pos = center + glm::dvec2(cos(phase), sin(phase)) * radius;
+	}
+
+	Gear::Gear(const glm::dvec2& pos, double radius, double speed, double phase) {
+		this->id = -1;
+		this->type = TYPE_GEAR;
+		this->ground = false;
 		this->center = center;
 		this->radius = radius;
 		this->speed = speed;
@@ -17,7 +29,6 @@ namespace kinematics {
 	Gear::Gear(QDomElement& node) : Joint() {
 		id = node.attribute("id").toInt();
 		type = TYPE_GEAR;
-		this->driver = node.attribute("driver").toLower() == "true";
 		this->ground = node.attribute("ground").toLower() == "true";
 		center.x = node.attribute("x").toDouble();
 		center.y = node.attribute("y").toDouble();
@@ -25,16 +36,6 @@ namespace kinematics {
 		speed = node.attribute("speed").toDouble();
 		phase = node.attribute("phase").toDouble();
 		pos = center + glm::dvec2(cos(phase), sin(phase)) * radius;
-	}
-
-	void Gear::saveState() {
-		prev_pos = pos;
-		prev_phase = phase;
-	}
-
-	void Gear::restoreState() {
-		pos = prev_pos;
-		phase = prev_phase;
 	}
 
 	void Gear::draw(QPainter& painter) {

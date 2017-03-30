@@ -17,18 +17,14 @@ namespace kinematics {
 	public:
 		int id;
 		int type;
-		bool driver;
 		bool ground;
 		glm::dvec2 pos;
-		glm::dvec2 prev_pos;
 		std::vector<boost::shared_ptr<Link>> links;
 		bool determined;
 
 	public:
 		Joint();
 
-		virtual void saveState() = 0;
-		virtual void restoreState() = 0;
 		void rotate(const glm::dvec2& rotation_center, double angle);
 		virtual void draw(QPainter& painter) = 0;
 		virtual void stepForward(double step_size) = 0;

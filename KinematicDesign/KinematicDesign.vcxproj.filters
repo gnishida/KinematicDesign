@@ -110,6 +110,12 @@
     <ClCompile Include="History.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LinkageSolver.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\KinematicDiagram.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -176,6 +182,12 @@
     </ClInclude>
     <ClInclude Include="History.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkageSolver.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\KinematicDiagram.h">
+      <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
