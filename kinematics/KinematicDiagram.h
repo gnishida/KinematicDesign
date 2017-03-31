@@ -15,6 +15,9 @@ namespace kinematics {
 		QMap<int, boost::shared_ptr<Joint>> joints;
 		QMap<int, boost::shared_ptr<Link>> links;
 		std::vector<boost::shared_ptr<BodyGeometry>> bodies;
+		double driver_angle;
+		double driver_angle_min;
+		double driver_angle_max;
 
 	public:
 		KinematicDiagram();

@@ -11,6 +11,9 @@
 namespace kinematics {
 
 	KinematicDiagram::KinematicDiagram() {
+		driver_angle = 0.0;
+		driver_angle_min = 0.0;
+		driver_angle_max = 0.0;
 	}
 
 
@@ -64,6 +67,11 @@ namespace kinematics {
 			copied_diagram.bodies.push_back(body);
 		}
 
+		// copy driver angle
+		copied_diagram.driver_angle = driver_angle;
+		copied_diagram.driver_angle_min = driver_angle_min;
+		copied_diagram.driver_angle_max = driver_angle_max;
+
 		copied_diagram.initialize();
 
 		return copied_diagram;
@@ -84,7 +92,10 @@ namespace kinematics {
 			}
 		}
 
+		// set the parts adjacency
 		updateBodyAdjacency();
+
+		driver_angle = 0.0;
 	}
 
 	void KinematicDiagram::addJoint(boost::shared_ptr<Joint> joint) {

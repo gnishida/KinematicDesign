@@ -116,9 +116,15 @@ namespace canvas {
 	}
 
 	void Canvas::solveInverse() {
-		kinematics.diagram = kinematics::LinkageSolver::solve(initial_diagrams);
-		initial_diagrams.clear();
-		update();
+		try {
+			//kinematics.diagram = kinematics::LinkageSolver::solve(initial_diagrams);
+			kinematics.diagram = kinematics::LinkageSolver::optimize(initial_diagrams);
+			initial_diagrams.clear();
+			update();
+		}
+		catch (char* ex) {
+			std::cout << ex << std::endl;
+		}
 	}
 
 	void Canvas::open(const QString& filename) {

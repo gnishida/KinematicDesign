@@ -1,6 +1,15 @@
 #include "Utils.h"
+#include <random>
 
 namespace kinematics {
+
+	double genRand() {
+		return rand() / (float(RAND_MAX) + 1);
+	}
+
+	double genRand(double a, double b) {
+		return genRand() * (b - a) + a;
+	}
 
 	glm::dvec2 rotatePoint(const glm::dvec2& pt, double angle) {
 		return glm::dvec2(cos(angle) * pt.x - sin(angle) * pt.y, sin(angle) * pt.x + cos(angle) * pt.y);

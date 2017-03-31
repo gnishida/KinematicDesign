@@ -13,6 +13,9 @@ namespace kinematics {
 	const double M_PI = 3.14159265;
 	const double TOL = 0.0000001;
 
+	double genRand();
+	double genRand(double a, double b);
+
 	glm::dvec2 rotatePoint(const glm::dvec2& pt, double angle);
 	glm::dvec2 rotatePoint(const glm::dvec2& pt, double angle, const glm::dvec2& rotation_center);
 	glm::dvec2 circleCircleIntersection(const glm::dvec2& center1, double radius1, const glm::dvec2& center2, double radius);

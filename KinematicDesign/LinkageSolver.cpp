@@ -3,6 +3,7 @@
 #include "Link.h"
 #include "BoundingBox.h"
 #include "Utils.h"
+#include "Kinematics.h"
 
 namespace kinematics {
 
@@ -124,16 +125,38 @@ namespace kinematics {
 		}
 
 		// check if the link has only one ground-attached joint, which indicats that the link is a driver
+		std::vector<double> angles;
 		for (int s = 0; s < 2; ++s) {
 			for (int l = 0; l < initial_diagrams[s].links.size(); ++l) {
 				int ground_joint_count = 0;
+				boost::shared_ptr<Joint> ground_joint;
 				for (int j = 0; j < initial_diagrams[s].links[l]->joints.size(); ++j) {
 					if (initial_diagrams[s].links[l]->joints[j]->ground) {
 						ground_joint_count++;
+						ground_joint = initial_diagrams[s].links[l]->joints[j];
 					}
 				}
+
 				if (ground_joint_count == 1) {
 					initial_diagrams[s].links[l]->driver = true;
+					
+					// find another joint
+					boost::shared_ptr<Joint> non_ground_joint;
+					double max_dist = 0;
+					for (int j = 0; j < initial_diagrams[s].links[l]->joints.size(); ++j) {
+						if (initial_diagrams[s].links[l]->joints[j]->id == ground_joint->id) continue;
+
+						double dist = glm::length(initial_diagrams[s].links[l]->joints[j]->pos - ground_joint->pos);
+						if (dist > max_dist) {
+							max_dist = dist;
+							non_ground_joint = initial_diagrams[s].links[l]->joints[j];
+						}
+					}
+					
+					// calcuate angle
+					glm::dvec2 vec = non_ground_joint->pos - ground_joint->pos;
+					double angle = atan2(vec.y, vec.x);
+					angles.push_back(angle);
 
 					// We have to have only one driving link, so once we find one, we break.
 					break;
@@ -141,19 +164,11 @@ namespace kinematics {
 			}
 		}
 
-		// HACK???
-		// remove the joint that has only one link
-		/*
-		for (int s = 0; s < 2; ++s) {
-			for (int i = 0; i < initial_diagrams[s].joints.size(); ++i) {
-				if (initial_diagrams[s].joints[i]->ground) continue;
-
-				if (initial_diagrams[s].joints[i]->links.size() <= 1) {
-					initial_diagrams[s].removeJoint(initial_diagrams[s].joints[i]);
-				}
-			}
-		}
-		*/
+		// calculate the range of the angle for the driver
+		initial_diagrams[0].driver_angle_min = angles[0];
+		initial_diagrams[0].driver_angle_max = angles[0];
+		initial_diagrams[1].driver_angle_min = angles[1];
+		initial_diagrams[1].driver_angle_max = angles[1];
 
 		return initial_diagrams;
 	}
@@ -263,7 +278,7 @@ namespace kinematics {
 		return min_length;
 	}
 
-	KinematicDiagram LinkageSolver::solve(std::vector<KinematicDiagram> initial_diagrams) {
+	KinematicDiagram LinkageSolver::solve(std::vector<KinematicDiagram> initial_diagrams, std::vector<double>& params) {
 		KinematicDiagram result_diagram = initial_diagrams[0].clone();
 
 		boost::shared_ptr<TreeNode> root = constructTree(initial_diagrams);
@@ -314,7 +329,10 @@ namespace kinematics {
 					v.push_back(dir / glm::length(dir));
 				}
 
-				double l = 40;
+				double l = genRand(-80, 80);
+				params.push_back(l);
+				//l = 40;
+				//std::cout << "l = " << l << std::endl;
 				/*if (node->links[0]->id == 2) {
 					l = -40;
 				}*/
@@ -343,18 +361,17 @@ namespace kinematics {
 
 				result_diagram.addLink(pts1_joint, pts2_joint);
 
-
-				// DEBUG
-				glm::dvec2 hoge = glm::dvec2(node->parent->parent->mat[1] * glm::dvec4(pts1b + p1_pos[1], 0, 1));
-				glm::dvec2 hoge2 = glm::dvec2(node->parent->parent->mat[1] * glm::dvec4(pts2[1] + p1_pos[1], 0, 1));
-				std::cout << hoge.x << "," << hoge.y << std::endl;
-				std::cout << hoge2.x << "," << hoge2.y << std::endl;
+				params.push_back(glm::length(pts1));
 			}
 
 			for (int i = 0; i < node->child_nodes.size(); ++i) {
 				queue.push_back(node->child_nodes[i].second);
 			}
 		}
+
+		// set the angle range of the driver
+		result_diagram.driver_angle_min = std::min(0.0, initial_diagrams[1].driver_angle_min - initial_diagrams[0].driver_angle_min);
+		result_diagram.driver_angle_max = std::max(0.0, initial_diagrams[1].driver_angle_max - initial_diagrams[0].driver_angle_max);
 
 		result_diagram.initialize();
 
@@ -412,6 +429,53 @@ namespace kinematics {
 		}
 
 		throw "No ground link.";
+	}
+
+	KinematicDiagram LinkageSolver::optimize(std::vector<KinematicDiagram> initial_diagrams) {
+		double min_length = std::numeric_limits<double>::max();
+		KinematicDiagram best_diagram;
+
+		for (int iter = 0; iter < 1000; ++iter) {
+			//std::cout << "iter: " << iter << std::endl;
+
+			Kinematics kin;
+			std::vector<double> params;
+			kin.diagram = solve(initial_diagrams, params);
+			//std::cout << "l: " << params[0] << std::endl;
+			double time_step = 0.05;
+			if (abs(kin.diagram.driver_angle_max - kin.diagram.driver_angle) < abs(kin.diagram.driver_angle_min - kin.diagram.driver_angle)) {
+				time_step = -time_step;
+			}
+
+			try {
+				KinematicDiagram backup_diagram = kin.diagram.clone();
+
+				// do a kinematic simulation for collision detection
+				while (kin.diagram.driver_angle + time_step >= kin.diagram.driver_angle_min && kin.diagram.driver_angle + time_step <= kin.diagram.driver_angle_max) {
+					//std::cout << "angle: " << kin.diagram.driver_angle << std::endl;
+					kin.stepForward(time_step);
+				}
+
+				double length = 0;
+				for (int i = 0; i < params.size(); ++i) {
+					length = std::max(length, params[i]);
+				}
+				if (length < min_length) {
+					//std::cout << "  best!!" << std::endl;
+					min_length = length;
+					best_diagram = backup_diagram.clone();
+				}
+			}
+			catch (char* ex) {
+			}
+		}
+
+		if (min_length < std::numeric_limits<double>::max()) {
+			return best_diagram;
+		}
+		else {
+			throw "Can't find valid linkage.";
+		}
 	}
 
 }

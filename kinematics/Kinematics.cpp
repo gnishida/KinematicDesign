@@ -52,13 +52,20 @@ namespace kinematics {
 		}
 
 		if (isCollided()) {
-			//throw "collision is detected.";
+			throw "collision is detected.";
 		}
 	}
 
 	void Kinematics::stepForward(double time_step) {
 		// save the current state
 		KinematicDiagram prev_state = diagram.clone();
+
+		if (diagram.driver_angle_min != diagram.driver_angle_max) {
+			if (diagram.driver_angle + time_step < diagram.driver_angle_min || diagram.driver_angle + time_step > diagram.driver_angle_max) {
+				throw "Out of range.";
+			}
+		}
+		diagram.driver_angle += time_step;
 
 		// clear the determined flag of joints
 		for (auto it = diagram.joints.begin(); it != diagram.joints.end(); ++it) {
