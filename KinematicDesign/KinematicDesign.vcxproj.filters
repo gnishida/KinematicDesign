@@ -116,6 +116,9 @@
     <ClCompile Include="..\kinematics\KinematicDiagram.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="..\kinematics\KinematicDiagram.h">
       <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleGraph.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

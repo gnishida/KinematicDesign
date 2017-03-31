@@ -52,7 +52,7 @@ namespace kinematics {
 		}
 
 		if (isCollided()) {
-			throw "collision is detected.";
+			//throw "collision is detected.";
 		}
 	}
 

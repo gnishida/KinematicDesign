@@ -3,6 +3,7 @@
 #include <vector>
 #include "KinematicDiagram.h"
 #include "Layer.h"
+#include "SimpleGraph.h"
 
 namespace kinematics {
 
@@ -24,6 +25,7 @@ namespace kinematics {
 		LinkageSolver();
 
 		static std::vector<KinematicDiagram> initialKinematicDiagram(std::vector<canvas::Layer> layers);
+		static SimpleGraph constructGraph(std::vector<canvas::Layer> layers);
 		static double findShortestDistanceBetweenLinks(boost::shared_ptr<Link> link0a, boost::shared_ptr<Link> link0b, boost::shared_ptr<Link> link1a, boost::shared_ptr<Link> link1b, double& best_k, double& best_l);
 		static KinematicDiagram solve(std::vector<KinematicDiagram> initial_diagrams);
 		static boost::shared_ptr<TreeNode> constructTree(std::vector<KinematicDiagram> diagrams);
