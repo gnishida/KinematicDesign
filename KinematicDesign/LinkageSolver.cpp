@@ -422,13 +422,10 @@ namespace kinematics {
 		best_k = 0.0;
 		best_l = 0.0;
 
+		double min_diff = std::numeric_limits<double>::max();
+
 		for (int ki = 0; ki <= 100; ki++) {
 			double k = ki * 0.01;
-
-			// find the best l such that the length between two parts is same across layers
-			double min_diff = std::numeric_limits<double>::max();
-			double best_l2 = 0.0;
-			double best_length = 0.0;
 
 			for (int li = 0; li <= 100; li++) {
 				double l = li * 0.01;
@@ -441,17 +438,14 @@ namespace kinematics {
 				glm::dvec2 q1 = link1b->joints[0]->pos + (link1b->joints[1]->pos - link1b->joints[0]->pos) * l;
 				double length1 = glm::length(p1 - q1);
 
-				if (abs(length0 - length1) < min_diff) {
-					min_diff = abs(length0 - length1);
-					best_l2 = l;
-					best_length = (length0 + length1) * 0.5;
-				}
-			}
+				double avg_length = (length0 + length1) * 0.5;
 
-			if (best_length < min_length) {
-				min_length = best_length;
-				best_k = k;
-				best_l = best_l2;
+				if (abs(length0 - length1) < min_diff + 1.0 && avg_length < min_length) {
+					min_diff = abs(length0 - length1);
+					best_k = k;
+					best_l = l;
+					min_length = avg_length;
+				}
 			}
 		}
 
