@@ -93,7 +93,7 @@ namespace kinematics {
 		}
 
 		// set the parts adjacency
-		updateBodyAdjacency();
+		//updateBodyAdjacency();
 
 		driver_angle = 0.0;
 	}
@@ -364,6 +364,7 @@ namespace kinematics {
 	}
 
 	void KinematicDiagram::updateBodyAdjacency() {
+#if 0
 		// clear the neighbors
 		for (int i = 0; i < bodies.size(); ++i) {
 			bodies[i]->neighbors.clear();
@@ -378,6 +379,7 @@ namespace kinematics {
 				}
 			}
 		}
+#endif
 	}
 
 	bool KinematicDiagram::isCollided() const {

@@ -24,6 +24,8 @@ namespace kinematics {
 	public:
 		LinkageSolver();
 
+		static void adjustSketch(std::vector<canvas::Layer>& layers);
+		static void translatePart(std::vector<canvas::Layer>& layers, int shape_id, std::vector<glm::dvec2> offset, QMap<int, bool> visited, const SimpleGraph& mst);
 		static std::vector<KinematicDiagram> initialKinematicDiagram(std::vector<canvas::Layer> layers);
 		static SimpleGraph constructGraph(std::vector<canvas::Layer> layers);
 		static double findShortestDistanceBetweenLinks(boost::shared_ptr<Link> link0a, boost::shared_ptr<Link> link0b, boost::shared_ptr<Link> link1a, boost::shared_ptr<Link> link1b, double& best_k, double& best_l);

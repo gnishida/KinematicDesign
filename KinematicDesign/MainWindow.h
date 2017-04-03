@@ -33,6 +33,7 @@ public slots:
 	void onSelectAll();
 	void onModeChanged();
 	void onLayerChanged();
+	void onAdjustSketch();
 	void onInitialKinematicDiagram();
 	void onSolveInverse();
 	void onRun();

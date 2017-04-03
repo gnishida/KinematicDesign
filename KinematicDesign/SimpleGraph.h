@@ -39,10 +39,11 @@ namespace kinematics {
 		boost::shared_ptr<SimpleGraphEdge> addEdge(double weight, int vertex1_id, int vertex2_id);
 		boost::shared_ptr<SimpleGraphEdge> addEdge(int id, double weight, boost::shared_ptr<SimpleGraphVertex> vertex1, boost::shared_ptr<SimpleGraphVertex> vertex2);
 
-		bool isConnected(int vertex_id1, int vertex_id2);
-		bool isNeighbor(int vertex_id1, int vertex_id2);
-		bool canReach(std::vector<int> history, int end);
-		SimpleGraph minimumSpanningTree();
+		bool isConnected(int vertex_id1, int vertex_id2) const;
+		bool isNeighbor(int vertex_id1, int vertex_id2) const;
+		boost::shared_ptr<SimpleGraphEdge> getEdge(int vertex_id1, int vertex_id2) const;
+		bool canReach(std::vector<int> history, int end) const;
+		SimpleGraph minimumSpanningTree() const;
 		
 	};
 

@@ -3,6 +3,10 @@
 
 namespace kinematics {
 
+	bool sortByValue(const std::pair<int, double>& a, const std::pair<int, double>& b) {
+		return a.second < b.second;
+	}
+
 	SimpleGraphVertex::SimpleGraphVertex(int id) {
 		this->id = id;
 	}
@@ -64,7 +68,7 @@ namespace kinematics {
 		return edge;
 	}
 
-	bool SimpleGraph::isConnected(int vertex_id1, int vertex_id2) {
+	bool SimpleGraph::isConnected(int vertex_id1, int vertex_id2) const {
 		std::vector<int> history1;
 		history1.push_back(vertex_id1);
 		if (canReach(history1, vertex_id2)) return true;
@@ -76,7 +80,7 @@ namespace kinematics {
 		return false;
 	}
 
-	bool SimpleGraph::isNeighbor(int vertex_id1, int vertex_id2) {
+	bool SimpleGraph::isNeighbor(int vertex_id1, int vertex_id2) const {
 		for (int i = 0; i < vertices[vertex_id1]->edges.size(); ++i) {
 			int edge_id = vertices[vertex_id1]->edges[i];
 			for (int j = 0; j < edges[edge_id]->vertices.size(); ++j) {
@@ -88,7 +92,21 @@ namespace kinematics {
 		return false;
 	}
 
-	bool SimpleGraph::canReach(std::vector<int> history, int end) {
+	boost::shared_ptr<SimpleGraphEdge> SimpleGraph::getEdge(int vertex_id1, int vertex_id2) const {
+		for (int i = 0; i < vertices[vertex_id1]->edges.size(); ++i) {
+			int edge_id = vertices[vertex_id1]->edges[i];
+
+			for (int j = 0; j < edges[edge_id]->vertices.size(); ++j) {
+				if (edges[edge_id]->vertices[j] == vertex_id2) {
+					return edges[edge_id];
+				}
+			}
+		}
+
+		throw "No edge.";
+	}
+
+	bool SimpleGraph::canReach(std::vector<int> history, int end) const {
 		for (int i = 0; i < vertices[history.back()]->edges.size(); ++i) {
 			int edge_id = vertices[history.back()]->edges[i];
 
@@ -111,7 +129,7 @@ namespace kinematics {
 		return false;
 	}
 
-	SimpleGraph SimpleGraph::minimumSpanningTree() {
+	SimpleGraph SimpleGraph::minimumSpanningTree() const {
 		SimpleGraph mst;
 
 		// copy all the vertices
@@ -120,14 +138,15 @@ namespace kinematics {
 		}
 
 		// sort the edges by their weights
-		QMap<double, int> sortedEdges;
+		std::vector<std::pair<int, double>> sortedEdges;
 		for (int i = 0; i < edges.size(); ++i) {
-			sortedEdges[edges[i]->weight] = edges[i]->id;
+			sortedEdges.push_back(std::make_pair(edges[i]->id, edges[i]->weight));
 		}
+		std::sort(sortedEdges.begin(), sortedEdges.end(), sortByValue);
 
 		// 
-		for (auto it = sortedEdges.begin(); it != sortedEdges.end(); ++it) {
-			int edge_id = it.value();
+		for (int i = 0; i < sortedEdges.size(); ++i) {
+			int edge_id = sortedEdges[i].first;
 			bool isolated = false;
 
 			assert(edges[edge_id]->vertices.size() == 2);

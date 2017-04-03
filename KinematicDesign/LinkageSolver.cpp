@@ -4,6 +4,8 @@
 #include "BoundingBox.h"
 #include "Utils.h"
 #include "Kinematics.h"
+#include "Layer.h"
+#include "Shape.h"
 
 namespace kinematics {
 
@@ -14,6 +16,127 @@ namespace kinematics {
 	}
 
 	LinkageSolver::LinkageSolver() {
+	}
+
+	void LinkageSolver::adjustSketch(std::vector<canvas::Layer>& layers) {
+		// check if the shape is attached to the ground
+		int ground_shape_id = -1;
+		for (int i = 0; i < layers[0].shapes.size(); ++i) {
+			canvas::BoundingBox bbox0 = layers[0].shapes[i]->boundingBox();
+			glm::dvec2 topLeft0 = bbox0.minPt;
+			glm::dvec2 bottomRight0 = bbox0.maxPt;
+			topLeft0 = layers[0].shapes[i]->worldCoordinate(topLeft0);
+			bottomRight0 = layers[0].shapes[i]->worldCoordinate(bottomRight0);
+
+			canvas::BoundingBox bbox1 = layers[1].shapes[i]->boundingBox();
+			glm::dvec2 topLeft1 = bbox1.minPt;
+			glm::dvec2 bottomRight1 = bbox1.maxPt;
+			topLeft1 = layers[1].shapes[i]->worldCoordinate(topLeft1);
+			bottomRight1 = layers[1].shapes[i]->worldCoordinate(bottomRight1);
+
+			if (glm::length(topLeft0 - topLeft1) < 0.1 && glm::length(bottomRight0 - bottomRight1) < 0.1) {
+				ground_shape_id = i;
+				break;
+			}
+		}
+
+		// construct a minimum spanning tree to determine the connectivity between parts
+		SimpleGraph graph = constructGraph(layers);
+		graph = graph.minimumSpanningTree();
+
+		for (int i = 0; i < layers[0].shapes.size(); ++i) {
+			for (int j = i + 1; j < layers[0].shapes.size(); ++j) {
+				if (!graph.isNeighbor(i, j)) continue;
+
+				if (graph.getEdge(i, j)->weight > 50) continue;
+
+				std::vector<glm::dvec2> midPt(2);
+				std::vector<glm::dvec2> pt_i(2);
+				std::vector<glm::dvec2> pt_j(2);
+				std::vector<double> ratio_i(2);
+				std::vector<double> ratio_j(2);
+				std::vector<glm::dvec2> v1(2), v2(2), v3(2), v4(2);
+				for (int s = 0; s < 2; ++s) {
+					canvas::BoundingBox bbox1 = layers[s].shapes[i]->boundingBox();
+					canvas::BoundingBox bbox2 = layers[s].shapes[j]->boundingBox();
+
+					if (bbox1.width() >= bbox1.height()) {
+						v1[s] = glm::dvec2(bbox1.minPt.x, (bbox1.minPt.y + bbox1.maxPt.y) * 0.5);
+						v2[s] = glm::dvec2(bbox1.maxPt.x, (bbox1.minPt.y + bbox1.maxPt.y) * 0.5);
+					}
+					else {
+						v1[s] = glm::dvec2((bbox1.minPt.x + bbox1.maxPt.x) * 0.5, bbox1.minPt.y);
+						v2[s] = glm::dvec2((bbox1.minPt.x + bbox1.maxPt.x) * 0.5, bbox1.maxPt.y);
+					}
+					v1[s] = layers[s].shapes[i]->worldCoordinate(v1[s]);
+					v2[s] = layers[s].shapes[i]->worldCoordinate(v2[s]);
+					if (bbox2.width() >= bbox2.height()) {
+						v3[s] = glm::dvec2(bbox2.minPt.x, (bbox2.minPt.y + bbox2.maxPt.y) * 0.5);
+						v4[s] = glm::dvec2(bbox2.maxPt.x, (bbox2.minPt.y + bbox2.maxPt.y) * 0.5);
+					}
+					else {
+						v3[s] = glm::dvec2((bbox2.minPt.x + bbox2.maxPt.x) * 0.5, bbox2.minPt.y);
+						v4[s] = glm::dvec2((bbox2.minPt.x + bbox2.maxPt.x) * 0.5, bbox2.maxPt.y);
+					}
+					v3[s] = layers[s].shapes[j]->worldCoordinate(v3[s]);
+					v4[s] = layers[s].shapes[j]->worldCoordinate(v4[s]);
+
+					glm::dvec2 p, q;
+					segmentSegmentDistance(v1[s], v2[s], v3[s], v4[s], p, q);
+
+					ratio_i[s] = glm::length(p - v1[s]) / glm::length(v2[s] - v1[s]);
+					ratio_j[s] = glm::length(q - v3[s]) / glm::length(v4[s] - v3[s]);
+				}
+
+				double ratio_i_avg = (ratio_i[0] + ratio_i[1]) * 0.5;
+				double ratio_j_avg = (ratio_j[0] + ratio_j[1]) * 0.5;
+
+
+				// translate part 1
+				std::vector<glm::dvec2> offset(2);
+				for (int s = 0; s < 2; ++s) {
+					glm::dvec2 joint_pos = ((v2[s] - v1[s]) * ratio_i_avg + v1[s] + (v4[s] - v3[s]) * ratio_j_avg + v3[s]) * 0.5;
+					offset[s] = joint_pos - (v2[s] - v1[s]) * ratio_i_avg - v1[s];
+				}
+				QMap<int, bool> visited;
+				visited[j] = true;
+				translatePart(layers, i, offset, visited, graph);
+
+				// translate part 1
+				for (int s = 0; s < 2; ++s) {
+					glm::dvec2 joint_pos = ((v2[s] - v1[s]) * ratio_i_avg + v1[s] + (v4[s] - v3[s]) * ratio_j_avg + v3[s]) * 0.5;
+					offset[s] = joint_pos - (v4[s] - v3[s]) * ratio_j_avg - v3[s];
+				}
+				visited.clear();
+				visited[i] = true;
+				translatePart(layers, j, offset, visited, graph);
+
+			}
+		}
+
+		// translate pose 2 such that the position of the grounded shape is exactly match with pose1
+		glm::dvec2 offset = layers[0].shapes[ground_shape_id]->worldCoordinate(layers[0].shapes[ground_shape_id]->getCenter()) - layers[1].shapes[ground_shape_id]->worldCoordinate(layers[1].shapes[ground_shape_id]->getCenter());
+		for (int i = 0; i < layers[1].shapes.size(); ++i) {
+			layers[1].shapes[i]->translate(offset);
+		}
+		
+	}
+
+	void LinkageSolver::translatePart(std::vector<canvas::Layer>& layers, int shape_id, std::vector<glm::dvec2> offset, QMap<int, bool> visited, const SimpleGraph& mst) {
+		for (int s = 0; s < layers.size(); ++s) {
+			layers[s].shapes[shape_id]->translate(offset[s]);
+		}
+		visited[shape_id] = true;
+
+		for (int i = 0; i < mst.vertices[shape_id]->edges.size(); ++i) {
+			int edge_id = mst.vertices[shape_id]->edges[i];
+			for (int j = 0; j < mst.edges[edge_id]->vertices.size(); ++j) {
+				int v_id = mst.edges[edge_id]->vertices[j];
+				if (visited.contains(v_id)) continue;
+
+				translatePart(layers, v_id, offset, visited, mst);
+			}
+		}
 	}
 
 	std::vector<KinematicDiagram> LinkageSolver::initialKinematicDiagram(std::vector<canvas::Layer> layers) {
@@ -83,33 +206,59 @@ namespace kinematics {
 				link2.push_back(initial_diagrams[0].links[j]);
 				link2.push_back(initial_diagrams[1].links[j]);
 
-				// find the best k such that the distance between two parts is shortest
-				double k, l;
-				double length = findShortestDistanceBetweenLinks(link1[0], link2[0], link1[1], link2[1], k, l);
+				if (graph.getEdge(i, j)->weight > 50) {
+					// find the best k such that the distance between two parts is shortest
+					double k, l;
+					double length = findShortestDistanceBetweenLinks(link1[0], link2[0], link1[1], link2[1], k, l);
 
-				for (int s = 0; s < 2; ++s) {
-					glm::dvec2 p = link1[s]->joints[0]->pos + (link1[s]->joints[1]->pos - link1[s]->joints[0]->pos) * k;
-					glm::dvec2 q = link2[s]->joints[0]->pos + (link2[s]->joints[1]->pos - link2[s]->joints[0]->pos) * l;
+					for (int s = 0; s < 2; ++s) {
+						glm::dvec2 p = link1[s]->joints[0]->pos + (link1[s]->joints[1]->pos - link1[s]->joints[0]->pos) * k;
+						glm::dvec2 q = link2[s]->joints[0]->pos + (link2[s]->joints[1]->pos - link2[s]->joints[0]->pos) * l;
 
-					if (length > 20) {
-						// update the diagram
-						boost::shared_ptr<Joint> joint1 = boost::shared_ptr<Joint>(new PinJoint(p));
-						initial_diagrams[s].addJoint(joint1);
-						boost::shared_ptr<Joint> joint2 = boost::shared_ptr<Joint>(new PinJoint(q));
-						initial_diagrams[s].addJoint(joint2);
+						if (length > 20) {
+							// update the diagram
+							boost::shared_ptr<Joint> joint1 = boost::shared_ptr<Joint>(new PinJoint(p));
+							initial_diagrams[s].addJoint(joint1);
+							boost::shared_ptr<Joint> joint2 = boost::shared_ptr<Joint>(new PinJoint(q));
+							initial_diagrams[s].addJoint(joint2);
 
-						initial_diagrams[s].setJointToLink(joint1, link1[s]);
-						initial_diagrams[s].setJointToLink(joint2, link2[s]);
+							initial_diagrams[s].setJointToLink(joint1, link1[s]);
+							initial_diagrams[s].setJointToLink(joint2, link2[s]);
 
-						boost::shared_ptr<Link> link3 = initial_diagrams[s].addLink(joint1, joint2);
+							boost::shared_ptr<Link> link3 = initial_diagrams[s].addLink(joint1, joint2);
+						}
 					}
-					else {
-						// if the distance between two parts is too close, use a single joint to connect them
+				}
+				else {
+					for (int s = 0; s < 2; ++s) {
+						glm::dvec2 p, q;
+						segmentSegmentDistance(link1[s]->joints[0]->pos, link1[s]->joints[1]->pos, link2[s]->joints[0]->pos, link2[s]->joints[1]->pos, p, q);
+
+						// use a single joint to connect parts
+						boost::shared_ptr<Joint> joint;
 						p = (p + q) * 0.5;
-						boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new PinJoint(p));
-						initial_diagrams[s].addJoint(joint);
-						initial_diagrams[s].setJointToLink(joint, link1[s]);
-						initial_diagrams[s].setJointToLink(joint, link2[s]);
+						if (glm::length(p - link1[s]->joints[0]->pos) < 0.1) {
+							joint = link1[s]->joints[0];
+							initial_diagrams[s].setJointToLink(joint, link2[s]);
+						}
+						else if (glm::length(p - link1[s]->joints[1]->pos) < 0.1) {
+							joint = link1[s]->joints[1];
+							initial_diagrams[s].setJointToLink(joint, link2[s]);
+						}
+						else if (glm::length(p - link2[s]->joints[0]->pos) < 0.1) {
+							joint = link2[s]->joints[0];
+							initial_diagrams[s].setJointToLink(joint, link1[s]);
+						}
+						else if (glm::length(p - link2[s]->joints[1]->pos) < 0.1) {
+							joint = link2[s]->joints[1];
+							initial_diagrams[s].setJointToLink(joint, link1[s]);
+						}
+						else {
+							joint = boost::shared_ptr<Joint>(new PinJoint(p));
+							initial_diagrams[s].addJoint(joint);
+							initial_diagrams[s].setJointToLink(joint, link1[s]);
+							initial_diagrams[s].setJointToLink(joint, link2[s]);
+						}
 					}
 				}
 			}
@@ -117,7 +266,7 @@ namespace kinematics {
 
 		// check if the joint is attached to the ground
 		for (int i = 0; i < initial_diagrams[0].joints.size(); ++i) {
-			if (glm::length(initial_diagrams[0].joints[i]->pos - initial_diagrams[1].joints[i]->pos) <= 5) {
+			if (glm::length(initial_diagrams[0].joints[i]->pos - initial_diagrams[1].joints[i]->pos) <= 0.1) {
 				for (int s = 0; s < 2; ++s) {
 					initial_diagrams[s].joints[i]->ground = true;
 				}
@@ -169,6 +318,33 @@ namespace kinematics {
 		initial_diagrams[0].driver_angle_max = angles[0];
 		initial_diagrams[1].driver_angle_min = angles[1];
 		initial_diagrams[1].driver_angle_max = angles[1];
+
+		// construct the parts adjacency
+		// we need to const the parts adjacency at this moment by considering all the poses
+		for (int s = 0; s < 2; ++s) {
+			for (int i = 0; i < initial_diagrams[s].bodies.size(); ++i) {
+				initial_diagrams[s].bodies[i]->neighbors.clear();
+			}
+		}
+		for (int i = 0; i < initial_diagrams[0].bodies.size(); ++i) {
+			for (int j = i + 1; j < initial_diagrams[0].bodies.size(); ++j) {
+				bool adjacent = false;
+				for (int s = 0; s < 2; ++s) {
+					// check the adjacency between parts i and j
+					if (polygonPolygonIntersection(initial_diagrams[s].bodies[i]->getActualPoints(), initial_diagrams[s].bodies[j]->getActualPoints())) {
+						adjacent = true;
+						break;
+					}
+				}
+
+				if (adjacent) {
+					for (int s = 0; s < 2; ++s) {
+						initial_diagrams[s].bodies[i]->neighbors[j] = true;
+						initial_diagrams[s].bodies[j]->neighbors[i] = true;
+					}
+				}
+			}
+		}
 
 		return initial_diagrams;
 	}
@@ -246,13 +422,17 @@ namespace kinematics {
 		best_k = 0.0;
 		best_l = 0.0;
 
-		for (double k = 0.0; k <= 1.0; k += 0.01) {
+		for (int ki = 0; ki <= 100; ki++) {
+			double k = ki * 0.01;
+
 			// find the best l such that the length between two parts is same across layers
 			double min_diff = std::numeric_limits<double>::max();
 			double best_l2 = 0.0;
 			double best_length = 0.0;
 
-			for (double l = 0.0; l <= 1.0; l += 0.01) {
+			for (int li = 0; li <= 100; li++) {
+				double l = li * 0.01;
+
 				glm::dvec2 p0 = link0a->joints[0]->pos + (link0a->joints[1]->pos - link0a->joints[0]->pos) * k;
 				glm::dvec2 q0 = link0b->joints[0]->pos + (link0b->joints[1]->pos - link0b->joints[0]->pos) * l;
 				double length0 = glm::length(p0 - q0);
@@ -329,13 +509,18 @@ namespace kinematics {
 					v.push_back(dir / glm::length(dir));
 				}
 
-				double l = genRand(-80, 80);
+				// randomly pick a parameter value
+				double l = 0;
+				if (genRand() >= 0.5) {
+					l = genRand(-80, -5);
+				}
+				else {
+					l = genRand(5, 80);
+				}
+				//l = -20;
 				params.push_back(l);
-				//l = 40;
-				//std::cout << "l = " << l << std::endl;
-				/*if (node->links[0]->id == 2) {
-					l = -40;
-				}*/
+
+				// deterministically calculate the positions of pts1 and pts2
 				std::vector<glm::dvec2> pts2;
 				for (int i = 0; i < v.size(); ++i) {
 					pts2.push_back(p2_pos[i] + v[i] * l - p1_pos[i]);
@@ -373,6 +558,7 @@ namespace kinematics {
 		result_diagram.driver_angle_min = std::min(0.0, initial_diagrams[1].driver_angle_min - initial_diagrams[0].driver_angle_min);
 		result_diagram.driver_angle_max = std::max(0.0, initial_diagrams[1].driver_angle_max - initial_diagrams[0].driver_angle_max);
 
+		// initialize the link lengths
 		result_diagram.initialize();
 
 		return result_diagram;
@@ -435,7 +621,7 @@ namespace kinematics {
 		double min_length = std::numeric_limits<double>::max();
 		KinematicDiagram best_diagram;
 
-		for (int iter = 0; iter < 1000; ++iter) {
+		for (int iter = 0; iter < 100; ++iter) {
 			//std::cout << "iter: " << iter << std::endl;
 
 			Kinematics kin;

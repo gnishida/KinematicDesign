@@ -1,0 +1,22 @@
+<design date="03/31/2017" author="Gen Nishida" version="1.0">
+    <layer>
+        <shape type="rectangle">
+            <model_mat m01="0" m20="0" m23="0" m21="0" m32="0" m12="0" m00="1" m31="502" m03="0" m10="0" m33="1" m13="0" m30="235" m11="1" m22="1" m02="0"/>
+            <params height="51" width="268"/>
+        </shape>
+        <shape type="rectangle">
+            <model_mat m01="0" m20="0" m23="0" m21="0" m32="0" m12="0" m00="1" m31="437" m03="0" m10="0" m33="1" m13="0" m30="357" m11="1" m22="1" m02="0"/>
+            <params height="43" width="146"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape type="rectangle">
+            <model_mat m01="0" m20="0" m23="0" m21="0" m32="0" m12="0" m00="1" m31="502" m03="0" m10="0" m33="1" m13="0" m30="235" m11="1" m22="1" m02="0"/>
+            <params height="51" width="268"/>
+        </shape>
+        <shape type="rectangle">
+            <model_mat m01="0.9999717648694884" m20="0" m23="0" m21="0" m32="0" m12="0" m00="0.007514616676830378" m31="409.3404969059755" m03="0" m10="-0.9999717648694884" m33="1" m13="0" m30="564.9508259272856" m11="0.007514616676830378" m22="1" m02="0"/>
+            <params height="43" width="146"/>
+        </shape>
+    </layer>
+</design>

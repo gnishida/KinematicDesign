@@ -66,6 +66,7 @@
     <property name="title">
      <string>Tool</string>
     </property>
+    <addaction name="actionAdjustSketch"/>
     <addaction name="actionInitialKinematicDiagram"/>
     <addaction name="actionSolveInverse"/>
     <addaction name="separator"/>
@@ -241,6 +242,11 @@
    </property>
    <property name="shortcut">
     <string>Left</string>
+   </property>
+  </action>
+  <action name="actionAdjustSketch">
+   <property name="text">
+    <string>Adjust Sketch</string>
    </property>
   </action>
  </widget>

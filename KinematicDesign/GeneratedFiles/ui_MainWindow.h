@@ -47,6 +47,7 @@ public:
     QAction *actionStop;
     QAction *actionStepForward;
     QAction *actionStepBackward;
+    QAction *actionAdjustSketch;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -109,6 +110,8 @@ public:
         actionStepForward->setObjectName(QStringLiteral("actionStepForward"));
         actionStepBackward = new QAction(MainWindowClass);
         actionStepBackward->setObjectName(QStringLiteral("actionStepBackward"));
+        actionAdjustSketch = new QAction(MainWindowClass);
+        actionAdjustSketch->setObjectName(QStringLiteral("actionAdjustSketch"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -157,6 +160,7 @@ public:
         menuEdit->addAction(actionSelectAll);
         menuLayer->addAction(actionLayer1);
         menuLayer->addAction(actionLayer2);
+        menuTool->addAction(actionAdjustSketch);
         menuTool->addAction(actionInitialKinematicDiagram);
         menuTool->addAction(actionSolveInverse);
         menuTool->addSeparator();
@@ -206,6 +210,7 @@ public:
         actionStepForward->setShortcut(QApplication::translate("MainWindowClass", "Right", 0));
         actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", 0));
         actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
+        actionAdjustSketch->setText(QApplication::translate("MainWindowClass", "Adjust Sketch", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
