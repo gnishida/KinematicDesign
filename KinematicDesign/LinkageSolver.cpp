@@ -424,11 +424,12 @@ namespace kinematics {
 
 		double min_diff = std::numeric_limits<double>::max();
 
-		for (int ki = 0; ki <= 100; ki++) {
-			double k = ki * 0.01;
+		const int N = 500;
+		for (int ki = 0; ki <= N; ki++) {
+			double k = (double)ki / N;
 
-			for (int li = 0; li <= 100; li++) {
-				double l = li * 0.01;
+			for (int li = 0; li <= N; li++) {
+				double l = (double)li / N;
 
 				glm::dvec2 p0 = link0a->joints[0]->pos + (link0a->joints[1]->pos - link0a->joints[0]->pos) * k;
 				glm::dvec2 q0 = link0b->joints[0]->pos + (link0b->joints[1]->pos - link0b->joints[0]->pos) * l;
@@ -440,7 +441,7 @@ namespace kinematics {
 
 				double avg_length = (length0 + length1) * 0.5;
 
-				if (abs(length0 - length1) < min_diff + 1.0 && avg_length < min_length) {
+				if (abs(length0 - length1) < min_diff + 0.01 && avg_length < min_length) {
 					min_diff = abs(length0 - length1);
 					best_k = k;
 					best_l = l;
@@ -511,7 +512,7 @@ namespace kinematics {
 				else {
 					l = genRand(5, 80);
 				}
-				//l = -20;
+				//l = 20;
 				params.push_back(l);
 
 				// deterministically calculate the positions of pts1 and pts2
@@ -638,7 +639,7 @@ namespace kinematics {
 
 				double length = 0;
 				for (int i = 0; i < params.size(); ++i) {
-					length = std::max(length, params[i]);
+					length = std::max(length, abs(params[i]));
 				}
 				if (length < min_length) {
 					//std::cout << "  best!!" << std::endl;

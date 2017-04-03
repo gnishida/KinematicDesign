@@ -48,6 +48,7 @@ public:
     QAction *actionStepForward;
     QAction *actionStepBackward;
     QAction *actionAdjustSketch;
+    QAction *actionSolveAll;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -112,6 +113,8 @@ public:
         actionStepBackward->setObjectName(QStringLiteral("actionStepBackward"));
         actionAdjustSketch = new QAction(MainWindowClass);
         actionAdjustSketch->setObjectName(QStringLiteral("actionAdjustSketch"));
+        actionSolveAll = new QAction(MainWindowClass);
+        actionSolveAll->setObjectName(QStringLiteral("actionSolveAll"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -160,6 +163,7 @@ public:
         menuEdit->addAction(actionSelectAll);
         menuLayer->addAction(actionLayer1);
         menuLayer->addAction(actionLayer2);
+        menuTool->addAction(actionSolveAll);
         menuTool->addAction(actionAdjustSketch);
         menuTool->addAction(actionInitialKinematicDiagram);
         menuTool->addAction(actionSolveInverse);
@@ -211,6 +215,7 @@ public:
         actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", 0));
         actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
         actionAdjustSketch->setText(QApplication::translate("MainWindowClass", "Adjust Sketch", 0));
+        actionSolveAll->setText(QApplication::translate("MainWindowClass", "Solve All", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));

@@ -66,6 +66,7 @@
     <property name="title">
      <string>Tool</string>
     </property>
+    <addaction name="actionSolveAll"/>
     <addaction name="actionAdjustSketch"/>
     <addaction name="actionInitialKinematicDiagram"/>
     <addaction name="actionSolveInverse"/>
@@ -247,6 +248,11 @@
   <action name="actionAdjustSketch">
    <property name="text">
     <string>Adjust Sketch</string>
+   </property>
+  </action>
+  <action name="actionSolveAll">
+   <property name="text">
+    <string>Solve All</string>
    </property>
   </action>
  </widget>

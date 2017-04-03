@@ -110,6 +110,13 @@ namespace canvas {
 		}
 	}
 
+	void Canvas::solveAll() {
+		kinematics::LinkageSolver::adjustSketch(layers);
+		initial_diagrams = kinematics::LinkageSolver::initialKinematicDiagram(layers);
+		solveInverse();
+		update();
+	}
+
 	void Canvas::adjustSketch() {
 		kinematics::LinkageSolver::adjustSketch(layers);
 		update();

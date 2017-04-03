@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionLayer1, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
 	connect(ui.actionLayer2, SIGNAL(triggered()), this, SLOT(onLayerChanged()));
+	connect(ui.actionSolveAll, SIGNAL(triggered()), this, SLOT(onSolveAll()));
 	connect(ui.actionAdjustSketch, SIGNAL(triggered()), this, SLOT(onAdjustSketch()));
 	connect(ui.actionInitialKinematicDiagram, SIGNAL(triggered()), this, SLOT(onInitialKinematicDiagram()));
 	connect(ui.actionSolveInverse, SIGNAL(triggered()), this, SLOT(onSolveInverse()));
@@ -115,6 +116,10 @@ void MainWindow::onLayerChanged() {
 	else if (ui.actionLayer2->isChecked()) {
 		canvas->setLayer(1);
 	}
+}
+
+void MainWindow::onSolveAll() {
+	canvas->solveAll();
 }
 
 void MainWindow::onAdjustSketch() {

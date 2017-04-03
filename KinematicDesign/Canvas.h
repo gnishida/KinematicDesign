@@ -58,6 +58,7 @@ namespace canvas {
 		void pasteCopiedShapes();
 		void setMode(int mode);
 		void setLayer(int layer_id);
+		void solveAll();
 		void adjustSketch();
 		void initialKinematicDiagram();
 		void solveInverse();
