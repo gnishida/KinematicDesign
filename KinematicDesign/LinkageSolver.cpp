@@ -516,32 +516,32 @@ namespace kinematics {
 				params.push_back(l);
 
 				// deterministically calculate the positions of pts1 and pts2
-				std::vector<glm::dvec2> pts2;
+				std::vector<glm::dvec2> Q2;
 				for (int i = 0; i < v.size(); ++i) {
-					pts2.push_back(p2_pos[i] + v[i] * l - p1_pos[i]);
+					Q2.push_back(p2_pos[i] + v[i] * l - p1_pos[i]);
 				}
 
-				glm::dvec2 perp = pts2[0] - pts2[1];
+				glm::dvec2 perp = Q2[0] - Q2[1];
 				perp = glm::dvec2(-perp.y, perp.x);
-				glm::dvec2 c = (pts2[0] + pts2[1]) * 0.5;
+				glm::dvec2 c = (Q2[0] + Q2[1]) * 0.5;
 				//glm::dvec2 prev_pt = glm::dvec2(glm::inverse(mat[0]) * glm::dvec4(input_points[0][pi - 1], 0, 1));
-				glm::dvec2 pts1 = kinematics::lineLineIntersection(c, c + perp, glm::dvec2(0, 0), p0[0]->pos - p1[0]->pos);
-				glm::dvec2 pts1b = kinematics::lineLineIntersection(c, c + perp, glm::dvec2(0, 0), p0[1]->pos - p1[1]->pos);
+				glm::dvec2 Q1 = kinematics::lineLineIntersection(c, c + perp, glm::dvec2(0, 0), p0[0]->pos - p1[0]->pos);
+				glm::dvec2 Q1b = kinematics::lineLineIntersection(c, c + perp, glm::dvec2(0, 0), p0[1]->pos - p1[1]->pos);
 
-				// add pts1 to link 0
+				// add Q1 to link 0
 				bool ground = false;
 				if (node->parent->parent->links[0]->isGrounded()) ground = true;
-				boost::shared_ptr<Joint> pts1_joint = boost::shared_ptr<Joint>(new PinJoint(ground, glm::dvec2(node->parent->parent->mat[0] * glm::dvec4(pts1 + p1_pos[0], 0, 1))));
-				result_diagram.addJoint(pts1_joint);
-				result_diagram.setJointToLink(pts1_joint, result_diagram.links[node->parent->parent->links[0]->id]);
+				boost::shared_ptr<Joint> Q1_joint = boost::shared_ptr<Joint>(new PinJoint(ground, glm::dvec2(node->parent->parent->mat[0] * glm::dvec4(Q1 + p1_pos[0], 0, 1))));
+				result_diagram.addJoint(Q1_joint);
+				result_diagram.setJointToLink(Q1_joint, result_diagram.links[node->parent->parent->links[0]->id]);
 
-				boost::shared_ptr<Joint> pts2_joint = boost::shared_ptr<Joint>(new PinJoint(glm::dvec2(node->parent->parent->mat[0] * glm::dvec4(pts2[0] + p1_pos[0], 0, 1))));
-				result_diagram.addJoint(pts2_joint);
-				result_diagram.setJointToLink(pts2_joint, result_diagram.links[node->links[0]->id]);
+				boost::shared_ptr<Joint> Q2_joint = boost::shared_ptr<Joint>(new PinJoint(glm::dvec2(node->parent->parent->mat[0] * glm::dvec4(Q2[0] + p1_pos[0], 0, 1))));
+				result_diagram.addJoint(Q2_joint);
+				result_diagram.setJointToLink(Q2_joint, result_diagram.links[node->links[0]->id]);
 
-				result_diagram.addLink(pts1_joint, pts2_joint);
+				result_diagram.addLink(Q1_joint, Q2_joint);
 
-				params.push_back(glm::length(pts1));
+				params.push_back(glm::length(Q1));
 			}
 
 			for (int i = 0; i < node->child_nodes.size(); ++i) {
