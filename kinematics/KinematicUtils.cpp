@@ -1,4 +1,4 @@
-#include "Utils.h"
+#include "KinematicUtils.h"
 #include <random>
 
 namespace kinematics {
@@ -301,6 +301,97 @@ namespace kinematics {
 
 		if (output.size() > 0) return true;
 		else return false;
+	}
+
+	/**
+	* Given three points, a, b, and c, find the coordinates of point p1, such that
+	* length a-p1 is l0, length b-p2 is l1, length c-p3 is l2, length p1-p2 is r0, length p1-p3 is r1, length p2-p3 is r2.
+	* Also, p1 should be close to prev_pos, p2 should be close to prev_pos2, p3 should be close to prev_pos3.
+	*/
+	glm::dvec2 threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3) {
+		double min_dist = std::numeric_limits<double>::max();
+		glm::dvec2 best_pos;
+
+		double theta0 = 0;
+		double theta1 = M_PI * 2;
+		double delta_theta = 0.01;
+		double best_theta;
+		for (int i = 0; i < 10; i++) {
+			best_theta = threeLengths(a, l0, b, l1, c, l2, r0, r1, r2, prev_pos, prev_pos2, prev_pos3, theta0, theta1, delta_theta);
+
+			theta0 = best_theta - delta_theta * 2;
+			theta1 = best_theta + delta_theta * 2;
+			delta_theta *= 0.1;
+		}
+
+		glm::dvec2 pos(a.x + l0 * cos(best_theta), a.y + l0 * sin(best_theta));
+
+		double dist = std::numeric_limits<double>::max();
+		try {
+			glm::dvec2 P1a = circleCircleIntersection(pos, r0, b, l1);// , prev_pos2);
+			glm::dvec2 P1b = circleCircleIntersection(b, l1, pos, r0);
+			glm::dvec2 P2a = circleCircleIntersection(pos, r1, c, l2);// , prev_pos3);
+			glm::dvec2 P2b = circleCircleIntersection(c, l2, pos, r1);
+
+			if (glm::length(P1a - prev_pos2) < l1 * 0.5 && glm::length(P2a - prev_pos3) < l2 * 0.5) {
+				dist = std::min(dist, std::abs(glm::length(P1a - P2a) - r2));
+			}
+			if (glm::length(P1a - prev_pos2) < l1 * 0.5 && glm::length(P2b - prev_pos3) < l2 * 0.5) {
+				dist = std::min(dist, std::abs(glm::length(P1a - P2b) - r2));
+			}
+			if (glm::length(P1b - prev_pos2) < l1 * 0.5 && glm::length(P2a - prev_pos3) < l2 * 0.5) {
+				dist = std::min(dist, std::abs(glm::length(P1b - P2a) - r2));
+			}
+			if (glm::length(P1b - prev_pos2) < l1 * 0.5 && glm::length(P2b - prev_pos3) < l2 * 0.5) {
+				dist = std::min(dist, std::abs(glm::length(P1b - P2b) - r2));
+			}
+		}
+		catch (char* ex) {
+		}
+
+		if (dist > 0.001) throw "No solution";
+
+		return pos;
+	}
+
+	double threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3, double theta0, double theta1, double delta_theta) {
+		double min_dist = std::numeric_limits<double>::max();
+		double best_theta;
+
+		for (double theta = theta0; theta <= theta1; theta += delta_theta) {
+			glm::dvec2 pos(a.x + l0 * cos(theta), a.y + l0 * sin(theta));
+			if (glm::length(pos - prev_pos) > l0 * 0.5) continue;
+
+			try {
+				glm::dvec2 P1a = circleCircleIntersection(pos, r0, b, l1);// , prev_pos2);
+				glm::dvec2 P1b = circleCircleIntersection(b, l1, pos, r0);
+				glm::dvec2 P2a = circleCircleIntersection(pos, r1, c, l2);// , prev_pos3);
+				glm::dvec2 P2b = circleCircleIntersection(c, l2, pos, r1);
+
+				double dist = std::numeric_limits<double>::max();
+				if (glm::length(P1a - prev_pos2) < l1 * 0.5 && glm::length(P2a - prev_pos3) < l2 * 0.5) {
+					dist = std::min(dist, std::abs(glm::length(P1a - P2a) - r2));
+				}
+				if (glm::length(P1a - prev_pos2) < l1 * 0.5 && glm::length(P2b - prev_pos3) < l2 * 0.5) {
+					dist = std::min(dist, std::abs(glm::length(P1a - P2b) - r2));
+				}
+				if (glm::length(P1b - prev_pos2) < l1 * 0.5 && glm::length(P2a - prev_pos3) < l2 * 0.5) {
+					dist = std::min(dist, std::abs(glm::length(P1b - P2a) - r2));
+				}
+				if (glm::length(P1b - prev_pos2) < l1 * 0.5 && glm::length(P2b - prev_pos3) < l2 * 0.5) {
+					dist = std::min(dist, std::abs(glm::length(P1b - P2b) - r2));
+				}
+
+				if (dist < min_dist) {
+					min_dist = dist;
+					best_theta = theta;
+				}
+			}
+			catch (char* ex) {
+			}
+		}
+
+		return best_theta;
 	}
 
 	bool pointWithinPolygon(const glm::dvec2& pt, const std::vector<glm::dvec2>& polygon) {

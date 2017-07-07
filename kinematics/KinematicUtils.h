@@ -6,7 +6,7 @@
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/register/linestring.hpp>
+#include <boost/geometry/geometries/register/ring.hpp>
 
 namespace kinematics {
 
@@ -29,6 +29,10 @@ namespace kinematics {
 	double pointSegmentDistance(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c);
 	double pointSegmentDistance(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c, glm::dvec2& nearestPt);
 	bool polygonPolygonIntersection(const std::vector<glm::dvec2>& polygon1, const std::vector<glm::dvec2>& polygon2);
+
+	glm::dvec2 threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3);
+	double threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3, double theta0, double theta1, double delta_theta);
+
 	bool pointWithinPolygon(const glm::dvec2& pt, const std::vector<glm::dvec2>& polygon);
 
 	typedef std::vector<glm::dvec2> polygon;
@@ -36,4 +40,4 @@ namespace kinematics {
 }
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(glm::dvec2, double, boost::geometry::cs::cartesian, x, y)
-BOOST_GEOMETRY_REGISTER_LINESTRING(kinematics::polygon)
+BOOST_GEOMETRY_REGISTER_RING(kinematics::polygon)

@@ -1,6 +1,6 @@
 #include "SliderHinge.h"
 #include "Link.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 
 namespace kinematics {
 

@@ -7,7 +7,7 @@
 #include "PinJoint.h"
 #include "SliderHinge.h"
 #include "Gear.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 
 namespace kinematics {
 	Kinematics::Kinematics() {

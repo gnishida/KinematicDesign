@@ -2,7 +2,7 @@
 #include "PinJoint.h"
 #include "Link.h"
 #include "BoundingBox.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 #include "Kinematics.h"
 #include "Layer.h"
 #include "Shape.h"

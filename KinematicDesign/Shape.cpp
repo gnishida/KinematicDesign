@@ -1,6 +1,6 @@
 #include "Shape.h"
 #include <QImage>
-#include "Utils.h"
+#include "KinematicUtils.h"
 
 namespace canvas {
 

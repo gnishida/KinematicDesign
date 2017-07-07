@@ -83,9 +83,6 @@
     <ClCompile Include="..\kinematics\SliderHinge.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\Utils.cpp">
-      <Filter>Source Files\kinematics</Filter>
-    </ClCompile>
     <ClCompile Include="Shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,6 +114,9 @@
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
     <ClCompile Include="SimpleGraph.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\KinematicUtils.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -159,9 +159,6 @@
     <ClInclude Include="..\kinematics\SliderHinge.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\Utils.h">
-      <Filter>Source Files\kinematics</Filter>
-    </ClInclude>
     <ClInclude Include="Shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -193,6 +190,9 @@
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
     <ClInclude Include="SimpleGraph.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\KinematicUtils.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>

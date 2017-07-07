@@ -15,6 +15,7 @@ namespace kinematics {
 		int id;
 		std::vector<boost::shared_ptr<Joint>> joints;
 		QMap<int, glm::dvec2> original_shape;
+		double angle;
 		bool driver;
 
 	public:

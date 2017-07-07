@@ -145,7 +145,7 @@
     <ClCompile Include="..\kinematics\Link.cpp" />
     <ClCompile Include="..\kinematics\PinJoint.cpp" />
     <ClCompile Include="..\kinematics\SliderHinge.cpp" />
-    <ClCompile Include="..\kinematics\Utils.cpp" />
+    <ClCompile Include="..\kinematics\KinematicUtils.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_Canvas.cpp">
@@ -235,7 +235,7 @@
     <ClInclude Include="..\kinematics\Link.h" />
     <ClInclude Include="..\kinematics\PinJoint.h" />
     <ClInclude Include="..\kinematics\SliderHinge.h" />
-    <ClInclude Include="..\kinematics\Utils.h" />
+    <ClInclude Include="..\kinematics\KinematicUtils.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Layer.h" />

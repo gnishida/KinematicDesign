@@ -7,7 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <Kinematics.h>
 #include "KinematicDiagram.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 #include "Shape.h"
 #include "Layer.h"
 #include <QTimer>

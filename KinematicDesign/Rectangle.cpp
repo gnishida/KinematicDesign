@@ -1,6 +1,6 @@
 #include "Rectangle.h"
 #include "Point.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 
 namespace canvas {
 

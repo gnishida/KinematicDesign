@@ -1,6 +1,6 @@
 #include "BodyGeometry.h"
 #include "Joint.h"
-#include "Utils.h"
+#include "KinematicUtils.h"
 
 namespace kinematics {
 
