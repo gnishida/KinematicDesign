@@ -24,17 +24,17 @@
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{74ba8bee-684b-441d-9ade-73bc3507eaa3}</UniqueIdentifier>
+      <UniqueIdentifier>{cf2ade65-0dd9-4b63-a329-9fe0fcb7f2d0}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{ac3f52be-400b-4897-a0e3-7186861b2dac}</UniqueIdentifier>
+      <UniqueIdentifier>{0e1e3fc0-9f88-4551-ab6c-c5c636ecf536}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Source Files\kinematics">
-      <UniqueIdentifier>{240b2546-a4c3-491e-b383-becaf1694ce0}</UniqueIdentifier>
+      <UniqueIdentifier>{d27a11a8-f8fa-4d7f-8983-4e7e2fbf3c29}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,41 +62,32 @@
     <ClCompile Include="GeneratedFiles\Release\moc_Canvas.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\BodyGeometry.cpp">
+    <ClCompile Include="..\kinematics\kinematics\BodyGeometry.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\Gear.cpp">
+    <ClCompile Include="..\kinematics\kinematics\Gear.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\Joint.cpp">
+    <ClCompile Include="..\kinematics\kinematics\Joint.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\Kinematics.cpp">
+    <ClCompile Include="..\kinematics\kinematics\KinematicDiagram.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\Link.cpp">
+    <ClCompile Include="..\kinematics\kinematics\Kinematics.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\PinJoint.cpp">
+    <ClCompile Include="..\kinematics\kinematics\KinematicUtils.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\SliderHinge.cpp">
+    <ClCompile Include="..\kinematics\kinematics\Link.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="Shape.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\kinematics\kinematics\PinJoint.cpp">
+      <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="Rectangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Polygon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Point.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BoundingBox.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\kinematics\kinematics\SliderHinge.cpp">
+      <Filter>Source Files\kinematics</Filter>
     </ClCompile>
     <ClCompile Include="Layer.cpp">
       <Filter>Source Files</Filter>
@@ -104,19 +95,49 @@
     <ClCompile Include="Operation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="History.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LinkageSolver.cpp">
+    <ClCompile Include="Circle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\BBox.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\KinematicDiagram.cpp">
+    <ClCompile Include="..\kinematics\kinematics\LeastSquareSolver.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleGraph.cpp">
+    <ClCompile Include="LinkageSynthesisOptionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LinkageSynthesisOptionDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LinkageSynthesisOptionDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\Solution.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\KinematicUtils.cpp">
+    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis4R.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesisRRRP.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -133,46 +154,46 @@
     <CustomBuild Include="Canvas.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="LinkageSynthesisOptionDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LinkageSynthesisOptionDialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_MainWindow.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\BodyGeometry.h">
+    <ClInclude Include="..\kinematics\kinematics\BodyGeometry.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\Gear.h">
+    <ClInclude Include="..\kinematics\kinematics\Gear.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\Joint.h">
+    <ClInclude Include="..\kinematics\kinematics\Joint.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\Kinematics.h">
+    <ClInclude Include="..\kinematics\kinematics\KinematicDiagram.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\Link.h">
+    <ClInclude Include="..\kinematics\kinematics\Kinematics.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\PinJoint.h">
+    <ClInclude Include="..\kinematics\kinematics\KinematicUtils.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\SliderHinge.h">
+    <ClInclude Include="..\kinematics\kinematics\Link.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="Shape.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\kinematics\kinematics\PinJoint.h">
+      <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="Rectangle.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\kinematics\kinematics\SliderHinge.h">
+      <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="Polygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BoundingBox.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\kinematics\kinematics.h">
+      <Filter>Source Files\kinematics</Filter>
     </ClInclude>
     <ClInclude Include="Layer.h">
       <Filter>Header Files</Filter>
@@ -180,19 +201,46 @@
     <ClInclude Include="Operation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="History.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LinkageSolver.h">
+    <ClInclude Include="Circle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\BBox.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\KinematicDiagram.h">
+    <ClInclude Include="..\kinematics\kinematics\LeastSquareSolver.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleGraph.h">
+    <ClInclude Include="GeneratedFiles\ui_LinkageSynthesisOptionDialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\Solution.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
-    <ClInclude Include="..\kinematics\KinematicUtils.h">
+    <ClInclude Include="..\kinematics\kinematics\LinkageSynthesis4R.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\LinkageSynthesisRRRP.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\LinkageSynthesis.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>

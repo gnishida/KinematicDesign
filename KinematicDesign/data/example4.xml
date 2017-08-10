@@ -1,0 +1,54 @@
+<design author="Gen Nishida" version="1.0" date="07/31/2017">
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose y="10.4" x="8.399999999999999" theta="0"/>
+            <params height="-3.4" width="11.3"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose y="22.5" x="-2.2" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.1999999999999993" x="37"/>
+            <point y="-28.8" x="37"/>
+            <point y="-28.7" x="0"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose y="6.635448633158675" x="15.75307999925125" theta="0.02900167323461722"/>
+            <params height="-3.4" width="11.3"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose y="22.5" x="-2.2" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.1999999999999993" x="37"/>
+            <point y="-28.8" x="37"/>
+            <point y="-28.7" x="0"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose y="14.34686035802784" x="22.17995730186216" theta="0.7586626903080851"/>
+            <params height="-3.4" width="11.3"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose y="22.5" x="-2.2" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.1999999999999993" x="37"/>
+            <point y="-28.8" x="37"/>
+            <point y="-28.7" x="0"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose y="15.25966971714668" x="12.61818756779844" theta="-4.718024306759709"/>
+            <params height="-3.4" width="11.3"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose y="22.5" x="-2.2" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.1999999999999993" x="37"/>
+            <point y="-28.8" x="37"/>
+            <point y="-28.7" x="0"/>
+        </shape>
+    </layer>
+</design>

@@ -1,5 +1,6 @@
 #include "Layer.h"
 #include "Rectangle.h"
+#include "Circle.h"
 #include "Polygon.h"
 
 namespace canvas {
@@ -16,11 +17,15 @@ namespace canvas {
 		QDomNode shape_node = node.firstChild();
 		while (!shape_node.isNull()) {
 			if (shape_node.toElement().tagName() == "shape") {
+				int subtype = shape_node.toElement().attribute("subtype").toInt();
 				if (shape_node.toElement().attribute("type") == "rectangle") {
-					shapes.push_back(boost::shared_ptr<Shape>(new Rectangle(shape_node)));
+					shapes.push_back(boost::shared_ptr<Shape>(new Rectangle(subtype, shape_node)));
+				}
+				else if (shape_node.toElement().attribute("type") == "circle") {
+					shapes.push_back(boost::shared_ptr<Shape>(new Circle(subtype, shape_node)));
 				}
 				else if (shape_node.toElement().attribute("type") == "polygon") {
-					shapes.push_back(boost::shared_ptr<Shape>(new Polygon(shape_node)));
+					shapes.push_back(boost::shared_ptr<Shape>(new Polygon(subtype, shape_node)));
 				}
 			}
 

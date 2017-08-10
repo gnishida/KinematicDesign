@@ -1,22 +1,56 @@
-<design version="1.0" author="Gen Nishida" date="03/26/2017">
+<design version="1.0" date="07/24/2017" author="Gen Nishida">
     <layer>
-        <shape type="rectangle">
-            <model_mat m11="1" m02="0" m21="0" m23="0" m00="1" m01="0" m12="0" m20="0" m22="1" m32="0" m03="0" m10="0" m33="1" m31="370.0983606557379" m13="0" m30="389.6426229508197"/>
-            <params height="55.90163934426229" width="139.3573770491803"/>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
         </shape>
-        <shape type="rectangle">
-            <model_mat m11="1" m02="0" m21="0" m23="0" m00="1" m01="0" m12="0" m20="0" m22="1" m32="0" m03="0" m10="0" m33="1" m31="434" m13="0" m30="222"/>
-            <params height="62" width="308"/>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="5" x="30.50000000000001"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
         </shape>
     </layer>
     <layer>
-        <shape type="rectangle">
-            <model_mat m11="-0.001440405747061634" m02="0" m21="0" m23="0" m00="-0.001440405747061634" m01="0.9999989626151039" m12="0" m20="0" m22="1" m32="0" m03="0" m10="-0.9999989626151039" m33="1" m31="357.4108246081887" m13="0" m30="593.3724677351813"/>
-            <params height="55.90163934426229" width="139.3573770491803"/>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
         </shape>
-        <shape type="rectangle">
-            <model_mat m11="1" m02="0" m21="0" m23="0" m00="1" m01="0" m12="0" m20="0" m22="1" m32="0" m03="0" m10="0" m33="1" m31="434" m13="0" m30="222"/>
-            <params height="62" width="308"/>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0.1011965966177499" y="18.71162803965818" x="29.60562227385768"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
+        </shape>
+        <shape subtype="0" type="rectangle">
+            <pose theta="-4.708336317668167" y="5.471651968704812" x="16.01018911324163"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
         </shape>
     </layer>
 </design>

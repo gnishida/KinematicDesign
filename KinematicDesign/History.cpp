@@ -20,7 +20,7 @@ namespace canvas {
 	}
 
 	std::vector<Layer> History::undo() {
-		if (index == 0) throw "No history.";
+		if (index <= 0) throw "No history.";
 
 		// return the previous state
 		index--;

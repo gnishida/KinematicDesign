@@ -1,24 +1,31 @@
 #include "Polygon.h"
 #include "Point.h"
-#include "KinematicUtils.h"
+#include <kinematics.h>
 
 namespace canvas {
 
-	Polygon::Polygon() : Shape() {
+	Polygon::Polygon(int subtype) : Shape(subtype) {
+		theta = 0;
 	}
 
-	Polygon::Polygon(const glm::dvec2& point) : Shape() {
+	Polygon::Polygon(int subtype, const glm::dvec2& point) : Shape(subtype) {
 		points.push_back(glm::dvec2());
-		model_mat = glm::translate(model_mat, glm::dvec3(point, 0));
+		pos = point;
+		theta = 0;
 
 		current_point = glm::dvec2();
 	}
 
-	Polygon::Polygon(QDomNode& node) : Shape() {
+	/**
+	* Construct a polygon from the xml dom node.
+	*/
+	Polygon::Polygon(int subtype, QDomNode& node) : Shape(subtype) {
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
-			if (params_node.toElement().tagName() == "model_mat") {
-				loadModelMat(params_node);
+			if (params_node.toElement().tagName() == "pose") {
+				pos.x = params_node.toElement().attribute("x").toDouble();
+				pos.y = params_node.toElement().attribute("y").toDouble();
+				theta = params_node.toElement().attribute("theta").toDouble();
 			}
 			else if (params_node.toElement().tagName() == "point") {
 				double x = params_node.toElement().attribute("x").toDouble();
@@ -38,10 +45,11 @@ namespace canvas {
 		return boost::shared_ptr<Shape>(new Polygon(*this));
 	}
 
-	void Polygon::draw(QPainter& painter) const {
+	void Polygon::draw(QPainter& painter, const QPointF& origin, double scale) const {
 		painter.save();
 
-		painter.setTransform(getQTransform());
+		painter.translate(origin.x() + pos.x * scale, origin.y() - pos.y * scale);
+		painter.rotate(-theta / 3.14159265 * 180);
 
 		if (selected || currently_drawing) {
 			painter.setPen(QPen(QColor(0, 0, 255), 2));
@@ -53,16 +61,16 @@ namespace canvas {
 			painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
 		}
 		else {
-			painter.setBrush(QBrush(QColor(0, 255, 0, 60)));
+			painter.setBrush(brushes[subtype]);
 		}
 
 		// draw edges
 		QPolygonF pol;
 		for (int i = 0; i < points.size(); ++i) {
-			pol.push_back(QPointF(points[i].x, points[i].y));
+			pol.push_back(QPointF(points[i].x * scale, -points[i].y * scale));
 		}
 		if (currently_drawing) {
-			pol.push_back(QPointF(current_point.x, current_point.y));
+			pol.push_back(QPointF(current_point.x * scale, -current_point.y * scale));
 			painter.drawPolyline(pol);
 		}
 		else {
@@ -74,16 +82,15 @@ namespace canvas {
 			BoundingBox bbox = boundingBox();
 			painter.setPen(QPen(QColor(0, 0, 0), 1));
 			painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
-			painter.drawRect(bbox.minPt.x, bbox.minPt.y, bbox.width(), bbox.height());
+			painter.drawRect(bbox.minPt.x * scale, -bbox.minPt.y * scale, bbox.width() * scale, -bbox.height() * scale);
 			painter.setBrush(QBrush(QColor(255, 255, 255)));
-			painter.drawRect(bbox.minPt.x - 3, bbox.minPt.y - 3, 6, 6);
-			painter.drawRect(bbox.maxPt.x - 3, bbox.minPt.y - 3, 6, 6);
-			painter.drawRect(bbox.maxPt.x - 3, bbox.maxPt.y - 3, 6, 6);
-			painter.drawRect(bbox.minPt.x - 3, bbox.maxPt.y - 3, 6, 6);
+			painter.drawRect(bbox.minPt.x * scale - 3, -bbox.minPt.y * scale - 3, 6, 6);
+			painter.drawRect(bbox.maxPt.x * scale - 3, -bbox.minPt.y * scale - 3, 6, 6);
+			painter.drawRect(bbox.maxPt.x * scale - 3, -bbox.maxPt.y * scale - 3, 6, 6);
+			painter.drawRect(bbox.minPt.x * scale - 3, -bbox.maxPt.y * scale - 3, 6, 6);
 
 			// show rotation marker
-			glm::dvec2 pos = getRotationMarkerPosition();
-			painter.drawImage(pos.x - rotation_marker.width() / 2, pos.y - rotation_marker.height() / 2, rotation_marker);
+			painter.drawImage(bbox.center().x * scale - rotation_marker.width() / 2, -bbox.maxPt.y * scale - 10 - rotation_marker.height() / 2, rotation_marker);
 		}
 
 		painter.restore();
@@ -92,9 +99,13 @@ namespace canvas {
 	QDomElement Polygon::toXml(QDomDocument& doc) const {
 		QDomElement shape_node = doc.createElement("shape");
 		shape_node.setAttribute("type", "polygon");
+		shape_node.setAttribute("subtype", subtype);
 
-		QDomElement model_mat_node = toModelMatXml(doc);
-		shape_node.appendChild(model_mat_node);
+		QDomElement pose_node = doc.createElement("pose");
+		pose_node.setAttribute("x", pos.x);
+		pose_node.setAttribute("y", pos.y);
+		pose_node.setAttribute("theta", theta);
+		shape_node.appendChild(pose_node);
 
 		for (int i = 0; i < points.size(); ++i) {
 			QDomElement point_node = doc.createElement("point");
@@ -107,10 +118,14 @@ namespace canvas {
 	}
 
 	void Polygon::addPoint(const glm::dvec2& point) {
-		points.push_back(point);
+		//points.push_back(point);
+		points.push_back(current_point);
 		current_point = point;
 	}
 
+	/**
+	* Return the points of the rectangle in the world coordinate system.
+	*/
 	std::vector<glm::dvec2> Polygon::getPoints() const {
 		std::vector<glm::dvec2> pts;
 		for (int i = 0; i < points.size(); ++i) {
@@ -119,8 +134,16 @@ namespace canvas {
 		return pts;
 	}
 
-	void Polygon::updateByNewPoint(const glm::dvec2& point) {
+	void Polygon::updateByNewPoint(const glm::dvec2& point, bool shiftPressed) {
 		current_point = point;
+		if (shiftPressed) {
+			if (abs(point.x - points.back().x) > abs(point.y - points.back().y)) {
+				current_point.y = points.back().y;
+			}
+			else {
+				current_point.x = points.back().x;
+			}
+		}
 	}
 
 	/**
@@ -129,18 +152,24 @@ namespace canvas {
 	bool Polygon::hit(const glm::dvec2& point) const {
 		glm::dvec2 pt = localCoordinate(point);
 
-		return kinematics::pointWithinPolygon(pt, points);
+		return kinematics::withinPolygon(points, pt);
 	}
-		
+	
+	/**
+	* Resize the polygon by the specified scale.
+	* The resizing scale and the center of the resizing are specified as local coordinates.
+	*/
 	void Polygon::resize(const glm::dvec2& scale, const glm::dvec2& resize_center) {
 		BoundingBox bbox = boundingBox();
 		glm::dvec2 offset(resize_center.x * (1.0 - scale.x), resize_center.y * (1.0 - scale.y));
-		model_mat = glm::translate(model_mat, glm::dvec3(offset, 0));
 				
 		for (int i = 0; i < points.size(); ++i) {
 			points[i].x = (points[i].x - resize_center.x) * scale.x + resize_center.x - offset.x;
 			points[i].y = (points[i].y - resize_center.y) * scale.y + resize_center.y - offset.y;
 		}
+
+		glm::dvec2 offset2(offset.x * cos(theta) - offset.y * sin(theta), offset.x * sin(theta) + offset.y * cos(theta));
+		pos += offset2;
 	}
 
 	BoundingBox Polygon::boundingBox() const {

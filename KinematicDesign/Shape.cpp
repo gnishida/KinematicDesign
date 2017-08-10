@@ -1,45 +1,26 @@
 #include "Shape.h"
 #include <QImage>
-#include "KinematicUtils.h"
+#include <kinematics.h>
 
 namespace canvas {
 
 	QImage Shape::rotation_marker = QImage("resources/rotation_marker.png").scaled(16, 16);
+	std::vector<QBrush> Shape::brushes = { QBrush(QColor(0, 255, 0, 60)), QBrush(QColor(0, 0, 255, 30)) };
 
-	Shape::Shape() {
+	Shape::Shape(int subtype) {
+		this->subtype = subtype;
 		selected = false;
 		currently_drawing = false;
-		model_mat = glm::dmat4x4();
 	}
 	
 	Shape::~Shape() {
 	}
 
-	void Shape::loadModelMat(QDomNode& node) {
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 4; ++j) {
-				QString name = QString("m%1%2").arg(i).arg(j);
-				model_mat[i][j] = node.toElement().attribute(name.toUtf8().constData()).toDouble();
-			}
-		}
-	}
-
-	QDomElement Shape::toModelMatXml(QDomDocument& doc) const {
-		QDomElement model_mat_node = doc.createElement("model_mat");
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 4; ++j) {
-				QString name = QString("m%1%2").arg(i).arg(j);
-				model_mat_node.setAttribute(name.toUtf8().constData(), model_mat[i][j]);
-			}
-		}
-
-		return model_mat_node;
-	}
-
-	QTransform Shape::getQTransform() const {
-		QTransform trans;
-		trans.setMatrix(model_mat[0][0], model_mat[0][1], model_mat[0][3], model_mat[1][0], model_mat[1][1], model_mat[1][3], model_mat[3][0], model_mat[3][1], model_mat[3][3]);
-		return trans;
+	/**
+	* Return a model matrix which transform the local coordinates to the world coordinates.
+	*/
+	glm::dmat3x3 Shape::getModelMatrix() const {
+		return glm::dmat3x3({ cos(theta), sin(theta), 0, -sin(theta), cos(theta), 0, pos.x, pos.y, 1 });
 	}
 
 	void Shape::select() {
@@ -63,32 +44,34 @@ namespace canvas {
 	}
 
 	void Shape::translate(const glm::dvec2& vec) {
-		model_mat = glm::translate(glm::dmat4x4(), glm::dvec3(vec, 0)) * model_mat;
+		pos += vec;
 	}
 
 	void Shape::rotate(double angle) {
 		glm::dvec2 c = boundingBox().center();
+		glm::dvec2 c2(cos(theta) * c.x - sin(theta) * c.y, sin(theta) * c.x + cos(theta) * c.y);
 
-		model_mat = glm::translate(model_mat, glm::dvec3(c, 0));
-		model_mat = glm::rotate(model_mat, angle, glm::dvec3(0, 0, 1));
-		model_mat = glm::translate(model_mat, glm::dvec3(-c, 0));
+		pos.x += c2.x * (1.0 - cos(angle)) + c2.y * sin(angle);
+		pos.y += -c2.x * sin(angle) + c2.y * (1.0 - cos(angle));
+
+		theta += angle;
 	}
 
 	glm::dvec2 Shape::getCenter() const {
 		return boundingBox().center();
 	}
-
-	glm::dvec2 Shape::getRotationMarkerPosition() const {
+	
+	glm::dvec2 Shape::getRotationMarkerPosition(double scale) const {
 		BoundingBox bbox = boundingBox();
 
-		return glm::dvec2(bbox.center().x, bbox.minPt.y - 10);
+		return glm::dvec2(bbox.center().x, bbox.maxPt.y + 10 / scale);
 	}
 	
 	glm::dvec2 Shape::localCoordinate(const glm::dvec2& point) const {
-		return glm::dvec2(glm::inverse(model_mat) * glm::dvec4(point, 0, 1));
+		return glm::dvec2((point.x - pos.x) * cos(-theta) - (point.y - pos.y) * sin(-theta), (point.x - pos.x) * sin(-theta) + (point.y - pos.y) * cos(-theta));
 	}
 
 	glm::dvec2 Shape::worldCoordinate(const glm::dvec2& point) const {
-		return glm::dvec2(model_mat * glm::dvec4(point, 0, 1));
+		return glm::dvec2(point.x * cos(theta) - point.y * sin(theta) + pos.x, point.x * sin(theta) + point.y * cos(theta) + pos.y);
 	}
 }

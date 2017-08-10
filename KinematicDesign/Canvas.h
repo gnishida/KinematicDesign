@@ -5,26 +5,25 @@
 #include <QKeyEvent>
 #include <glm/glm.hpp>
 #include <boost/shared_ptr.hpp>
-#include <Kinematics.h>
-#include "KinematicDiagram.h"
-#include "KinematicUtils.h"
+#include <kinematics.h>
+#include <QTimer>
 #include "Shape.h"
 #include "Layer.h"
-#include <QTimer>
 #include "Operation.h"
 #include "History.h"
 
 class MainWindow;
 
 namespace canvas {
-	
+
 	class Canvas : public QWidget {
 		Q_OBJECT
 
 	public:
-		static enum { MODE_SELECT = 0, MODE_MOVE, MODE_ROTATION, MODE_RESIZE, MODE_POLYGON, MODE_RECTANGLE, MODE_CIRCLE };
+		static enum { MODE_SELECT = 0, MODE_MOVE, MODE_ROTATION, MODE_RESIZE, MODE_RECTANGLE, MODE_CIRCLE, MODE_POLYGON, MODE_LINKAGE_REGION, MODE_LINKAGE_AVOIDANCE, MODE_KINEMATICS };
+		static enum { LINKAGE_4R = 0, LINKAGE_RRRP };
 
-	private:
+	public:
 		MainWindow* mainWin;
 		bool ctrlPressed;
 		bool shiftPressed;
@@ -37,12 +36,25 @@ namespace canvas {
 		boost::shared_ptr<canvas::Shape> selected_shape;
 		std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
 		History history;
-
-		std::vector<kinematics::KinematicDiagram> initial_diagrams;
-
-		kinematics::Kinematics kinematics;
+		
+		std::vector<kinematics::Kinematics> kinematics;
 		QTimer* animation_timer;
-		float simulation_speed;
+		bool collision_check;
+		QPointF prev_mouse_pt;
+		QPointF origin;
+		double scale;
+		std::vector<std::vector<kinematics::Solution>> solutions;
+		std::pair<int, int> selectedJoint;
+		//std::vector<bool> is_fixed_bodies;
+		std::vector<std::vector<glm::dvec2>> fixed_body_pts;
+		std::vector<std::vector<glm::dvec2>> body_pts;
+		std::vector<std::vector<glm::dvec2>> linkage_region_pts;
+		std::vector<std::vector<glm::dmat3x3>> poses;
+		int linkage_type;
+		int linkage_subtype;
+		bool orderDefect;
+		bool branchDefect;
+		bool circuitDefect;
 
 	public:
 		Canvas(MainWindow* mainWin);
@@ -56,15 +68,16 @@ namespace canvas {
 		void redo();
 		void copySelectedShapes();
 		void pasteCopiedShapes();
+		void circularRepeat(int num_repeat);
 		void setMode(int mode);
+		void addLayer();
+		void insertLayer();
+		void deleteLayer();
 		void setLayer(int layer_id);
-		void solveAll();
-		void adjustSketch();
-		void initialKinematicDiagram();
-		void solveInverse();
 		void open(const QString& filename);
 		void save(const QString& filename);
 		void run();
+		void runBackward();
 		void stop();
 		void speedUp();
 		void speedDown();
@@ -74,8 +87,16 @@ namespace canvas {
 		void showAssemblies(bool flag);
 		void showLinks(bool flag);
 		void showBodies(bool flag);
+		glm::dvec2 screenToWorldCoordinates(const glm::dvec2& p);
+		glm::dvec2 screenToWorldCoordinates(double x, double y);
+		glm::dvec2 worldToScreenCoordinates(const glm::dvec2& p);
 
-		public slots:
+		void calculateSolutions(int linkage_type, int num_samples, double sigma, bool avoid_branch_defect, bool rotatable_crank, double pose_error_weight, double trajectory_weight, double size_weight);
+		int findSolution(const std::vector<kinematics::Solution>& solutions, const glm::dvec2& pt, int joint_id);
+		void updateDefectFlag(const std::vector<glm::dmat3x3>& poses, const kinematics::Kinematics& kinematics);
+		//void onDebug();
+
+	public slots:
 		void animation_update();
 
 	protected:
@@ -84,6 +105,7 @@ namespace canvas {
 		void mouseMoveEvent(QMouseEvent* e);
 		void mouseReleaseEvent(QMouseEvent* e);
 		void mouseDoubleClickEvent(QMouseEvent* e);
+		void wheelEvent(QWheelEvent* e);
 		void resizeEvent(QResizeEvent *e);
 
 	public:

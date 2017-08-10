@@ -4,22 +4,22 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 #include "Canvas.h"
+#include <vector>
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 public:
 	Ui::MainWindowClass ui;
+	std::vector<QAction*> menuLayers;
+	QActionGroup* groupLayer;
 	canvas::Canvas* canvas;
 
 public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-protected:
-	void keyPressEvent(QKeyEvent* e);
-	void keyReleaseEvent(QKeyEvent* e);
+	void initLayerMenu(int num_layers);
 
 public slots:
 	void onNew();
@@ -31,16 +31,22 @@ public slots:
 	void onPaste();
 	void onDelete();
 	void onSelectAll();
+	void onCircularRepeat();
 	void onModeChanged();
+	void onAddLayer();
+	void onInsertLayer();
+	void onDeleteLayer();
 	void onLayerChanged();
-	void onSolveAll();
-	void onAdjustSketch();
-	void onInitialKinematicDiagram();
-	void onSolveInverse();
+	void onCalculateSolution4RLinkage();
+	void onCalculateSolutionSliderCrank();
 	void onRun();
+	void onRunBackward();
 	void onStop();
 	void onStepForward();
 	void onStepBackward();
+	void onCollisionCheck();
+	void keyPressEvent(QKeyEvent* e);
+	void keyReleaseEvent(QKeyEvent* e);
 };
 
 #endif // MAINWINDOW_H

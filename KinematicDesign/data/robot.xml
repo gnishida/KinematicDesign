@@ -1,0 +1,44 @@
+<design author="Gen Nishida" date="07/17/2017" version="1.0">
+    <layer>
+        <shape type="rectangle">
+            <pose theta="0" x="13.81578947368421" y="49.07894736842106"/>
+            <params height="-21.31578947368421" width="14.47368421052631"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0" x="15.13157894736842" y="16.97368421052631"/>
+            <params height="-17.10526315789474" width="3.552631578947368"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0.4519619409700106" x="23.38150034669722" y="19.0454958414993"/>
+            <params height="-17.23684210526316" width="3.421052631578949"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape type="rectangle">
+            <pose theta="0" x="13.81578947368421" y="49.07894736842106"/>
+            <params height="-21.31578947368421" width="14.47368421052631"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="-1.003391861384154" x="24.48640623269044" y="18.51963618662004"/>
+            <params height="-17.10526315789474" width="3.375"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0" x="18.68421052631579" y="17.23684210526315"/>
+            <params height="-17.23684210526316" width="3.421052631578949"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape type="rectangle">
+            <pose theta="0" x="13.81578947368421" y="49.07894736842106"/>
+            <params height="-21.31578947368421" width="14.47368421052631"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0.4840549883385084" x="23.32917865560275" y="18.58552099327137"/>
+            <params height="-17.10526315789474" width="3.552631578947368"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="-1.018013150637019" x="24.33146080705563" y="18.2835735044709"/>
+            <params height="-17.23684210526316" width="3.421052631578949"/>
+        </shape>
+    </layer>
+</design>

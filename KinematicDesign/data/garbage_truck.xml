@@ -1,0 +1,152 @@
+<design author="Gen Nishida" date="07/19/2017" version="1.0">
+    <layer>
+        <shape type="rectangle" subtype="0">
+            <pose y="-0" x="3.1" theta="0"/>
+            <params height="-0.7" width="63.4"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="4.4" x="10.6" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.09999999999999965" x="32.1"/>
+            <point y="9" x="32.1"/>
+            <point y="14.4" x="28.7"/>
+            <point y="14.4" x="22.9"/>
+            <point y="4" x="22.9"/>
+            <point y="4" x="-0.09999999999999965"/>
+        </shape>
+        <shape type="rectangle" subtype="0">
+            <pose y="19.4" x="10.7" theta="0"/>
+            <params height="-10.5" width="22.3"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="7.6" x="33.3" theta="0"/>
+            <params height="-7.600000000000001" width="7.699999999999996"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.3" x="12.1" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.200000000000001" x="18.8" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="7.6" x="44.1" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="-7.4" x="3"/>
+            <point y="-7.4" x="10.6"/>
+            <point y="0.3000000000000007" x="10.6"/>
+            <point y="0.3000000000000007" x="0"/>
+        </shape>
+        <shape type="polygon" subtype="1">
+            <pose y="4.5" x="29" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="-1.7" x="1.800000000000001"/>
+            <point y="-3.6" x="3.600000000000001"/>
+            <point y="-3.6" x="25.7"/>
+            <point y="6.4" x="25.8"/>
+            <point y="14.5" x="10.2"/>
+            <point y="14.5" x="0.3999999999999986"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape type="rectangle" subtype="0">
+            <pose y="-0" x="3.1" theta="0"/>
+            <params height="-0.7" width="63.4"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="4.4" x="10.6" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.09999999999999965" x="32.1"/>
+            <point y="9" x="32.1"/>
+            <point y="14.4" x="28.7"/>
+            <point y="14.4" x="22.9"/>
+            <point y="4" x="22.9"/>
+            <point y="4" x="-0.09999999999999965"/>
+        </shape>
+        <shape type="rectangle" subtype="0">
+            <pose y="19.4" x="10.7" theta="0"/>
+            <params height="-10.5" width="22.3"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="7.6" x="33.3" theta="0"/>
+            <params height="-7.600000000000001" width="7.699999999999996"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.3" x="12.1" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.200000000000001" x="18.8" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="21.69566842234605" x="40.86870155416621" theta="0.03807682558980408"/>
+            <point y="0" x="0"/>
+            <point y="-7.4" x="3"/>
+            <point y="-7.4" x="10.6"/>
+            <point y="0.3000000000000007" x="10.6"/>
+            <point y="0.3000000000000007" x="0"/>
+        </shape>
+        <shape type="polygon" subtype="1">
+            <pose y="4.5" x="29" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="-1.7" x="1.800000000000001"/>
+            <point y="-3.6" x="3.600000000000001"/>
+            <point y="-3.6" x="25.7"/>
+            <point y="6.4" x="25.8"/>
+            <point y="14.5" x="10.2"/>
+            <point y="14.5" x="0.3999999999999986"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape type="rectangle" subtype="0">
+            <pose y="-0" x="3.1" theta="0"/>
+            <params height="-0.7" width="63.4"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="4.4" x="10.6" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="0.09999999999999965" x="32.1"/>
+            <point y="9" x="32.1"/>
+            <point y="14.4" x="28.7"/>
+            <point y="14.4" x="22.9"/>
+            <point y="4" x="22.9"/>
+            <point y="4" x="-0.09999999999999965"/>
+        </shape>
+        <shape type="rectangle" subtype="0">
+            <pose y="19.4" x="10.7" theta="0"/>
+            <params height="-10.5" width="22.3"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="7.6" x="33.3" theta="0"/>
+            <params height="-7.600000000000001" width="7.699999999999996"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.3" x="12.1" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="circle" subtype="0">
+            <pose y="6.200000000000001" x="18.8" theta="0"/>
+            <params height="-6.3" width="6.200000000000001"/>
+        </shape>
+        <shape type="polygon" subtype="0">
+            <pose y="19.79776780767996" x="31.83161642310222" theta="1.362699173493227"/>
+            <point y="0" x="0"/>
+            <point y="-7.4" x="3"/>
+            <point y="-7.4" x="10.6"/>
+            <point y="0.3000000000000007" x="10.6"/>
+            <point y="0.3000000000000007" x="0"/>
+        </shape>
+        <shape type="polygon" subtype="1">
+            <pose y="4.5" x="29" theta="0"/>
+            <point y="0" x="0"/>
+            <point y="-1.7" x="1.800000000000001"/>
+            <point y="-3.6" x="3.600000000000001"/>
+            <point y="-3.6" x="25.7"/>
+            <point y="6.4" x="25.8"/>
+            <point y="14.5" x="10.2"/>
+            <point y="14.5" x="0.3999999999999986"/>
+        </shape>
+    </layer>
+</design>

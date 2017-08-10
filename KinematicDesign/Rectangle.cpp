@@ -1,25 +1,32 @@
 #include "Rectangle.h"
 #include "Point.h"
-#include "KinematicUtils.h"
+#include <kinematics.h>
 
 namespace canvas {
 
-	Rectangle::Rectangle() : Shape() {
+	Rectangle::Rectangle(int subtype) : Shape(subtype) {
 		width = 0;
 		height = 0;
+		theta = 0;
 	}
 
-	Rectangle::Rectangle(const glm::dvec2& point) : Shape() {
-		model_mat = glm::translate(model_mat, glm::dvec3(point, 0));
+	Rectangle::Rectangle(int subtype, const glm::dvec2& point) : Shape(subtype) {
 		width = 0;
 		height = 0;
+		pos = point;
+		theta = 0;
 	}
 
-	Rectangle::Rectangle(QDomNode& node) : Shape() {
+	/**
+	 * Construct a rectangle from the xml dom node.
+	 */
+	Rectangle::Rectangle(int subtype, QDomNode& node) : Shape(subtype) {
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
-			if (params_node.toElement().tagName() == "model_mat") {
-				loadModelMat(params_node);
+			if (params_node.toElement().tagName() == "pose") {
+				pos.x = params_node.toElement().attribute("x").toDouble();
+				pos.y = params_node.toElement().attribute("y").toDouble();
+				theta = params_node.toElement().attribute("theta").toDouble();
 			}
 			else if (params_node.toElement().tagName() == "params") {
 				width = params_node.toElement().attribute("width").toDouble();
@@ -37,10 +44,11 @@ namespace canvas {
 		return boost::shared_ptr<Shape>(new Rectangle(*this));
 	}
 
-	void Rectangle::draw(QPainter& painter) const {
+	void Rectangle::draw(QPainter& painter, const QPointF& origin, double scale) const {
 		painter.save();
 
-		painter.setTransform(getQTransform());
+		painter.translate(origin.x() + pos.x * scale, origin.y() - pos.y * scale);
+		painter.rotate(-theta / 3.14159265 * 180);
 
 		if (selected || currently_drawing) {
 			painter.setPen(QPen(QColor(0, 0, 255), 2));
@@ -52,15 +60,15 @@ namespace canvas {
 			painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
 		}
 		else {
-			painter.setBrush(QBrush(QColor(0, 255, 0, 60)));
+			painter.setBrush(brushes[subtype]);
 		}
 
 		// draw edges
 		QPolygonF pol;
 		pol.push_back(QPointF(0, 0));
-		pol.push_back(QPointF(width, 0));
-		pol.push_back(QPointF(width, height));
-		pol.push_back(QPointF(0, height));
+		pol.push_back(QPointF(width * scale, 0));
+		pol.push_back(QPointF(width * scale, -height * scale));
+		pol.push_back(QPointF(0, -height * scale));
 		painter.drawPolygon(pol);
 
 		if (selected) {
@@ -68,12 +76,14 @@ namespace canvas {
 			painter.setPen(QPen(QColor(0, 0, 0), 1));
 			painter.setBrush(QBrush(QColor(255, 255, 255)));
 			painter.drawRect(-3, -3, 6, 6);
-			painter.drawRect(width - 3, -3, 6, 6);
-			painter.drawRect(width - 3, height - 3, 6, 6);
-			painter.drawRect(-3, height - 3, 6, 6);
+			painter.drawRect(width * scale - 3, -3, 6, 6);
+			painter.drawRect(width * scale - 3, -height * scale - 3, 6, 6);
+			painter.drawRect(-3, -height * scale - 3, 6, 6);
 			
+			BoundingBox bbox = boundingBox();
+
 			// show rotation marker
-			painter.drawImage(width * 0.5 - rotation_marker.width() / 2, -10 - rotation_marker.height() / 2, rotation_marker);
+			painter.drawImage(width * scale  * 0.5 - rotation_marker.width() / 2, -bbox.maxPt.y * scale - 10 - rotation_marker.height() / 2, rotation_marker);
 		}
 
 		painter.restore();
@@ -82,10 +92,14 @@ namespace canvas {
 	QDomElement Rectangle::toXml(QDomDocument& doc) const {
 		QDomElement shape_node = doc.createElement("shape");
 		shape_node.setAttribute("type", "rectangle");
+		shape_node.setAttribute("subtype", subtype);
 
-		QDomElement model_mat_node = toModelMatXml(doc);
-		shape_node.appendChild(model_mat_node);
-
+		QDomElement pose_node = doc.createElement("pose");
+		pose_node.setAttribute("x", pos.x);
+		pose_node.setAttribute("y", pos.y);
+		pose_node.setAttribute("theta", theta);
+		shape_node.appendChild(pose_node);
+		
 		QDomElement params_node = doc.createElement("params");
 		params_node.setAttribute("width", width);
 		params_node.setAttribute("height", height);
@@ -98,6 +112,9 @@ namespace canvas {
 		// do nothing
 	}
 
+	/**
+	 * Return the points of the rectangle in the world coordinate system.
+	 */
 	std::vector<glm::dvec2> Rectangle::getPoints() const {
 		std::vector<glm::dvec2> points;
 		points.push_back(worldCoordinate(glm::dvec2(0, 0)));
@@ -107,9 +124,14 @@ namespace canvas {
 		return points;
 	}
 
-	void Rectangle::updateByNewPoint(const glm::dvec2& point) {
+	void Rectangle::updateByNewPoint(const glm::dvec2& point, bool shiftPressed) {
 		width = point.x;
 		height = point.y;
+		if (shiftPressed) {
+			width = std::max(width, height);
+			if (height * width >= 0) height = width;
+			else height = -width;
+		}
 	}
 
 	/**
@@ -127,9 +149,15 @@ namespace canvas {
 		else return true;
 	}
 	
-	
+	/**
+	 * Resize the rectangle by the specified scale.
+	 * The resizing scale and the center of the resizing are specified as local coordinates.
+	 */
 	void Rectangle::resize(const glm::dvec2& scale, const glm::dvec2& resize_center) {
-		model_mat = glm::translate(model_mat, glm::dvec3(resize_center.x * (1.0 - scale.x), resize_center.y * (1.0 - scale.y), 0));
+		glm::dvec2 dir(resize_center.x * (1.0 - scale.x), resize_center.y * (1.0 - scale.y));
+		
+		pos.x += dir.x * cos(theta) - dir.y * sin(theta);
+		pos.y += dir.x * sin(theta) + dir.y * cos(theta);
 
 		width *= scale.x;
 		height *= scale.y;

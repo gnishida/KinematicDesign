@@ -6,8 +6,7 @@ namespace canvas {
 		this->minPt = minPt;
 		this->maxPt = maxPt;
 	}
-
-
+	
 	BoundingBox::~BoundingBox() {
 	}
 
