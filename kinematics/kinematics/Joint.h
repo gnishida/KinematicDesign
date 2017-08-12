@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QMap>
 #include <QPainter>
+#include <QDomElement>
 #include <iostream>
 
 namespace kinematics {
@@ -29,6 +30,7 @@ namespace kinematics {
 		virtual void draw(QPainter& painter, const QPointF& origin, float scale) = 0;
 		virtual void stepForward(double step_size) = 0;
 		virtual bool forwardKinematics() = 0;
+		virtual QDomElement toXml(QDomDocument& doc) = 0;
 	};
 
 }

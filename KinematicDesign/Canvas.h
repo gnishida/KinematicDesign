@@ -76,6 +76,7 @@ namespace canvas {
 		void setLayer(int layer_id);
 		void open(const QString& filename);
 		void save(const QString& filename);
+		void saveKinematics(const QString& filename);
 		void run();
 		void runBackward();
 		void stop();

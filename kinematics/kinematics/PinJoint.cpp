@@ -175,4 +175,16 @@ namespace kinematics {
 		return false;
 	}
 
+	QDomElement PinJoint::toXml(QDomDocument& doc) {
+		QDomElement joint_node = doc.createElement("joint");
+		joint_node.setAttribute("id", id);
+		joint_node.setAttribute("x", pos.x);
+		joint_node.setAttribute("y", pos.y);
+		joint_node.setAttribute("type", "pin");
+		if (ground) {
+			joint_node.setAttribute("ground", "true");
+		}
+		return joint_node;
+	}
+
 }

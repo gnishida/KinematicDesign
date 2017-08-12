@@ -63,6 +63,7 @@ public:
     QAction *actionInsertLayer;
     QAction *actionDebug;
     QAction *actionDeleteLayer;
+    QAction *actionSaveKinematics;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -165,6 +166,8 @@ public:
         actionDebug->setObjectName(QStringLiteral("actionDebug"));
         actionDeleteLayer = new QAction(MainWindowClass);
         actionDeleteLayer->setObjectName(QStringLiteral("actionDeleteLayer"));
+        actionSaveKinematics = new QAction(MainWindowClass);
+        actionSaveKinematics->setObjectName(QStringLiteral("actionSaveKinematics"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -197,6 +200,7 @@ public:
         menuFile->addAction(actionNew);
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
+        menuFile->addAction(actionSaveKinematics);
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
         menuTool->addAction(actionCalculateSolution4RLinkage);
@@ -289,6 +293,7 @@ public:
         actionInsertLayer->setText(QApplication::translate("MainWindowClass", "Insert Layer", 0));
         actionDebug->setText(QApplication::translate("MainWindowClass", "Debug", 0));
         actionDeleteLayer->setText(QApplication::translate("MainWindowClass", "Delete Layer", 0));
+        actionSaveKinematics->setText(QApplication::translate("MainWindowClass", "Save Kinematics", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuTool->setTitle(QApplication::translate("MainWindowClass", "Kinematics", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

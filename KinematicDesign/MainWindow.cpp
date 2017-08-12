@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
+	connect(ui.actionSaveKinematics, SIGNAL(triggered()), this, SLOT(onSaveKinematics()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(onUndo()));
 	connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(onRedo()));
@@ -92,6 +93,13 @@ void MainWindow::onSave() {
 
 	canvas->save(filename);
 	setWindowTitle("Dynamic Object Design - " + QFileInfo(filename).fileName());
+}
+
+void MainWindow::onSaveKinematics() {
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save kinematic file..."), "", tr("Kinematic files (*.xml)"));
+	if (filename.isEmpty()) return;
+
+	canvas->saveKinematics(filename);
 }
 
 void MainWindow::onUndo() {

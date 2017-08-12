@@ -25,6 +25,7 @@ public slots:
 	void onNew();
 	void onOpen();
 	void onSave();
+	void onSaveKinematics();
 	void onUndo();
 	void onRedo();
 	void onCopy();

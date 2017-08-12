@@ -289,6 +289,10 @@ namespace canvas {
 		doc.save(out, 4);
 	}
 
+	void Canvas::saveKinematics(const QString& filename) {
+		if (kinematics.size() > 0) kinematics[0].save(filename);
+	}
+
 	void Canvas::run() {
 		if (animation_timer == NULL) {
 			animation_timer = new QTimer(this);
