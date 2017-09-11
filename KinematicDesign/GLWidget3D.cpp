@@ -439,6 +439,11 @@ void GLWidget3D::open(const QString& filename) {
 	QFile file(filename);
 	if (!file.open(QFile::ReadOnly | QFile::Text)) throw "File cannot open.";
 
+	// if the animation is running, stop it.
+	if (animation_timer) {
+		stop();
+	}
+
 	QDomDocument doc;
 	doc.setContent(&file);
 
@@ -534,13 +539,39 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 	renderManager.removeObjects();
 	std::vector<Vertex> vertices;
 	for (int i = 0; i < kinematics.size(); i++) {
-		for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
+		// generate geometry of rigid bodies
+ 		for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
 			std::vector<glm::dvec2> points = kinematics[i].diagram.bodies[j]->getActualPoints();
 			std::vector<glm::vec2> pts(points.size());
 			for (int k = 0; k < points.size(); k++) {
 				pts[k] = glm::vec2(points[k].x, points[k].y);
 			}
 			glutils::drawPrism(pts, 10, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10)), vertices);
+		}
+
+		// generate geometry of links
+		const float link_rad = 0.5f;
+		const float link_depth = 0.3f;
+		for (int j = 0; j < kinematics[i].diagram.links.size(); j++) {
+			glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
+			std::vector<glm::vec2> pts;
+			float theta0 = atan2(p2.y - p1.y, p2.x - p1.x) + glutils::M_PI * 0.5;
+			for (int k = 0; k <= 12; k++) {
+				float theta = theta0 + glutils::M_PI / 12 * k;
+				pts.push_back(glm::vec2(cos(theta) * link_rad + p1.x, sin(theta) * link_rad + p1.y));
+			}
+			theta0 += glutils::M_PI;
+			for (int k = 0; k <= 12; k++) {
+				float theta = theta0 + glutils::M_PI / 12 * k;
+				pts.push_back(glm::vec2(cos(theta) * link_rad + p2.x, sin(theta) * link_rad + p2.y));
+			}
+			float z = link_depth * 1.5 * (int)(j / 2);
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+
+			// joints
+			glutils::drawCylinderZ(link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_depth * 0.5, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z + link_depth)), vertices, 24);
+			glutils::drawCylinderZ(link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_depth * 0.5, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z + link_depth)), vertices, 24);
 		}
 	}
 	renderManager.addObject("kinematics", "", vertices, true);
@@ -971,6 +1002,11 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 			}
 		}
 		else {
+			// make the 3D faded
+			painter.setPen(QColor(255, 255, 255, 160));
+			painter.setBrush(QColor(255, 255, 255, 160));
+			painter.drawRect(0, 0, width(), height());
+
 			for (int i = 0; i < kinematics.size(); i++) {
 				kinematics[i].draw(painter, QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
 			}
