@@ -5,6 +5,7 @@
 #include "SliderHinge.h"
 #include "BoundingBox.h"
 #include "LeastSquareSolver.h"
+#include <opencv2/opencv.hpp>
 
 namespace kinematics {
 	
@@ -15,71 +16,137 @@ namespace kinematics {
 	* @param solutions1	the output solutions for the driving crank, each of which contains a pair of the center point and the circle point
 	* @param solutions2	the output solutions for the follower, each of which contains a pair of the fixed point and the slider point
 	*/
-	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, int num_samples, const std::vector<std::vector<glm::dvec2>>& fixed_body_pts, const std::vector<glm::dvec2>& body_pts, double sigma, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions) {
+	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, int num_samples, const std::vector<std::vector<glm::dvec2>>& fixed_body_pts, const std::vector<glm::dvec2>& body_pts, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions) {
 		solutions.clear();
 
 		srand(0);
 
-		// calculate the bounding boxe of the valid regions
+		// calculate the center of the valid regions
 		BBox bbox_world = boundingBox(linkage_region_pts);
+		glm::dvec2 bbox_world_center = bbox_world.center();
 
-		// convert the coordinates of the valid regions to the local coordinate system of the first pose
+		// convert the coordinates of the regions to the local coordinate system of the first pose
 		glm::dmat3x3 inv_pose0 = glm::inverse(poses[0]);
-		std::vector<glm::dvec2> valid_region(linkage_region_pts.size());
+		std::vector<glm::dvec2> region_local(linkage_region_pts.size());
 		for (int i = 0; i < linkage_region_pts.size(); i++) {
-			valid_region[i] = glm::dvec2(inv_pose0 * glm::dvec3(linkage_region_pts[i], 1));
+			region_local[i] = glm::dvec2(inv_pose0 * glm::dvec3(linkage_region_pts[i], 1));
 		}
 
-		// calculate the bounding boxes of the valid regions
-		BBox bbox_local = boundingBox(valid_region);
+		// calculate the bounding boxes of the regions
+		BBox bbox_local = boundingBox(region_local);
 
-		// calculate the solutions for the driving crank
 		int cnt = 0;
-		printf("sampling");
-		for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
-			printf("\rsampling %d/%d", cnt, iter + 1);
-
-			// perturbe the poses a little
-			// HACK: 本来なら、bodyの座標を関数に渡し、関数側でpertubeしてからposeを計算すべきか？
-			//       とりあえず、回転はperturbしていない。
-			std::vector<glm::dmat3x3> perturbed_poses = poses;
-			double pose_error = 0.0;
-			for (int i = 1; i < poses.size(); i++) {
-				double e1 = genNormal(0, sigma);
-				perturbed_poses[i][2][0] += e1;
-				double e2 = genNormal(0, sigma);
-				perturbed_poses[i][2][1] += e2;
-				pose_error += e1 * e1 + e2 * e2;
+		for (int scale = 1; scale <= 5 && cnt < num_samples; scale++) {
+			// calculate the enlarged linkage region for the sampling region
+			std::vector<glm::dvec2> enlarged_linkage_region_pts;
+			for (int i = 0; i < linkage_region_pts.size(); i++) {
+				enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - bbox_world_center) * (double)scale + bbox_world_center);
 			}
 
-			// sample a slider crank linkage
-			glm::dvec2 A0, A1;
-			if (poses.size() == 2) {
-				if (!sampleLinkForTwoPoses(perturbed_poses, linkage_region_pts, valid_region, bbox_world, bbox_local, A0, A1)) continue;
+			// calculate the bounding boxe of the valid regions
+			BBox enlarged_bbox_world = boundingBox(enlarged_linkage_region_pts);
+
+			// calculate the distace transform of the linkage region
+			cv::Mat img(enlarged_bbox_world.height() + 1, enlarged_bbox_world.width() + 1, CV_8U, cv::Scalar(255));
+			std::vector<std::vector<cv::Point>> pts(1);
+			for (int i = 0; i < linkage_region_pts.size(); i++) {
+				double x = linkage_region_pts[i].x - enlarged_bbox_world.minPt.x;
+				double y = linkage_region_pts[i].y - enlarged_bbox_world.minPt.y;
+				pts[0].push_back(cv::Point(x, y));
 			}
-			else if (poses.size() == 3) {
-				if (!sampleLinkForThreePoses(perturbed_poses, linkage_region_pts, valid_region, bbox_local, A0, A1)) continue;
+			cv::fillPoly(img, pts, cv::Scalar(0), 4);
+			cv::Mat distMap;
+			cv::distanceTransform(img, distMap, CV_DIST_L2, 3);
+			cv::imwrite("test2.png", img);
+			cv::imwrite("test.png", distMap);
+			distMap.convertTo(distMap, CV_64F);
+
+			// convert the coordinates of the enlarged regions to the local coordinate system of the first pose
+			std::vector<glm::dvec2> enlarged_region_local(enlarged_linkage_region_pts.size());
+			for (int i = 0; i < enlarged_linkage_region_pts.size(); i++) {
+				enlarged_region_local[i] = glm::dvec2(inv_pose0 * glm::dvec3(enlarged_linkage_region_pts[i], 1));
 			}
-			else {
-				if (!sampleLink(perturbed_poses, linkage_region_pts, valid_region, bbox_world, bbox_local, A0, A1)) continue;
+
+			// calculate the bounding boxes of the enlarged regions
+			BBox enlarged_bbox_local = boundingBox(enlarged_region_local);
+
+			for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
+				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples * 100 + iter + 1);
+
+				// perturbe the poses a little
+				// HACK: 本来なら、bodyの座標を関数に渡し、関数側でpertubeしてからposeを計算すべきか？
+				//       とりあえず、回転はperturbしていない。
+				std::vector<glm::dmat3x3> perturbed_poses = poses;
+				double position_error = 0.0;
+				double orientation_error = 0.0;
+				for (int i = 1; i < poses.size() - 1; i++) {
+					double e1 = 0;
+					double e2 = 0;
+					double delta_theta = 0;
+					if (i == 0) {
+						e1 = genNormal(0, sigmas[0].first);
+						e2 = genNormal(0, sigmas[0].first);
+						delta_theta = genNormal(0, sigmas[0].second);
+					}
+					else if (i == poses.size() - 1) {
+						e1 = genNormal(0, sigmas[2].first);
+						e2 = genNormal(0, sigmas[2].first);
+						delta_theta = genNormal(0, sigmas[2].second);
+					}
+					else {
+						e1 = genNormal(0, sigmas[1].first);
+						e2 = genNormal(0, sigmas[1].first);
+						delta_theta = genNormal(0, sigmas[1].second);
+					}
+
+					perturbed_poses[i][2][0] += e1;
+					perturbed_poses[i][2][1] += e2;
+					position_error += e1 * e1 + e2 * e2;
+
+					double theta = atan2(poses[i][0][1], poses[i][0][0]) + delta_theta;
+					perturbed_poses[i][0][0] = cos(theta);
+					perturbed_poses[i][0][1] = sin(theta);
+					perturbed_poses[i][1][0] = -sin(theta);
+					perturbed_poses[i][1][1] = cos(theta);
+					orientation_error += abs(delta_theta);
+				}
+
+				// sample a slider crank linkage
+				glm::dvec2 A0, A1;
+				if (poses.size() == 2) {
+					if (!sampleLinkForTwoPoses(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_world, enlarged_bbox_local, A0, A1)) continue;
+				}
+				else if (poses.size() == 3) {
+					if (!sampleLinkForThreePoses(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_local, A0, A1)) continue;
+				}
+				else {
+					if (!sampleLink(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_world, enlarged_bbox_local, A0, A1)) continue;
+				}
+
+				glm::dvec2 B0, B1;
+				if (!sampleSlider(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_world, enlarged_bbox_local, B0, B1)) continue;
+
+				// check hard constraints
+				if (glm::length(A0 - B0) < min_link_length) continue;
+				if (glm::length(A1 - B1) < min_link_length) continue;
+
+				if (rotatable_crank && checkRotatableCrankDefect(A0, B0, A1, B1)) continue;
+				if (avoid_branch_defect && checkBranchDefect(perturbed_poses, A0, B0, A1, B1)) continue;
+				if (checkCircuitDefect(perturbed_poses, A0, B0, A1, B1)) continue;
+
+				// collision check
+				if (checkCollision(perturbed_poses, A0, B0, A1, B1, fixed_body_pts, body_pts)) continue;
+
+				// calculate the distance of the joints from the user-specified linkage region
+				double dist = 0.0;
+				dist += distMap.at<double>(A0.y - enlarged_bbox_world.minPt.y, A0.x - enlarged_bbox_world.minPt.x);
+				dist += distMap.at<double>(A1.y - enlarged_bbox_world.minPt.y, A1.x - enlarged_bbox_world.minPt.x);
+				dist += distMap.at<double>(B0.y - enlarged_bbox_world.minPt.y, B0.x - enlarged_bbox_world.minPt.x);
+				dist += distMap.at<double>(B1.y - enlarged_bbox_world.minPt.y, B1.x - enlarged_bbox_world.minPt.x);
+
+				solutions.push_back(Solution(A0, A1, B0, B1, position_error, orientation_error, 0, perturbed_poses));
+				cnt++;
 			}
-
-			glm::dvec2 B0, B1;
-			if (!sampleSlider(perturbed_poses, linkage_region_pts, valid_region, bbox_world, bbox_local, B0, B1)) continue;
-
-			// check hard constraints
-			if (glm::length(A0 - B0) < min_link_length) continue;
-			if (glm::length(A1 - B1) < min_link_length) continue;
-
-			if (rotatable_crank && checkRotatableCrankDefect(A0, B0, A1, B1)) continue;
-			if (avoid_branch_defect && checkBranchDefect(perturbed_poses, A0, B0, A1, B1)) continue;
-			if (checkCircuitDefect(perturbed_poses, A0, B0, A1, B1)) continue;
-
-			// collision check
-			if (checkCollision(perturbed_poses, A0, B0, A1, B1, fixed_body_pts, body_pts)) continue;
-
-			solutions.push_back(Solution(A0, A1, B0, B1, pose_error, perturbed_poses));
-			cnt++;
 		}
 		printf("\n");
 	}
@@ -270,16 +337,18 @@ namespace kinematics {
 		return true;
 	}
 
-	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<Solution>& solutions, const std::vector<std::vector<glm::dvec2>>& fixed_body_pts, const std::vector<glm::dvec2>& body_pts, double pose_error_weight, double smoothness_weight, double size_weight) {
+	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<Solution>& solutions, const std::vector<std::vector<glm::dvec2>>& fixed_body_pts, const std::vector<glm::dvec2>& body_pts, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
 		// select the best solution based on the trajectory
 		if (solutions.size() > 0) {
 			double min_cost = std::numeric_limits<double>::max();
 			int best = -1;
 			for (int i = 0; i < solutions.size(); i++) {
-				double pose_error = solutions[i].pose_error;
+				double position_error = solutions[i].position_error;
+				double orientation_error = solutions[i].orientation_error;
+				double linkage_location = solutions[i].dist;
 				double tortuosity = tortuosityOfTrajectory(poses, solutions[i].fixed_point[0], solutions[i].fixed_point[1], solutions[i].moving_point[0], solutions[i].moving_point[1], body_pts);
 				double size = glm::length(solutions[i].fixed_point[0] - solutions[i].moving_point[0]) + glm::length(solutions[i].fixed_point[1] - solutions[i].moving_point[1]) + glm::length(solutions[i].moving_point[0] - solutions[i].moving_point[1]);
-				double cost = pose_error * pose_error_weight + tortuosity * smoothness_weight + size * size_weight;
+				double cost = position_error * position_error_weight + orientation_error * orientation_error_weight + linkage_location * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 				if (cost < min_cost) {
 					min_cost = cost;
 					best = i;
@@ -289,7 +358,7 @@ namespace kinematics {
 			return solutions[best];
 		}
 		else {
-			return Solution({ 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 }, 0, poses);
+			return Solution({ 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 }, 0, 0, 0, poses);
 		}
 	}
 

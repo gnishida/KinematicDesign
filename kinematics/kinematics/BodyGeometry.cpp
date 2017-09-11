@@ -45,7 +45,6 @@ namespace kinematics {
 		painter.drawPolygon(pts);
 
 		painter.restore();
-
 	}
 
 }

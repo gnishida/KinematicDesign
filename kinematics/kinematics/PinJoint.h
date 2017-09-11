@@ -13,7 +13,6 @@ namespace kinematics {
 		void draw(QPainter& painter, const QPointF& origin, float scale);
 		void stepForward(double step_size);
 		bool forwardKinematics();
-		QDomElement toXml(QDomDocument& doc);
 	};
 
 }

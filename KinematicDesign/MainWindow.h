@@ -3,8 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
-#include "Canvas.h"
-#include <vector>
+#include "GLWidget3D.h"
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -13,7 +12,7 @@ public:
 	Ui::MainWindowClass ui;
 	std::vector<QAction*> menuLayers;
 	QActionGroup* groupLayer;
-	canvas::Canvas* canvas;
+	GLWidget3D* glWidget;
 
 public:
 	MainWindow(QWidget *parent = 0);
@@ -21,18 +20,20 @@ public:
 
 	void initLayerMenu(int num_layers);
 
+protected:
+	void keyPressEvent(QKeyEvent* e);
+	void keyReleaseEvent(QKeyEvent* e);
+
 public slots:
 	void onNew();
 	void onOpen();
 	void onSave();
-	void onSaveKinematics();
 	void onUndo();
 	void onRedo();
 	void onCopy();
 	void onPaste();
 	void onDelete();
 	void onSelectAll();
-	void onCircularRepeat();
 	void onModeChanged();
 	void onAddLayer();
 	void onInsertLayer();
@@ -46,8 +47,6 @@ public slots:
 	void onStepForward();
 	void onStepBackward();
 	void onCollisionCheck();
-	void keyPressEvent(QKeyEvent* e);
-	void keyReleaseEvent(QKeyEvent* e);
 };
 
 #endif // MAINWINDOW_H

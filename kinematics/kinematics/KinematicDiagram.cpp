@@ -7,8 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <glm/gtc/matrix_transform.hpp>
-#include <QDate>
-#include <QDomElement>
 
 namespace kinematics {
 
@@ -287,6 +285,7 @@ namespace kinematics {
 	}
 
 	void KinematicDiagram::save(const QString& filename) {
+		/*
 		QFile file(filename);
 		if (!file.open(QFile::WriteOnly)) throw "File cannot open.";
 
@@ -300,49 +299,58 @@ namespace kinematics {
 		doc.appendChild(root);
 
 		// write points
-		QDomElement joints_node = doc.createElement("joints");
-		root.appendChild(joints_node);
+		QDomElement points_node = doc.createElement("points");
+		root.appendChild(points_node);
 		for (auto it = joints.begin(); it != joints.end(); ++it) {
-			joints_node.appendChild(it.value()->toXml(doc));
+		QDomElement point_node = doc.createElement("point");
+		point_node.setAttribute("id", it.key());
+		point_node.setAttribute("x", it.value()->pos.x);
+		point_node.setAttribute("y", it.value()->pos.y);
+		points_node.appendChild(point_node);
 		}
 
 		// write links
 		QDomElement links_node = doc.createElement("links");
 		root.appendChild(links_node);
-		for (auto it = links.begin(); it != links.end(); ++it) {
-			QDomElement link_node = doc.createElement("link");
-			QString joints;
-			for (int j = 0; j < it.value()->joints.size(); ++j) {
-				if (j > 0) joints += ",";
-				joints += QString::number(it.value()->joints[j]->id);
-			}
-			link_node.setAttribute("joints", joints);
-			if (it.value()->driver) {
-				link_node.setAttribute("driver", "true");
-			}
-			links_node.appendChild(link_node);
+		for (auto it = joints.begin(); it != joints.end(); ++it) {
+		for (int j = 0; j < it.value()->in_links.size(); ++j) {
+		QDomElement link_node = doc.createElement("link");
+		link_node.setAttribute("order", j);
+		link_node.setAttribute("start", it.value()->in_links[j]->start);
+		link_node.setAttribute("end", it.value()->in_links[j]->end);
+		links_node.appendChild(link_node);
+		}
 		}
 
 		// write bodies
 		QDomElement bodies_node = doc.createElement("bodies");
 		root.appendChild(bodies_node);
 		for (int i = 0; i < bodies.size(); ++i) {
-			QDomElement body_node = doc.createElement("body");
-			body_node.setAttribute("id1", bodies[i]->pivot1->id);
-			body_node.setAttribute("id2", bodies[i]->pivot2->id);
-			bodies_node.appendChild(body_node);
+		QDomElement body_node = doc.createElement("body");
+		body_node.setAttribute("id1", bodies[i].pivot1);
+		body_node.setAttribute("id2", bodies[i].pivot2);
+		bodies_node.appendChild(body_node);
 
-			std::vector<glm::dvec2> pts = bodies[i]->getActualPoints();
-			for (int k = 0; k < pts.size(); ++k) {
-				QDomElement point_node = doc.createElement("point");
-				point_node.setAttribute("x", pts[k].x);
-				point_node.setAttribute("y", pts[k].y);
-				body_node.appendChild(point_node);
-			}
+		// setup rotation matrix
+		glm::dvec2 dir = joints[bodies[i].pivot2]->pos - joints[bodies[i].pivot1]->pos;
+		double angle = atan2(dir.y, dir.x);
+		glm::dvec2 p1 = (joints[bodies[i].pivot1]->pos + joints[bodies[i].pivot2]->pos) * 0.5;
+		glm::dmat4x4 model;
+		model = glm::rotate(model, angle, glm::dvec3(0, 0, 1));
+
+		for (int k = 0; k < bodies[i].points.size(); ++k) {
+		// convert the coordinates to the local coordinate system
+		glm::dvec2 rotated_p = glm::dvec2(model * glm::vec4(bodies[i].points[k].x, bodies[i].points[k].y, 0, 1)) + p1;
+		QDomElement point_node = doc.createElement("point");
+		point_node.setAttribute("x", rotated_p.x);
+		point_node.setAttribute("y", rotated_p.y);
+		body_node.appendChild(point_node);
+		}
 		}
 
 		QTextStream out(&file);
 		doc.save(out, 4);
+		*/
 	}
 
 	void KinematicDiagram::updateBodyAdjacency() {

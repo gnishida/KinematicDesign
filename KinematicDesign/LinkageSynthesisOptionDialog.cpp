@@ -4,10 +4,17 @@ LinkageSynthesisOptionDialog::LinkageSynthesisOptionDialog(QWidget *parent) : QD
 	ui.setupUi(this);
 
 	ui.lineEditNumSamples->setText("1000");
-	ui.lineEditStdDev->setText("0");
+	ui.lineEditStdDevPositionFirst->setText("0");
+	ui.lineEditStdDevOrientationFirst->setText("0");
+	ui.lineEditStdDevPositionMiddle->setText("0");
+	ui.lineEditStdDevOrientationMiddle->setText("0");
+	ui.lineEditStdDevPositionLast->setText("0");
+	ui.lineEditStdDevOrientationLast->setText("0");
 	ui.checkBoxAvoidBranchDefect->setChecked(true);
 	ui.checkBoxRotatableCrank->setChecked(true);
-	ui.lineEditPoseErrorWeight->setText("1");
+	ui.lineEditPositionErrorWeight->setText("1");
+	ui.lineEditOrientationErrorWeight->setText("5");
+	ui.lineEditLinkageLocationWeight->setText("10");
 	ui.lineEditTrajectoryWeight->setText("1");
 	ui.lineEditSizeWeight->setText("1");
 

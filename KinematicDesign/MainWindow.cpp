@@ -5,8 +5,8 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
 
-	canvas = new canvas::Canvas(this);
-	setCentralWidget(canvas);
+	glWidget = new GLWidget3D(this);
+	setCentralWidget(glWidget);
 
 	QActionGroup* groupMode = new QActionGroup(this);
 	groupMode->addAction(ui.actionSelect);
@@ -16,16 +16,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	groupMode->addAction(ui.actionLinkageRegion);
 	groupMode->addAction(ui.actionKinematics);
 	ui.actionSelect->setChecked(true);
-	
+
 	groupLayer = new QActionGroup(this);
 	initLayerMenu(2);
 
-	ui.actionCollisionCheck->setChecked(canvas->collision_check);
+	ui.actionCollisionCheck->setChecked(glWidget->collision_check);
 
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
-	connect(ui.actionSaveKinematics, SIGNAL(triggered()), this, SLOT(onSaveKinematics()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(onUndo()));
 	connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(onRedo()));
@@ -33,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionPaste, SIGNAL(triggered()), this, SLOT(onPaste()));
 	connect(ui.actionDelete, SIGNAL(triggered()), this, SLOT(onDelete()));
 	connect(ui.actionSelectAll, SIGNAL(triggered()), this, SLOT(onSelectAll()));
-	connect(ui.actionCircularRepeat, SIGNAL(triggered()), this, SLOT(onCircularRepeat()));
 	connect(ui.actionSelect, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionRectangle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
@@ -75,79 +73,76 @@ void MainWindow::initLayerMenu(int num_layers) {
 }
 
 void MainWindow::onNew() {
-	canvas->clear();
-	setWindowTitle("Dynamic Object Design");
+	glWidget->clear();
+	setWindowTitle("Canvas 3D");
 }
 
 void MainWindow::onOpen() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open design file..."), "", tr("Design files (*.xml)"));
 	if (filename.isEmpty()) return;
 
-	canvas->open(filename);
-	setWindowTitle("Dynamic Object Design - " + QFileInfo(filename).fileName());
+	glWidget->open(filename);
+	setWindowTitle("Canvas 3D - " + QFileInfo(filename).fileName());
 }
 
 void MainWindow::onSave() {
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save design file..."), "", tr("Design files (*.xml)"));
 	if (filename.isEmpty()) return;
 
-	canvas->save(filename);
-	setWindowTitle("Dynamic Object Design - " + QFileInfo(filename).fileName());
-}
-
-void MainWindow::onSaveKinematics() {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save kinematic file..."), "", tr("Kinematic files (*.xml)"));
-	if (filename.isEmpty()) return;
-
-	canvas->saveKinematics(filename);
+	glWidget->save(filename);
+	setWindowTitle("Canvas 3D - " + QFileInfo(filename).fileName());
 }
 
 void MainWindow::onUndo() {
-	canvas->undo();
+	glWidget->undo();
 }
 
 void MainWindow::onRedo() {
-	canvas->redo();
+	glWidget->redo();
 }
 
 void MainWindow::onCopy() {
-	canvas->copySelectedShapes();
+	glWidget->copySelectedShapes();
 }
 
 void MainWindow::onPaste() {
-	canvas->pasteCopiedShapes();
+	glWidget->pasteCopiedShapes();
 }
 
 void MainWindow::onDelete() {
-	canvas->deleteSelectedShapes();
+	glWidget->deleteSelectedShapes();
 }
 
 void MainWindow::onSelectAll() {
-	canvas->selectAll();
+	glWidget->selectAll();
 }
 
-void MainWindow::onCircularRepeat() {
-	canvas->circularRepeat(8);
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+	glWidget->keyPressEvent(e);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* e) {
+	glWidget->keyReleaseEvent(e);
 }
 
 void MainWindow::onModeChanged() {
 	if (ui.actionSelect->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_SELECT);
+		glWidget->setMode(GLWidget3D::MODE_SELECT);
 	}
 	else if (ui.actionRectangle->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_RECTANGLE);
+		glWidget->setMode(GLWidget3D::MODE_RECTANGLE);
 	}
 	else if (ui.actionCircle->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_CIRCLE);
+		glWidget->setMode(GLWidget3D::MODE_CIRCLE);
 	}
 	else if (ui.actionPolygon->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_POLYGON);
+		glWidget->setMode(GLWidget3D::MODE_POLYGON);
 	}
 	else if (ui.actionLinkageRegion->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_LINKAGE_REGION);
+		glWidget->setMode(GLWidget3D::MODE_LINKAGE_REGION);
 	}
 	else if (ui.actionKinematics->isChecked()) {
-		canvas->setMode(canvas::Canvas::MODE_KINEMATICS);
+		glWidget->setMode(GLWidget3D::MODE_KINEMATICS);
 	}
 	update();
 }
@@ -159,7 +154,7 @@ void MainWindow::onAddLayer() {
 	menuLayers.back()->setChecked(true);
 	connect(menuLayers.back(), SIGNAL(triggered()), this, SLOT(onLayerChanged()));
 
-	canvas->addLayer();
+	glWidget->addLayer();
 }
 
 void MainWindow::onInsertLayer() {
@@ -168,7 +163,7 @@ void MainWindow::onInsertLayer() {
 	groupLayer->addAction(menuLayers.back());
 	connect(menuLayers.back(), SIGNAL(triggered()), this, SLOT(onLayerChanged()));
 
-	canvas->insertLayer();
+	glWidget->insertLayer();
 }
 
 void MainWindow::onDeleteLayer() {
@@ -178,13 +173,13 @@ void MainWindow::onDeleteLayer() {
 	delete menuLayers.back();
 	menuLayers.resize(menuLayers.size() - 1);
 
-	canvas->deleteLayer();
+	glWidget->deleteLayer();
 }
 
 void MainWindow::onLayerChanged() {
 	for (int i = 0; i < menuLayers.size(); i++) {
 		if (menuLayers[i]->isChecked()) {
-			canvas->setLayer(i);
+			glWidget->setLayer(i);
 			break;
 		}
 	}
@@ -193,12 +188,20 @@ void MainWindow::onLayerChanged() {
 void MainWindow::onCalculateSolution4RLinkage() {
 	LinkageSynthesisOptionDialog dlg;
 	if (dlg.exec()) {
-		canvas->calculateSolutions(canvas::Canvas::LINKAGE_4R, 
+		std::vector<std::pair<double, double>> sigmas = {
+			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_4R,
 			dlg.ui.lineEditNumSamples->text().toInt(),
-			dlg.ui.lineEditStdDev->text().toDouble(),
+			sigmas,
 			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
 			dlg.ui.checkBoxRotatableCrank->isChecked(),
-			dlg.ui.lineEditPoseErrorWeight->text().toDouble(),
+			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
+			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble());
 	}
@@ -207,48 +210,46 @@ void MainWindow::onCalculateSolution4RLinkage() {
 void MainWindow::onCalculateSolutionSliderCrank() {
 	LinkageSynthesisOptionDialog dlg;
 	if (dlg.exec()) {
-		canvas->calculateSolutions(canvas::Canvas::LINKAGE_RRRP,
-			dlg.ui.lineEditNumSamples->text().toInt(), 
-			dlg.ui.lineEditStdDev->text().toDouble(),
+		std::vector<std::pair<double, double>> sigmas = {
+			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_RRRP,
+			dlg.ui.lineEditNumSamples->text().toInt(),
+			sigmas,
 			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
 			dlg.ui.checkBoxRotatableCrank->isChecked(),
-			dlg.ui.lineEditPoseErrorWeight->text().toDouble(),
+			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
+			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble());
-
 	}
 }
 
 void MainWindow::onRun() {
-	canvas->run();
+	glWidget->run();
 }
 
 void MainWindow::onRunBackward() {
-	canvas->invertSpeed();
-	canvas->run();
+	glWidget->invertSpeed();
+	glWidget->run();
 }
 
 void MainWindow::onStop() {
-	canvas->stop();
+	glWidget->stop();
 }
 
 void MainWindow::onStepForward() {
-	canvas->stepForward();
+	glWidget->stepForward();
 }
 
 void MainWindow::onStepBackward() {
-	canvas->stepBackward();
+	glWidget->stepBackward();
 }
 
 void MainWindow::onCollisionCheck() {
-	canvas->collision_check = ui.actionCollisionCheck->isChecked();
+	glWidget->collision_check = ui.actionCollisionCheck->isChecked();
 }
-
-void MainWindow::keyPressEvent(QKeyEvent* e) {
-	canvas->keyPressEvent(e);
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent* e) {
-	canvas->keyReleaseEvent(e);
-}
-

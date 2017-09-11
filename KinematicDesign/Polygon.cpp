@@ -1,14 +1,23 @@
 #include "Polygon.h"
-#include "Point.h"
-#include <kinematics.h>
+#include <boost/geometry.hpp>
+#include <boost/geometry/core/point_type.hpp>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/register/ring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/register/ring.hpp>
+#include <boost/geometry/algorithms/within.hpp>
+#include <boost/geometry/geometries/register/ring.hpp>
 
 namespace canvas {
 
 	Polygon::Polygon(int subtype) : Shape(subtype) {
+		type = TYPE_POLYGON;
 		theta = 0;
 	}
 
 	Polygon::Polygon(int subtype, const glm::dvec2& point) : Shape(subtype) {
+		type = TYPE_POLYGON;
 		points.push_back(glm::dvec2());
 		pos = point;
 		theta = 0;
@@ -20,6 +29,7 @@ namespace canvas {
 	* Construct a polygon from the xml dom node.
 	*/
 	Polygon::Polygon(int subtype, QDomNode& node) : Shape(subtype) {
+		type = TYPE_POLYGON;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "pose") {
@@ -31,11 +41,20 @@ namespace canvas {
 				double x = params_node.toElement().attribute("x").toDouble();
 				double y = params_node.toElement().attribute("y").toDouble();
 
-				points.push_back(glm::dvec2(x, y));
+				if (points.size() == 0 || points.back() != glm::dvec2(x, y)) {
+					points.push_back(glm::dvec2(x, y));
+				}
 			}
 
 			params_node = params_node.nextSibling();
 		}
+
+		// remove the last point if it is coincide with the first point
+		if (points.size() >= 2 && points.front() == points.back()) {
+			points.pop_back();
+		}
+
+		update3DGeometry();
 	}
 
 	Polygon::~Polygon() {
@@ -119,7 +138,9 @@ namespace canvas {
 
 	void Polygon::addPoint(const glm::dvec2& point) {
 		//points.push_back(point);
-		points.push_back(current_point);
+		if (points.size() == 0 || points.back() != current_point) {
+			points.push_back(current_point);
+		}
 		current_point = point;
 	}
 
@@ -152,7 +173,7 @@ namespace canvas {
 	bool Polygon::hit(const glm::dvec2& point) const {
 		glm::dvec2 pt = localCoordinate(point);
 
-		return kinematics::withinPolygon(points, pt);
+		return withinPolygon(points, pt);
 	}
 	
 	/**
@@ -170,6 +191,8 @@ namespace canvas {
 
 		glm::dvec2 offset2(offset.x * cos(theta) - offset.y * sin(theta), offset.x * sin(theta) + offset.y * cos(theta));
 		pos += offset2;
+
+		update3DGeometry();
 	}
 
 	BoundingBox Polygon::boundingBox() const {
@@ -185,6 +208,18 @@ namespace canvas {
 		}
 
 		return BoundingBox(glm::dvec2(min_x, min_y), glm::dvec2(max_x, max_y));
+	}
+
+	bool Polygon::withinPolygon(const std::vector<glm::dvec2>& points, const glm::dvec2& pt) const {
+		typedef boost::geometry::model::d2::point_xy<double> point_2d;
+
+		boost::geometry::model::ring<point_2d> ring;
+		for (int i = 0; i < points.size(); i++) {
+			ring.push_back(point_2d(points[i].x, points[i].y));
+		}
+
+		boost::geometry::correct(ring);
+		return boost::geometry::within(point_2d(pt.x, pt.y), ring);
 	}
 
 }

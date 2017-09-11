@@ -5,6 +5,9 @@
 #include <boost/shared_ptr.hpp>
 #include "Shape.h"
 #include <QDomDocument>
+#include "Vertex.h"
+#include <algorithm>
+#include <vector>
 
 namespace canvas {
 

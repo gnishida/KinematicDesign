@@ -4,8 +4,6 @@
 
 namespace canvas {
 
-	class Point;
-
 	class Rectangle : public Shape {
 	private:
 		double width;

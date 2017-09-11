@@ -1,16 +1,16 @@
 #include "Rectangle.h"
-#include "Point.h"
-#include <kinematics.h>
 
 namespace canvas {
 
 	Rectangle::Rectangle(int subtype) : Shape(subtype) {
+		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
 		theta = 0;
 	}
 
 	Rectangle::Rectangle(int subtype, const glm::dvec2& point) : Shape(subtype) {
+		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
 		pos = point;
@@ -21,6 +21,7 @@ namespace canvas {
 	 * Construct a rectangle from the xml dom node.
 	 */
 	Rectangle::Rectangle(int subtype, QDomNode& node) : Shape(subtype) {
+		type = TYPE_RECTANGLE;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "pose") {
@@ -35,13 +36,16 @@ namespace canvas {
 
 			params_node = params_node.nextSibling();
 		}
+
+		update3DGeometry();
 	}
 
 	Rectangle::~Rectangle() {
 	}
 
 	boost::shared_ptr<Shape> Rectangle::clone() const {
-		return boost::shared_ptr<Shape>(new Rectangle(*this));
+		Rectangle* new_rec = new Rectangle(*this);
+		return boost::shared_ptr<Shape>(new_rec);
 	}
 
 	void Rectangle::draw(QPainter& painter, const QPointF& origin, double scale) const {
@@ -161,6 +165,8 @@ namespace canvas {
 
 		width *= scale.x;
 		height *= scale.y;
+
+		update3DGeometry();
 	}
 
 	BoundingBox Rectangle::boundingBox() const {
