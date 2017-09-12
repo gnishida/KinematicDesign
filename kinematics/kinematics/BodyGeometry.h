@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <QPainter>
 #include <QMap>
+#include "KinematicUtils.h"
 
 namespace kinematics {
 
@@ -14,11 +15,11 @@ namespace kinematics {
 	public:
 		boost::shared_ptr<Joint> pivot1;
 		boost::shared_ptr<Joint> pivot2;
-		std::vector<glm::dvec2> points;
+		Polygon25D polygon;
 		QMap<int, bool> neighbors;
 
 	public:
-		BodyGeometry(boost::shared_ptr<Joint> pivot1, boost::shared_ptr<Joint> pivot2) : pivot1(pivot1), pivot2(pivot2) {}
+		BodyGeometry(boost::shared_ptr<Joint> pivot1, boost::shared_ptr<Joint> pivot2, const Polygon25D& polygon) : pivot1(pivot1), pivot2(pivot2), polygon(polygon) {}
 
 		std::vector<glm::dvec2> getActualPoints();
 		void draw(QPainter& painter, const QPointF& origin, float scale);

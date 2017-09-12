@@ -60,11 +60,12 @@ namespace kinematics {
 		for (int i = 0; i < bodies.size(); ++i) {
 			int id1 = bodies[i]->pivot1->id;
 			int id2 = bodies[i]->pivot2->id;
-			boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(copied_diagram.joints[id1], copied_diagram.joints[id2]));
-			
-			for (int j = 0; j < bodies[i]->points.size(); ++j) {
-				body->points.push_back(bodies[i]->points[j]);
+			boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(copied_diagram.joints[id1], copied_diagram.joints[id2], bodies[i]->polygon));
+			/*
+			for (int j = 0; j < bodies[i]->polygon.points.size(); ++j) {
+				body->polygon.points.push_back(bodies[i]->polygon.points[j]);
 			}
+			*/
 
 			for (auto it = bodies[i]->neighbors.begin(); it != bodies[i]->neighbors.end(); ++it) {
 				body->neighbors[it.key()] = it.value();
@@ -174,8 +175,8 @@ namespace kinematics {
 		return link;
 	}
 
-	void KinematicDiagram::addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, std::vector<glm::dvec2> points) {
-		boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(joint1, joint2));
+	void KinematicDiagram::addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Polygon25D& polygon) {
+		boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(joint1, joint2, polygon));
 
 		// setup rotation matrix
 		glm::vec2 dir = joint2->pos - joint1->pos;
@@ -185,11 +186,11 @@ namespace kinematics {
 		glm::dmat4x4 model;
 		model = glm::rotate(model, -angle, glm::dvec3(0, 0, 1));
 
-		for (int i = 0; i < points.size(); ++i) {
+		for (int i = 0; i < polygon.points.size(); ++i) {
 			// convert the coordinates to the local coordinate system
-			glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(points[i].x - p1.x, points[i].y - p1.y, 0, 1));
+			glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygon.points[i].x - p1.x, polygon.points[i].y - p1.y, 0, 1));
 
-			body->points.push_back(rotated_p);
+			body->polygon.points[i] = rotated_p;
 		}
 
 		bodies.push_back(body);
@@ -255,6 +256,8 @@ namespace kinematics {
 						// add a body
 						int id1 = body_node.toElement().attribute("id1").toInt();
 						int id2 = body_node.toElement().attribute("id2").toInt();
+						double depth1 = body_node.toElement().attribute("depth1").toDouble();
+						double depth2 = body_node.toElement().attribute("depth2").toDouble();
 
 						std::vector<glm::dvec2> points;
 						QDomNode point_node = body_node.firstChild();
@@ -268,7 +271,7 @@ namespace kinematics {
 							point_node = point_node.nextSibling();
 						}
 
-						addBody(joints[id1], joints[id2], points);
+						addBody(joints[id1], joints[id2], Polygon25D(points, depth1, depth2));
 					}
 
 					body_node = body_node.nextSibling();
@@ -375,6 +378,9 @@ namespace kinematics {
 			for (int j = i + 1; j < bodies.size(); ++j) {
 				// skip the neighbors
 				if (bodies[i]->neighbors.contains(j)) continue;
+
+				// if the depth is different, we do not need to check the collision between these rigid bodies
+				if (bodies[i]->polygon.depth1 >= bodies[j]->polygon.depth2 || bodies[j]->polygon.depth1 >= bodies[i]->polygon.depth2) continue;
 
 				if (polygonPolygonIntersection(bodies[i]->getActualPoints(), bodies[j]->getActualPoints())) {
 					return true;

@@ -11,6 +11,17 @@
 
 namespace kinematics {
 
+	class Polygon25D {
+	public:
+		std::vector<glm::dvec2> points;
+		double depth1;
+		double depth2;
+
+	public:
+		Polygon25D() : depth1(0), depth2(0) {}
+		Polygon25D(const std::vector<glm::dvec2>& points, double depth1, double depth2) : points(points), depth1(depth1), depth2(depth2) {}
+	};
+
 	const double M_PI = 3.14159265;
 	const double TOL = 0.0000001;
 
@@ -30,6 +41,7 @@ namespace kinematics {
 	glm::dvec2 threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3);
 	double threeLengths(const glm::dvec2& a, double l0, const glm::dvec2& b, double l1, const glm::dvec2& c, double l2, double r0, double r1, double r2, const glm::dvec2& prev_pos, const glm::dvec2& prev_pos2, const glm::dvec2& prev_pos3, double theta0, double theta1, double delta_theta);
 	void circleFit(const std::vector<glm::dvec2>& p, glm::dvec2& c, double& r);
+	glm::dvec2 closestPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, int num_samples = 200);
 
 	glm::dvec2 reflect(const glm::dvec2& p, const glm::dvec2& a, const glm::dvec2& v);
 	glm::dmat3x3 affineTransform(const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& q1, const glm::dvec2& q2);

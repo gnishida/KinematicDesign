@@ -542,42 +542,71 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 		// generate geometry of rigid bodies
  		for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
 			std::vector<glm::dvec2> points = kinematics[i].diagram.bodies[j]->getActualPoints();
-			std::vector<glm::vec2> pts(points.size());
-			for (int k = 0; k < points.size(); k++) {
-				pts[k] = glm::vec2(points[k].x, points[k].y);
-			}
-			glutils::drawPrism(pts, 10, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10)), vertices);
+			float z = kinematics[i].diagram.bodies[j]->polygon.depth1;
+			float depth = kinematics[i].diagram.bodies[j]->polygon.depth2 - kinematics[i].diagram.bodies[j]->polygon.depth1;
+			glutils::drawPrism(points, depth, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 		}
 
 		// generate geometry of links
-		const float link_rad = 0.5f;
+		const float link_radius = 0.5f;
 		const float link_depth = 0.3f;
+		const float joint_radius = 0.25f;
+		const float joint_depth = 0.15f;
 		for (int j = 0; j < kinematics[i].diagram.links.size(); j++) {
 			glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
 			glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
-			std::vector<glm::vec2> pts;
-			float theta0 = atan2(p2.y - p1.y, p2.x - p1.x) + glutils::M_PI * 0.5;
-			for (int k = 0; k <= 12; k++) {
-				float theta = theta0 + glutils::M_PI / 12 * k;
-				pts.push_back(glm::vec2(cos(theta) * link_rad + p1.x, sin(theta) * link_rad + p1.y));
-			}
-			theta0 += glutils::M_PI;
-			for (int k = 0; k <= 12; k++) {
-				float theta = theta0 + glutils::M_PI / 12 * k;
-				pts.push_back(glm::vec2(cos(theta) * link_rad + p2.x, sin(theta) * link_rad + p2.y));
-			}
-			float z = link_depth * 1.5 * (int)(j / 2);
+			std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), link_radius);
+
+			// HACK
+			// This part is currently very unorganized.
+			// For each type of mechanism, I have to hard code the depth of each link.
+			// In the future, this part of code should be moved to the class of each type of mechanism.
+			float z;
+			if (j == 0) z = (link_depth + joint_depth) * 1;
+			else if (j == 1) z = (link_depth + joint_depth) * 1;
+			else z = (link_depth + joint_depth) * 2;
 			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 
 			// joints
-			glutils::drawCylinderZ(link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_depth * 0.5, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z + link_depth)), vertices, 24);
-			glutils::drawCylinderZ(link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_rad * 0.5, link_depth * 0.5, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z + link_depth)), vertices, 24);
+			float height = 0;
+			if (j == 0) {
+				height = (link_depth + joint_depth) * 1 + joint_depth;
+			}
+			else if (j == 1) {
+				height = (link_depth + joint_depth) * 1 + joint_depth;
+			}
+			else {
+				height = (link_depth + joint_depth) * 2 + joint_depth;
+			}
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, link_depth)), vertices, 24);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, link_depth)), vertices, 24);
 		}
 	}
 	renderManager.addObject("kinematics", "", vertices, true);
 
 	// update shadow map
 	renderManager.updateShadowMap(this, light_dir, light_mvpMatrix);
+}
+
+std::vector<glm::dvec2> GLWidget3D::generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices) {
+	std::vector<glm::dvec2> ans;
+
+	double theta0 = atan2(p2.y - p1.y, p2.x - p1.x) + glutils::M_PI * 0.5;
+	for (int k = 0; k <= num_slices/2; k++) {
+		if (p1 != p2 || k < num_slices / 2) {
+			double theta = theta0 + glutils::M_PI / 12 * k;
+			ans.push_back(glm::dvec2(cos(theta) * link_radius + p1.x, sin(theta) * link_radius + p1.y));
+		}
+	}
+	theta0 += glutils::M_PI;
+	for (int k = 0; k <= num_slices/2; k++) {
+		if (p1 != p2 || k < num_slices / 2) {
+			double theta = theta0 + glutils::M_PI / 12 * k;
+			ans.push_back(glm::dvec2(cos(theta) * link_radius + p2.x, sin(theta) * link_radius + p2.y));
+		}
+	}
+
+	return ans;
 }
 
 void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight) {
@@ -611,7 +640,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 			}
 
 			if (moved) {
-				body_pts.push_back(layers[0].shapes[i]->getPoints());
+				body_pts.push_back(kinematics::Polygon25D(layers[0].shapes[i]->getPoints(), -10, 0));
 
 				// calcualte poses of the moving body
 				poses.resize(poses.size() + 1);
@@ -620,7 +649,8 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 				}
 			}
 			else {
-				fixed_body_pts.push_back(layers[0].shapes[i]->getPoints());
+				//fixed_body_pts.push_back(layers[0].shapes[i]->getPoints());
+				fixed_body_pts.push_back(kinematics::Polygon25D(layers[0].shapes[i]->getPoints(), -10, 0));
 			}
 		}
 		else if (subtype == canvas::Shape::TYPE_LINKAGE_REGION) {
@@ -718,6 +748,145 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for finding the best solution. " << std::endl;
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// connect the joints to the rigid bodies
+
+	const float link_radius = 0.5f;
+	const float link_depth = 0.3f;
+	int N = fixed_body_pts.size();
+	for (int i = 0; i < kinematics.size(); i++) {
+		for (int j = 0; j < kinematics[i].diagram.joints.size(); j++) {
+			boost::shared_ptr<kinematics::Joint>& joint = kinematics[i].diagram.joints[j];
+
+			if (joint->ground) {
+				// check if the joint is within the rigid body
+				bool is_inside = false;
+				for (int k = 0; k < N; k++) {
+					if (kinematics::withinPolygon(fixed_body_pts[k].points, joint->pos)) {
+						is_inside = true;
+						break;
+					}
+				}
+
+				glm::dvec2 closest_point;
+				if (is_inside) {
+					closest_point = joint->pos;
+				}
+				else {
+					// find the closest point of a rigid body
+					double min_dist = std::numeric_limits<double>::max();
+					for (int k = 0; k < N; k++) {
+						glm::dvec2 cp = kinematics::closestPoint(fixed_body_pts[k].points, joint->pos);
+
+						// extend the point a little into the rigid body
+						glm::dvec2 v = glm::normalize(cp - joint->pos);
+						v *= link_radius;
+						cp += v;
+
+						double dist = glm::length(cp - joint->pos);
+						if (dist < min_dist) {
+							min_dist = dist;
+							closest_point = cp;
+						}
+					}
+				}
+
+				// create a geometry to extend the body to the joint
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(closest_point, joint->pos, link_radius);
+				fixed_body_pts.push_back(kinematics::Polygon25D(pts, 0, link_depth));
+			}
+		}
+	}
+
+	for (int i = 0; i < kinematics.size(); i++) {
+		int N = kinematics[i].diagram.bodies.size();
+		for (int j = 0; j < N; j++) {
+			if (kinematics[i].diagram.bodies[j]->pivot1->ground || kinematics[i].diagram.bodies[j]->pivot2->ground) continue;
+
+			std::vector<glm::dvec2> body_pts = kinematics[i].diagram.bodies[j]->getActualPoints();
+
+			bool is_inside1 = kinematics::withinPolygon(body_pts, kinematics[i].diagram.bodies[j]->pivot1->pos);
+			bool is_inside2 = kinematics::withinPolygon(body_pts, kinematics[i].diagram.bodies[j]->pivot2->pos);
+
+			if (is_inside1) {
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(kinematics[i].diagram.bodies[j]->pivot1->pos, kinematics[i].diagram.bodies[j]->pivot1->pos, link_radius);
+
+				// create a geometry to extend the body to the joint
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+			}
+			
+			if (is_inside2) {
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(kinematics[i].diagram.bodies[j]->pivot2->pos, kinematics[i].diagram.bodies[j]->pivot2->pos, link_radius);
+
+				// create a geometry to extend the body to the joint
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+			}
+
+			if (!is_inside1 && !is_inside2) {
+				// find the closest point of a rigid body
+				glm::dvec2 cp1 = kinematics::closestPoint(body_pts, kinematics[i].diagram.bodies[j]->pivot1->pos);
+
+				// extend the point a little into the rigid body
+				glm::dvec2 v1 = glm::normalize(cp1 - kinematics[i].diagram.bodies[j]->pivot1->pos);
+				v1 *= link_radius;
+				cp1 += v1;
+
+				double dist1 = glm::length(cp1 - kinematics[i].diagram.bodies[j]->pivot1->pos);
+
+				glm::dvec2 cp2 = kinematics::closestPoint(body_pts, kinematics[i].diagram.bodies[j]->pivot2->pos);
+
+				// extend the point a little into the rigid body
+				glm::dvec2 v2 = glm::normalize(cp2 - kinematics[i].diagram.bodies[j]->pivot2->pos);
+				v2 *= link_radius;
+				cp2 += v2;
+
+				double dist2 = glm::length(cp2 - kinematics[i].diagram.bodies[j]->pivot2->pos);
+
+				std::vector<glm::dvec2> pts;
+				if (dist1 < dist2) {
+					pts = generateRoundedBarPolygon(cp1, kinematics[i].diagram.bodies[j]->pivot1->pos, link_radius);
+				}
+				else {
+					pts = generateRoundedBarPolygon(cp2, kinematics[i].diagram.bodies[j]->pivot2->pos, link_radius);
+				}
+
+				// create a geometry to extend the body to the joint
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// add the fixed rigid bodies to the fixed joints of all the linkages
 	for (int i = 0; i < fixed_body_pts.size(); i++) {
 		for (int j = 0; j < kinematics.size(); j++) {
@@ -732,7 +901,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 	time_t end = clock();
 	std::cout << "Total computation time was " << (double)(end - start) / CLOCKS_PER_SEC << " sec." << std::endl;
-
+	
 	// update 3D geometry from kinematics
 	update3DGeometryFromKinematics();
 

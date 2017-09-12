@@ -57,8 +57,8 @@ public:
 
 	std::vector<kinematics::Kinematics> kinematics;
 	std::vector<std::vector<kinematics::Solution>> solutions;
-	std::vector<std::vector<glm::dvec2>> fixed_body_pts;
-	std::vector<std::vector<glm::dvec2>> body_pts;
+	std::vector<kinematics::Polygon25D> fixed_body_pts;
+	std::vector<kinematics::Polygon25D> body_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dmat3x3>> poses;
 	int linkage_type;
@@ -91,6 +91,7 @@ public:
 	double scale();
 	void update3DGeometry();
 	void update3DGeometryFromKinematics();
+	std::vector<glm::dvec2> generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices = 24);
 
 	void calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight);
 	void run();

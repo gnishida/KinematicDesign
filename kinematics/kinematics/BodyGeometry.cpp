@@ -24,8 +24,8 @@ namespace kinematics {
 		mat[1][1] = cos(angle);
 		mat[2][1] = p1.y;
 
-		for (int k = 0; k < points.size(); ++k) {
-			glm::dvec2 actual_point = mat * glm::dvec3(points[k], 1);
+		for (int k = 0; k < polygon.points.size(); ++k) {
+			glm::dvec2 actual_point = mat * glm::dvec3(polygon.points[k], 1);
 			actual_points.push_back(actual_point);
 		}
 

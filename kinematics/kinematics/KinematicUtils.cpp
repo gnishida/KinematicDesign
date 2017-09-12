@@ -388,6 +388,51 @@ namespace kinematics {
 	}
 
 	/**
+	 * Find the closest point of a polygon from the specified point.
+	 */
+	glm::dvec2 closestPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, int num_samples) {
+		std::vector<double> edge_lengths(points.size());
+		double length = 0.0;
+		for (int i = 0; i < points.size(); i++) {
+			int next = (i + 1) % points.size();
+			edge_lengths[i] = glm::length(points[next] - points[i]);
+			length += edge_lengths[i];
+		}
+
+		double step = length / num_samples;
+
+		// sample #num_samples points on the polygon
+		std::vector<glm::dvec2> sampled_points(num_samples);
+		int index = 0;
+		double len = 0;
+		for (int i = 0; i < num_samples; i++) {
+			int next = (index + 1) % points.size();
+			sampled_points[i] = glm::mix(points[index], points[next], len / edge_lengths[index]);
+
+			len += step;
+			if (len > edge_lengths[index]) {
+				while (index < points.size() && len > edge_lengths[index]) {
+					len -= edge_lengths[index];
+					index++;
+				}
+			}
+		}
+
+		// find the cloest point
+		double min_dist = std::numeric_limits<double>::max();
+		glm::dvec2 ans;
+		for (int i = 0; i < num_samples; i++) {
+			double dist = glm::length(sampled_points[i] - p);
+			if (dist < min_dist) {
+				min_dist = dist;
+				ans = sampled_points[i];
+			}
+		}
+
+		return ans;
+	}
+
+	/**
 	 * Calcualte the reflection point of p about the line that passes a and its direction is v.
 	 */
 	glm::dvec2 reflect(const glm::dvec2& p, const glm::dvec2& a, const glm::dvec2& v) {
