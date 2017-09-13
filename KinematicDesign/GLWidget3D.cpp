@@ -566,6 +566,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 			else if (j == 1) z = (link_depth + joint_depth) * 1;
 			else z = (link_depth + joint_depth) * 2;
 			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - link_depth)), vertices);
 
 			// joints
 			float height = 0;
@@ -580,6 +581,9 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 			}
 			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, link_depth)), vertices, 24);
 			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, link_depth)), vertices, 24);
+
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - link_depth - height)), vertices, 24);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - link_depth - height)), vertices, 24);
 		}
 	}
 	renderManager.addObject("kinematics", "", vertices, true);
@@ -649,7 +653,6 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 				}
 			}
 			else {
-				//fixed_body_pts.push_back(layers[0].shapes[i]->getPoints());
 				fixed_body_pts.push_back(kinematics::Polygon25D(layers[0].shapes[i]->getPoints(), -10, 0));
 			}
 		}
@@ -807,6 +810,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 				// create a geometry to extend the body to the joint
 				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(closest_point, joint->pos, link_radius);
 				fixed_body_pts.push_back(kinematics::Polygon25D(pts, 0, link_depth));
+				fixed_body_pts.push_back(kinematics::Polygon25D(pts, -10 - link_depth, -10));
 			}
 		}
 	}
@@ -826,6 +830,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 				// create a geometry to extend the body to the joint
 				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
 			}
 			
 			if (is_inside2) {
@@ -833,6 +838,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 				// create a geometry to extend the body to the joint
 				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
 			}
 
 			if (!is_inside1 && !is_inside2) {
@@ -865,6 +871,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 				// create a geometry to extend the body to the joint
 				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
+				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
 			}
 		}
 	}
