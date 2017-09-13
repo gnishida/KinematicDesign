@@ -505,7 +505,7 @@ namespace glutils {
 		}
 	}
 
-	void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 		glm::vec4 p1(points.back(), 0, 1);
 		p1 = mat * p1;
 		glm::vec4 p2(points[0], 0, 1);
@@ -520,6 +520,7 @@ namespace glutils {
 
 			if (!normal_computed) {
 				normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
+				if (flip) normal = -normal;
 				normal_computed = true;
 			}
 
@@ -539,7 +540,7 @@ namespace glutils {
 		}
 	}
 
-	void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 		glm::vec4 p1(points.back(), 0, 1);
 		p1 = mat * p1;
 		glm::vec2 t1 = texCoords.back();
@@ -557,6 +558,7 @@ namespace glutils {
 
 			if (!normal_computed) {
 				normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
+				if (flip) normal = -normal;
 				normal_computed = true;
 			}
 
@@ -577,7 +579,7 @@ namespace glutils {
 		}
 	}
 
-	void drawConcavePolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawConcavePolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 		float max_x = 0.0f;
 		float max_y = 0.0f;
 
@@ -610,11 +612,11 @@ namespace glutils {
 				texCoords.push_back(glm::vec2(vit->x() / max_x, vit->y() / max_y));
 			}
 
-			drawPolygon(pts, color, texCoords, mat, vertices);
+			drawPolygon(pts, color, texCoords, mat, vertices, flip);
 		}
 	}
 
-	void drawConcavePolygon(const std::vector<glm::dvec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawConcavePolygon(const std::vector<glm::dvec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 		float max_x = 0.0f;
 		float max_y = 0.0f;
 
@@ -647,11 +649,11 @@ namespace glutils {
 				texCoords.push_back(glm::vec2(vit->x() / max_x, vit->y() / max_y));
 			}
 
-			drawPolygon(pts, color, texCoords, mat, vertices);
+			drawPolygon(pts, color, texCoords, mat, vertices, flip);
 		}
 	}
 
-	void drawConcavePolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawConcavePolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 		Polygon_2 polygon;
 		for (int i = 0; i < points.size(); ++i) {
 			polygon.push_back(Point_2(points[i].x, points[i].y));
@@ -704,7 +706,7 @@ namespace glutils {
 				tex.push_back(texCoord);
 			}
 
-			drawPolygon(pts, color, tex, mat, vertices);
+			drawPolygon(pts, color, tex, mat, vertices, flip);
 		}
 	}
 
@@ -1033,9 +1035,7 @@ namespace glutils {
 		drawConcavePolygon(points, color, glm::translate(mat, glm::vec3(0, 0, h)), vertices);
 
 		// bottom face
-		std::vector<glm::vec2> reversed_points = points;
-		std::reverse(reversed_points.begin(), reversed_points.end());
-		drawConcavePolygon(reversed_points, color, mat, vertices);
+		drawConcavePolygon(points, color, mat, vertices, true);
 
 		// side faces
 		for (int i = 0; i < points.size(); i++) {
@@ -1070,9 +1070,7 @@ namespace glutils {
 		drawConcavePolygon(points, color, glm::translate(mat, glm::vec3(0, 0, h)), vertices);
 
 		// bottom face
-		std::vector<glm::dvec2> reversed_points = points;
-		std::reverse(reversed_points.begin(), reversed_points.end());
-		drawConcavePolygon(reversed_points, color, mat, vertices);
+		drawConcavePolygon(points, color, mat, vertices, true);
 
 		// side faces
 		for (int i = 0; i < points.size(); i++) {

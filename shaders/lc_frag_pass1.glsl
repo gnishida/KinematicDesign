@@ -105,10 +105,13 @@ void main(){
 
 	// lighting
 	if (lighting == 1) {
-		vec3 reflect = reflect(normalize(origVertex - spotLightPos), varyingNormal);
-		vec3 view = normalize(cameraPos - origVertex);
-		float a = dot(reflect, view);
-		specular = a > 0 ? pow(a, 2) : 0;
+		vec3 b = normalize(origVertex - spotLightPos);
+		if (dot(b, varyingNormal) < 0) {
+			vec3 r = reflect(b, varyingNormal);
+			vec3 view = normalize(cameraPos - origVertex);
+			float a = dot(r, view);
+			specular = a > 0 ? pow(a, 2) : 0;
+		}
 		intensity = ambient + specular * 0.3 + (visibility * 0.95 + 0.05) * diffuse * max(0.0, dot(-lightDir, varyingNormal));
 	}
 	else {

@@ -8,6 +8,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	glWidget = new GLWidget3D(this);
 	setCentralWidget(glWidget);
 
+	ui.actionCollisionCheck->setChecked(glWidget->collision_check);
+	ui.actionShowSolutions->setChecked(glWidget->show_solutions);
+
+	// group for mode
 	QActionGroup* groupMode = new QActionGroup(this);
 	groupMode->addAction(ui.actionSelect);
 	groupMode->addAction(ui.actionRectangle);
@@ -17,11 +21,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	groupMode->addAction(ui.actionKinematics);
 	ui.actionSelect->setChecked(true);
 
+	// group for layer
 	groupLayer = new QActionGroup(this);
 	initLayerMenu(2);
 
-	ui.actionCollisionCheck->setChecked(glWidget->collision_check);
-	ui.actionShowSolutions->setChecked(glWidget->show_solutions);
+	// group for rendering
+	QActionGroup* groupRendering = new QActionGroup(this);
+	groupRendering->addAction(ui.actionRenderBasic);
+	groupRendering->addAction(ui.actionRenderSSAO);
+	groupRendering->addAction(ui.actionRenderLine);
+	groupRendering->addAction(ui.actionRenderHatching);
 
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
@@ -51,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionStepBackward, SIGNAL(triggered()), this, SLOT(onStepBackward()));
 	connect(ui.actionCollisionCheck, SIGNAL(triggered()), this, SLOT(onCollisionCheck()));
 	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
+	connect(ui.actionRenderBasic, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
+	connect(ui.actionRenderSSAO, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
+	connect(ui.actionRenderLine, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
+	connect(ui.actionRenderHatching, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 }
 
 MainWindow::~MainWindow() {
@@ -259,4 +272,19 @@ void MainWindow::onCollisionCheck() {
 void MainWindow::onShowSolutions() {
 	glWidget->show_solutions = ui.actionShowSolutions->isChecked();
 	update();
+}
+
+void MainWindow::onRenderingChanged() {
+	if (ui.actionRenderBasic->isChecked()) {
+		glWidget->renderManager.renderingMode = RenderManager::RENDERING_MODE_BASIC;
+	}
+	else if (ui.actionRenderSSAO->isChecked()) {
+		glWidget->renderManager.renderingMode = RenderManager::RENDERING_MODE_SSAO;
+	}
+	else if (ui.actionRenderLine->isChecked()) {
+		glWidget->renderManager.renderingMode = RenderManager::RENDERING_MODE_LINE;
+	}
+	else if (ui.actionRenderHatching->isChecked()) {
+		glWidget->renderManager.renderingMode = RenderManager::RENDERING_MODE_HATCHING;
+	}
 }

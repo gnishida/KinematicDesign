@@ -12,6 +12,7 @@ public:
 	Ui::MainWindowClass ui;
 	std::vector<QAction*> menuLayers;
 	QActionGroup* groupLayer;
+	QActionGroup* groupRender;
 	GLWidget3D* glWidget;
 
 public:
@@ -48,6 +49,7 @@ public slots:
 	void onStepBackward();
 	void onCollisionCheck();
 	void onShowSolutions();
+	void onRenderingChanged();
 };
 
 #endif // MAINWINDOW_H

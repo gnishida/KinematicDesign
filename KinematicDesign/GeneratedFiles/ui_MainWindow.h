@@ -54,6 +54,10 @@ public:
     QAction *actionStepBackward;
     QAction *actionCalculateSolutionSliderCrank;
     QAction *actionShowSolutions;
+    QAction *actionRenderBasic;
+    QAction *actionRenderSSAO;
+    QAction *actionRenderLine;
+    QAction *actionRenderHatching;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -134,6 +138,18 @@ public:
         actionShowSolutions = new QAction(MainWindowClass);
         actionShowSolutions->setObjectName(QStringLiteral("actionShowSolutions"));
         actionShowSolutions->setCheckable(true);
+        actionRenderBasic = new QAction(MainWindowClass);
+        actionRenderBasic->setObjectName(QStringLiteral("actionRenderBasic"));
+        actionRenderBasic->setCheckable(true);
+        actionRenderSSAO = new QAction(MainWindowClass);
+        actionRenderSSAO->setObjectName(QStringLiteral("actionRenderSSAO"));
+        actionRenderSSAO->setCheckable(true);
+        actionRenderLine = new QAction(MainWindowClass);
+        actionRenderLine->setObjectName(QStringLiteral("actionRenderLine"));
+        actionRenderLine->setCheckable(true);
+        actionRenderHatching = new QAction(MainWindowClass);
+        actionRenderHatching->setObjectName(QStringLiteral("actionRenderHatching"));
+        actionRenderHatching->setCheckable(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -203,6 +219,11 @@ public:
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionCollisionCheck);
         menuView->addAction(actionShowSolutions);
+        menuView->addSeparator();
+        menuView->addAction(actionRenderBasic);
+        menuView->addAction(actionRenderSSAO);
+        menuView->addAction(actionRenderLine);
+        menuView->addAction(actionRenderHatching);
 
         retranslateUi(MainWindowClass);
 
@@ -251,6 +272,10 @@ public:
         actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
         actionCalculateSolutionSliderCrank->setText(QApplication::translate("MainWindowClass", "Calculate Solution for Slider Crank", 0));
         actionShowSolutions->setText(QApplication::translate("MainWindowClass", "Show Solutions", 0));
+        actionRenderBasic->setText(QApplication::translate("MainWindowClass", "Basic", 0));
+        actionRenderSSAO->setText(QApplication::translate("MainWindowClass", "SSAO", 0));
+        actionRenderLine->setText(QApplication::translate("MainWindowClass", "Line", 0));
+        actionRenderHatching->setText(QApplication::translate("MainWindowClass", "Hatching", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
