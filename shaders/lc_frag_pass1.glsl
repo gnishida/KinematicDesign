@@ -19,6 +19,8 @@ uniform int softShadow;
 uniform int lighting;
 uniform mat4 light_mvpMatrix;
 uniform vec3 lightDir;
+uniform vec3 spotLightPos;
+uniform vec3 cameraPos;
 uniform sampler2D shadowMap;
 uniform int textureEnabled;
 
@@ -98,11 +100,16 @@ void main(){
 
 	float ambient = 0.6;
 	float diffuse = 0.5;
+	float specular = 0.0;
 	float intensity;
 
 	// lighting
 	if (lighting == 1) {
-		intensity = ambient + (visibility * 0.95 + 0.05) * diffuse * max(0.0, dot(-lightDir, varyingNormal));
+		vec3 reflect = reflect(normalize(origVertex - spotLightPos), varyingNormal);
+		vec3 view = normalize(cameraPos - origVertex);
+		float a = dot(reflect, view);
+		specular = a > 0 ? pow(a, 2) : 0;
+		intensity = ambient + specular * 0.3 + (visibility * 0.95 + 0.05) * diffuse * max(0.0, dot(-lightDir, varyingNormal));
 	}
 	else {
 		intensity = ambient + (visibility * 0.95 + 0.05) * diffuse;

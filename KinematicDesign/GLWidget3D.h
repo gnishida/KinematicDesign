@@ -36,6 +36,7 @@ public:
 	Camera camera;
 	glm::vec3 light_dir;
 	glm::mat4 light_mvpMatrix;
+	glm::vec3 spot_light_pos;
 
 	// rendering engine
 	RenderManager renderManager;
