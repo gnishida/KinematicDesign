@@ -31,6 +31,7 @@ GLWidget3D::GLWidget3D(MainWindow *parent) : QGLWidget(QGLFormat(QGL::SampleBuff
 	linkage_type = LINKAGE_4R;
 	animation_timer = NULL;
 	collision_check = true;
+	show_solutions = false;
 
 	// This is necessary to prevent the screen overdrawn by OpenGL
 	setAutoFillBackground(false);
@@ -308,6 +309,14 @@ void GLWidget3D::clear() {
 	}
 	selected_shape.reset();
 
+	// select 1st layer
+	setLayer(0);
+
+	// clear the kinematic data
+	kinematics.clear();
+	solutions.clear();
+	selectedJoint = std::make_pair(-1, -1);
+
 	// update 3D geometry
 	update3DGeometry();
 
@@ -316,14 +325,12 @@ void GLWidget3D::clear() {
 
 void GLWidget3D::selectAll() {
 	layers[layer_id].selectAll();
-
 	mode = MODE_SELECT;
 	update();
 }
 
 void GLWidget3D::unselectAll() {
 	layers[layer_id].unselectAll();
-
 	current_shape.reset();
 	update();
 }
@@ -372,11 +379,6 @@ void GLWidget3D::redo() {
 
 void GLWidget3D::copySelectedShapes() {
 	layers[layer_id].copySelectedShapes(copied_shapes);
-
-	// update 3D geometry
-	update3DGeometry();
-
-	update();
 }
 
 void GLWidget3D::pasteCopiedShapes() {
@@ -394,6 +396,10 @@ void GLWidget3D::pasteCopiedShapes() {
 void GLWidget3D::setMode(int mode) {
 	if (this->mode != mode) {
 		this->mode = mode;
+
+		// clear
+		unselectAll();
+		selectedJoint = std::make_pair(-1, -1);
 
 		update();
 	}
@@ -475,6 +481,10 @@ void GLWidget3D::open(const QString& filename) {
 	// no currently drawing shape
 	current_shape.reset();
 
+	// clear the kinematic data
+	kinematics.clear();
+	solutions.clear();
+
 	// update the layer menu based on the loaded data
 	mainWin->initLayerMenu(layers.size());
 
@@ -514,7 +524,6 @@ glm::dvec2 GLWidget3D::screenToWorldCoordinates(double x, double y) {
 }
 
 glm::dvec2 GLWidget3D::worldToScreenCoordinates(const glm::dvec2& p) {
-	//return glm::dvec2(width() * 0.5 + p.x * camera.f() / camera.pos.z * width() * 0.5, height() * 0.5 - p.y * scale());
 	return glm::dvec2(width() * 0.5 + (p.x - camera.pos.x) * scale(), height() * 0.5 - (p.y - camera.pos.y) * scale());
 }
 
@@ -915,6 +924,28 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	update();
 }
 
+/**
+* Find the closest solution.
+*
+* @param solutions	solution set
+* @param pt		mouse position
+* @param joint_id	0 -- driving crank / 1 -- follower
+*/
+int GLWidget3D::findSolution(const std::vector<kinematics::Solution>& solutions, const glm::dvec2& pt, int joint_id) {
+	int ans = -1;
+	double min_dist = std::numeric_limits<double>::max();
+
+	for (int i = 0; i < solutions.size(); i++) {
+		double dist = glm::length(solutions[i].fixed_point[joint_id] - pt);
+		if (dist < min_dist) {
+			min_dist = dist;
+			ans = i;
+		}
+	}
+
+	return ans;
+}
+
 void GLWidget3D::run() {
 	if (animation_timer == NULL) {
 		animation_timer = new QTimer(this);
@@ -1183,6 +1214,21 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 			painter.setBrush(QColor(255, 255, 255, 160));
 			painter.drawRect(0, 0, width(), height());
 
+			if (show_solutions && selectedJoint.first >= 0) {
+				int linkage_id = selectedJoint.first;
+				painter.setPen(QPen(QColor(255, 128, 128, 64), 1));
+				painter.setBrush(QBrush(QColor(255, 128, 128, 64)));
+				for (int i = 0; i < solutions[linkage_id].size(); i++) {
+					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].fixed_point[0].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].fixed_point[0].y * scale(), 3, 3);
+				}
+				painter.setPen(QPen(QColor(128, 128, 255, 64), 1));
+				painter.setBrush(QBrush(QColor(128, 128, 255, 64)));
+				for (int i = 0; i < solutions[linkage_id].size(); i++) {
+					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].fixed_point[1].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].fixed_point[1].y * scale(), 3, 3);
+				}
+			}
+
+			// draw 2D mechanism
 			for (int i = 0; i < kinematics.size(); i++) {
 				kinematics[i].draw(painter, QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
 			}
@@ -1371,6 +1417,25 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 				setMouseTracking(true);
 			}
 		}
+		else if (mode == MODE_KINEMATICS) {
+			// convert the mouse position to the world coordinate system
+			glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
+			//glm::dvec2 pt((e->x() - origin.x()) / scale, -(e->y() - origin.y()) / scale);
+
+			// select a joint to move
+			selectedJoint = std::make_pair(-1, -1);
+			double min_dist = 6;
+			for (int i = 0; i < kinematics.size(); i++) {
+				for (int j = 0; j < kinematics[i].diagram.joints.size(); j++) {
+					if (!ctrlPressed && j >= 2) continue;
+					double dist = glm::length(kinematics[i].diagram.joints[j]->pos - pt);
+					if (dist < min_dist) {
+						min_dist = dist;
+						selectedJoint = std::make_pair(i, j);
+					}
+				}
+			}
+		}
 	}
 	else if (e->buttons() & Qt::RightButton) {
 		camera.mousePress(e->x(), e->y());
@@ -1382,7 +1447,15 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 */
 
 void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
-	if (mode == MODE_MOVE) {
+	if (e->buttons() & Qt::RightButton) {
+		if (shiftPressed) {
+			camera.move(e->x(), e->y());
+		}
+		else {
+			camera.rotate(e->x(), e->y(), (ctrlPressed ? 0.1 : 1));
+		}
+	}
+	else if (mode == MODE_MOVE) {
 		boost::shared_ptr<canvas::MoveOperation> op = boost::static_pointer_cast<canvas::MoveOperation>(operation);
 		glm::dvec2 dir = screenToWorldCoordinates(e->x(), e->y()) - op->pivot;
 		for (int i = 0; i < layers[layer_id].shapes.size(); ++i) {
@@ -1458,12 +1531,68 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 			current_shape->updateByNewPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())), shiftPressed);
 		}
 	}
-	else if (e->buttons() & Qt::RightButton) {
-		if (shiftPressed) {
-			camera.move(e->x(), e->y());
-		}
-		else {
-			camera.rotate(e->x(), e->y(), (ctrlPressed ? 0.1 : 1));
+	else if (mode == MODE_KINEMATICS) {
+		if (selectedJoint.first >= 0) {
+			int linkage_id = selectedJoint.first;
+			int joint_id = selectedJoint.second;
+			glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
+
+			if (ctrlPressed) {
+				// move the selected joint
+				kinematics[linkage_id].diagram.joints[joint_id]->pos = pt;
+
+				//updateDefectFlag(poses[linkage_id], kinematics[linkage_id]);
+			}
+			else {
+				// select a solution
+				glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
+				int selectedSolution = findSolution(solutions[linkage_id], pt, joint_id);
+
+				if (selectedSolution >= 0) {
+					// move the selected joint (center point)
+					kinematics[linkage_id].diagram.joints[joint_id]->pos = solutions[linkage_id][selectedSolution].fixed_point[joint_id];
+
+					// move the other end joint (circle point)
+					kinematics[linkage_id].diagram.joints[joint_id + 2]->pos = solutions[linkage_id][selectedSolution].moving_point[joint_id];
+
+					// initialize the other link
+					joint_id = 1 - joint_id;
+					kinematics[linkage_id].diagram.joints[joint_id]->pos = solutions[linkage_id][selectedSolution].fixed_point[joint_id];
+					kinematics[linkage_id].diagram.joints[joint_id + 2]->pos = solutions[linkage_id][selectedSolution].moving_point[joint_id];
+
+					// initialize the other linkages
+					for (int i = 0; i < kinematics.size(); i++) {
+						if (i == linkage_id) continue;
+
+						int selectedSolution = findSolution(solutions[i], kinematics[i].diagram.joints[0]->pos, 0);
+						if (selectedSolution >= 0) {
+							kinematics[i].diagram.joints[2]->pos = solutions[i][selectedSolution].moving_point[0];
+							kinematics[i].diagram.joints[3]->pos = solutions[i][selectedSolution].moving_point[1];
+						}
+					}
+
+					//updateDefectFlag(solutions[linkage_id][selectedSolution].poses, kinematics[linkage_id]);
+				}
+			}
+
+			// update the geometry
+			for (int i = 0; i < body_pts.size(); i++) {
+				kinematics[i].diagram.bodies.clear();
+				kinematics[i].diagram.addBody(kinematics[i].diagram.joints[2], kinematics[i].diagram.joints[3], body_pts[i]);
+			}
+			for (int i = 0; i < fixed_body_pts.size(); i++) {
+				for (int j = 0; j < kinematics.size(); j++) {
+					kinematics[j].diagram.addBody(kinematics[j].diagram.joints[0], kinematics[j].diagram.joints[1], fixed_body_pts[i]);
+				}
+			}
+
+			// setup the kinematic system
+			for (int i = 0; i < kinematics.size(); i++) {
+				kinematics[i].diagram.initialize();
+			}
+			update();
+
+			//updateDefectFlag(poses[linkage_id], kinematics[linkage_id]);
 		}
 	}
 

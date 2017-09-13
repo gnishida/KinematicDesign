@@ -47,6 +47,7 @@ public slots:
 	void onStepForward();
 	void onStepBackward();
 	void onCollisionCheck();
+	void onShowSolutions();
 };
 
 #endif // MAINWINDOW_H

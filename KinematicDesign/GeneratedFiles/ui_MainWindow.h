@@ -53,6 +53,7 @@ public:
     QAction *actionStepForward;
     QAction *actionStepBackward;
     QAction *actionCalculateSolutionSliderCrank;
+    QAction *actionShowSolutions;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -60,6 +61,7 @@ public:
     QMenu *menuEdit;
     QMenu *menuLayer;
     QMenu *menuKinematics;
+    QMenu *menuView;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -129,6 +131,9 @@ public:
         actionStepBackward->setObjectName(QStringLiteral("actionStepBackward"));
         actionCalculateSolutionSliderCrank = new QAction(MainWindowClass);
         actionCalculateSolutionSliderCrank->setObjectName(QStringLiteral("actionCalculateSolutionSliderCrank"));
+        actionShowSolutions = new QAction(MainWindowClass);
+        actionShowSolutions->setObjectName(QStringLiteral("actionShowSolutions"));
+        actionShowSolutions->setCheckable(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -145,6 +150,8 @@ public:
         menuLayer->setObjectName(QStringLiteral("menuLayer"));
         menuKinematics = new QMenu(menuBar);
         menuKinematics->setObjectName(QStringLiteral("menuKinematics"));
+        menuView = new QMenu(menuBar);
+        menuView->setObjectName(QStringLiteral("menuView"));
         MainWindowClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindowClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -158,6 +165,7 @@ public:
         menuBar->addAction(menuMode->menuAction());
         menuBar->addAction(menuLayer->menuAction());
         menuBar->addAction(menuKinematics->menuAction());
+        menuBar->addAction(menuView->menuAction());
         menuFile->addAction(actionNew);
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
@@ -194,6 +202,7 @@ public:
         menuKinematics->addAction(actionStepBackward);
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionCollisionCheck);
+        menuView->addAction(actionShowSolutions);
 
         retranslateUi(MainWindowClass);
 
@@ -241,11 +250,13 @@ public:
         actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", 0));
         actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
         actionCalculateSolutionSliderCrank->setText(QApplication::translate("MainWindowClass", "Calculate Solution for Slider Crank", 0));
+        actionShowSolutions->setText(QApplication::translate("MainWindowClass", "Show Solutions", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
         menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", 0));
         menuKinematics->setTitle(QApplication::translate("MainWindowClass", "Kinematics", 0));
+        menuView->setTitle(QApplication::translate("MainWindowClass", "View", 0));
     } // retranslateUi
 
 };

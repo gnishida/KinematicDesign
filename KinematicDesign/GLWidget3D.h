@@ -57,6 +57,7 @@ public:
 
 	std::vector<kinematics::Kinematics> kinematics;
 	std::vector<std::vector<kinematics::Solution>> solutions;
+	std::pair<int, int> selectedJoint;
 	std::vector<kinematics::Polygon25D> fixed_body_pts;
 	std::vector<kinematics::Polygon25D> body_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
@@ -64,6 +65,7 @@ public:
 	int linkage_type;
 	QTimer* animation_timer;
 	bool collision_check;
+	bool show_solutions;
 
 public:
 	GLWidget3D(MainWindow *parent = 0);
@@ -94,6 +96,7 @@ public:
 	std::vector<glm::dvec2> generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices = 24);
 
 	void calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight);
+	int findSolution(const std::vector<kinematics::Solution>& solutions, const glm::dvec2& pt, int joint_id);
 	void run();
 	void runBackward();
 	void stop();

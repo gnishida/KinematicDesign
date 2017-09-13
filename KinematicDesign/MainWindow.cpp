@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	initLayerMenu(2);
 
 	ui.actionCollisionCheck->setChecked(glWidget->collision_check);
+	ui.actionShowSolutions->setChecked(glWidget->show_solutions);
 
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
@@ -49,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionStepForward, SIGNAL(triggered()), this, SLOT(onStepForward()));
 	connect(ui.actionStepBackward, SIGNAL(triggered()), this, SLOT(onStepBackward()));
 	connect(ui.actionCollisionCheck, SIGNAL(triggered()), this, SLOT(onCollisionCheck()));
+	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
 }
 
 MainWindow::~MainWindow() {
@@ -252,4 +254,9 @@ void MainWindow::onStepBackward() {
 
 void MainWindow::onCollisionCheck() {
 	glWidget->collision_check = ui.actionCollisionCheck->isChecked();
+}
+
+void MainWindow::onShowSolutions() {
+	glWidget->show_solutions = ui.actionShowSolutions->isChecked();
+	update();
 }
