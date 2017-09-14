@@ -27,6 +27,7 @@ namespace kinematics {
 		bool checkCircuitDefect(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, bool debug = false);
 		bool checkCollision(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, const std::vector<Polygon25D>& fixed_body_pts, const Polygon25D& body_pts);
 		double tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, const Polygon25D& body_pts);
+		void adjustSlider(const std::vector<glm::dmat3x3>& poses, Solution& solution);
 	};
 
 }

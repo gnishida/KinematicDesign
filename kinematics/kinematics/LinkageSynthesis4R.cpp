@@ -276,7 +276,7 @@ namespace kinematics {
 	}
 
 	Solution LinkageSynthesis4R::findBestSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<Solution>& solutions, const std::vector<Polygon25D>& fixed_body_pts, const Polygon25D& body_pts, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
-		// select the best solution based on the trajectory
+		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
 			double min_cost = std::numeric_limits<double>::max();
 			int best = -1;

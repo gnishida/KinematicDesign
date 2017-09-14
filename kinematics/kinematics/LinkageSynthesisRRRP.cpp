@@ -144,8 +144,13 @@ namespace kinematics {
 				dist += distMap.at<double>(B0.y - enlarged_bbox_world.minPt.y, B0.x - enlarged_bbox_world.minPt.x);
 				dist += distMap.at<double>(B1.y - enlarged_bbox_world.minPt.y, B1.x - enlarged_bbox_world.minPt.x);
 
-				solutions.push_back(Solution(A0, A1, B0, B1, position_error, orientation_error, 0, perturbed_poses));
+				solutions.push_back(Solution(A0, A1, B0, B1, position_error, orientation_error, dist, perturbed_poses));
 				cnt++;
+
+				// HACK
+				// For the slider crank, we check the two exteme positions of the slider,
+				// and place the joints accordingly.
+				adjustSlider(poses, solutions.back());
 			}
 		}
 		printf("\n");
@@ -338,7 +343,7 @@ namespace kinematics {
 	}
 
 	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<Solution>& solutions, const std::vector<Polygon25D>& fixed_body_pts, const Polygon25D& body_pts, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
-		// select the best solution based on the trajectory
+		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
 			double min_cost = std::numeric_limits<double>::max();
 			int best = -1;
@@ -838,6 +843,10 @@ namespace kinematics {
 
 		kinematics.clear();
 		return length_of_trajectory / length_of_straight;
+	}
+
+	void LinkageSynthesisRRRP::adjustSlider(const std::vector<glm::dmat3x3>& poses, Solution& solution) {
+		// To do ...
 	}
 
 }
