@@ -26,7 +26,7 @@ void GeometryObject::addVertices(const std::vector<Vertex>& vertices) {
  * Create VAO according to the vertices.
  */
 void GeometryObject::createVAO() {
-	// VAOが作成済みで、最新なら、何もしないで終了
+	// if the vao is already updated, do nothing
 	if (vaoCreated && !vaoOutdated) return;
 
 	if (!vaoCreated) {

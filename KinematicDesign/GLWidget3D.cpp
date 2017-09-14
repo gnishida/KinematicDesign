@@ -40,7 +40,7 @@ GLWidget3D::GLWidget3D(MainWindow *parent) : QGLWidget(QGLFormat(QGL::SampleBuff
 	light_dir = glm::normalize(glm::vec3(-4, -5, -8));
 
 	// model/view/projection matrices for shadow mapping
-	glm::mat4 light_pMatrix = glm::ortho<float>(-50, 50, -50, 50, 0.1, 200);
+	glm::mat4 light_pMatrix = glm::ortho<float>(-100, 100, -100, 100, 0.1, 200);
 	glm::mat4 light_mvMatrix = glm::lookAt(-light_dir * 50.0f, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	light_mvpMatrix = light_pMatrix * light_mvMatrix;
 
@@ -797,9 +797,8 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 	}
 
-	kinematics.clear();
-
 	solutions.resize(body_pts.size(), std::vector<kinematics::Solution>(2));
+	selected_solutions.resize(body_pts.size());
 	for (int i = 0; i < body_pts.size(); i++) {
 		time_t start = clock();
 
@@ -829,14 +828,71 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 		if (linkage_type == LINKAGE_4R) {
-			kinematics::Solution solution = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+			selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		}
+		else if (linkage_type == LINKAGE_RRRP) {
+			selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		}
 
+		end = clock();
+		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for finding the best solution. " << std::endl;
+	}
+
+	constructKinematics();
+
+	time_t end = clock();
+	std::cout << "Total computation time was " << (double)(end - start) / CLOCKS_PER_SEC << " sec." << std::endl;
+	
+	// update 3D geometry from kinematics
+	update3DGeometryFromKinematics();
+
+	update();
+}
+
+/**
+ * Construct a kinematic diagram based on the selected solution.
+ */
+void GLWidget3D::constructKinematics() {
+	kinematics.clear();
+
+	// get the geometry of fixed rigid bodies, moving bodies
+	fixed_body_pts.clear();
+	body_pts.clear();
+	for (int i = 0; i < layers[0].shapes.size(); i++) {
+		int subtype = layers[0].shapes[i]->getSubType();
+		if (subtype == canvas::Shape::TYPE_BODY) {
+			glm::dmat3x3 mat0 = layers[0].shapes[i]->getModelMatrix();
+
+			bool moved = false;
+			for (int j = 0; j < layers.size(); j++) {
+				glm::dmat3x3 mat = layers[j].shapes[i]->getModelMatrix();
+				if (mat != mat0) {
+					moved = true;
+					break;
+				}
+			}
+
+			if (moved) {
+				body_pts.push_back(kinematics::Polygon25D(layers[0].shapes[i]->getPoints(), -10, 0));
+			}
+			else {
+				fixed_body_pts.push_back(kinematics::Polygon25D(layers[0].shapes[i]->getPoints(), -10, 0));
+			}
+		}
+		else if (subtype == canvas::Shape::TYPE_LINKAGE_REGION) {
+			linkage_region_pts.push_back(layers[0].shapes[i]->getPoints());
+		}
+	}
+
+	// construct kinamtics
+	for (int i = 0; i < selected_solutions.size(); i++) {
+		if (linkage_type == LINKAGE_4R) {
 			// construct a linkage
 			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, solution.fixed_point[0])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, solution.fixed_point[1])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, solution.moving_point[0])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, solution.moving_point[1])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].fixed_point[0])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].fixed_point[1])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].moving_point[0])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, selected_solutions[i].moving_point[1])));
 			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2]);
 			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3]);
 			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3]);
@@ -850,14 +906,12 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 			//updateDefectFlag(solution.poses, kinematics[0]);
 		}
 		else if (linkage_type == LINKAGE_RRRP) {
-			kinematics::Solution solution = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
-
 			// construct a linkage
 			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, solution.fixed_point[0])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, solution.fixed_point[1])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, solution.moving_point[0])));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, solution.moving_point[1])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].fixed_point[0])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].fixed_point[1])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].moving_point[0])));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, selected_solutions[i].moving_point[1])));
 			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2]);
 			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3]);
 			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3]);
@@ -870,153 +924,10 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 			//updateDefectFlag(solution.poses, kinematics[0]);
 		}
-
-		end = clock();
-		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for finding the best solution. " << std::endl;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// connect the joints to the rigid bodies
-
-	const float link_radius = 0.5f;
-	const float link_depth = 0.3f;
-	int N = fixed_body_pts.size();
-	for (int i = 0; i < kinematics.size(); i++) {
-		for (int j = 0; j < kinematics[i].diagram.joints.size(); j++) {
-			boost::shared_ptr<kinematics::Joint>& joint = kinematics[i].diagram.joints[j];
-
-			if (joint->ground) {
-				// check if the joint is within the rigid body
-				bool is_inside = false;
-				for (int k = 0; k < N; k++) {
-					if (kinematics::withinPolygon(fixed_body_pts[k].points, joint->pos)) {
-						is_inside = true;
-						break;
-					}
-				}
-
-				glm::dvec2 closest_point;
-				if (is_inside) {
-					closest_point = joint->pos;
-				}
-				else {
-					// find the closest point of a rigid body
-					double min_dist = std::numeric_limits<double>::max();
-					for (int k = 0; k < N; k++) {
-						glm::dvec2 cp = kinematics::closestPoint(fixed_body_pts[k].points, joint->pos);
-
-						// extend the point a little into the rigid body
-						glm::dvec2 v = glm::normalize(cp - joint->pos);
-						v *= link_radius;
-						cp += v;
-
-						double dist = glm::length(cp - joint->pos);
-						if (dist < min_dist) {
-							min_dist = dist;
-							closest_point = cp;
-						}
-					}
-				}
-
-				// create a geometry to extend the body to the joint
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(closest_point, joint->pos, link_radius);
-				fixed_body_pts.push_back(kinematics::Polygon25D(pts, 0, link_depth));
-				fixed_body_pts.push_back(kinematics::Polygon25D(pts, -10 - link_depth, -10));
-			}
-		}
-	}
-
-	for (int i = 0; i < kinematics.size(); i++) {
-		int N = kinematics[i].diagram.bodies.size();
-		for (int j = 0; j < N; j++) {
-			if (kinematics[i].diagram.bodies[j]->pivot1->ground || kinematics[i].diagram.bodies[j]->pivot2->ground) continue;
-
-			std::vector<glm::dvec2> body_pts = kinematics[i].diagram.bodies[j]->getActualPoints();
-
-			bool is_inside1 = kinematics::withinPolygon(body_pts, kinematics[i].diagram.bodies[j]->pivot1->pos);
-			bool is_inside2 = kinematics::withinPolygon(body_pts, kinematics[i].diagram.bodies[j]->pivot2->pos);
-
-			if (is_inside1) {
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(kinematics[i].diagram.bodies[j]->pivot1->pos, kinematics[i].diagram.bodies[j]->pivot1->pos, link_radius);
-
-				// create a geometry to extend the body to the joint
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
-			}
-			
-			if (is_inside2) {
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(kinematics[i].diagram.bodies[j]->pivot2->pos, kinematics[i].diagram.bodies[j]->pivot2->pos, link_radius);
-
-				// create a geometry to extend the body to the joint
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
-			}
-
-			if (!is_inside1 && !is_inside2) {
-				// find the closest point of a rigid body
-				glm::dvec2 cp1 = kinematics::closestPoint(body_pts, kinematics[i].diagram.bodies[j]->pivot1->pos);
-
-				// extend the point a little into the rigid body
-				glm::dvec2 v1 = glm::normalize(cp1 - kinematics[i].diagram.bodies[j]->pivot1->pos);
-				v1 *= link_radius;
-				cp1 += v1;
-
-				double dist1 = glm::length(cp1 - kinematics[i].diagram.bodies[j]->pivot1->pos);
-
-				glm::dvec2 cp2 = kinematics::closestPoint(body_pts, kinematics[i].diagram.bodies[j]->pivot2->pos);
-
-				// extend the point a little into the rigid body
-				glm::dvec2 v2 = glm::normalize(cp2 - kinematics[i].diagram.bodies[j]->pivot2->pos);
-				v2 *= link_radius;
-				cp2 += v2;
-
-				double dist2 = glm::length(cp2 - kinematics[i].diagram.bodies[j]->pivot2->pos);
-
-				std::vector<glm::dvec2> pts;
-				if (dist1 < dist2) {
-					pts = generateRoundedBarPolygon(cp1, kinematics[i].diagram.bodies[j]->pivot1->pos, link_radius);
-				}
-				else {
-					pts = generateRoundedBarPolygon(cp2, kinematics[i].diagram.bodies[j]->pivot2->pos, link_radius);
-				}
-
-				// create a geometry to extend the body to the joint
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, 0, link_depth));
-				kinematics[i].diagram.addBody(kinematics[i].diagram.bodies[j]->pivot1, kinematics[i].diagram.bodies[j]->pivot2, kinematics::Polygon25D(pts, -10 - link_depth, -10));
-			}
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	// connect joints to rigid bodies
+	connectJointsToRigidBodies();
 
 	// add the fixed rigid bodies to the fixed joints of all the linkages
 	for (int i = 0; i < fixed_body_pts.size(); i++) {
@@ -1029,14 +940,6 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	for (int i = 0; i < kinematics.size(); i++) {
 		kinematics[i].diagram.initialize();
 	}
-
-	time_t end = clock();
-	std::cout << "Total computation time was " << (double)(end - start) / CLOCKS_PER_SEC << " sec." << std::endl;
-	
-	// update 3D geometry from kinematics
-	update3DGeometryFromKinematics();
-
-	update();
 }
 
 void GLWidget3D::connectJointsToRigidBodies() {
@@ -1765,6 +1668,12 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 
 			if (ctrlPressed) {
 				// move the selected joint
+				if (joint_id < 2) {
+					selected_solutions[linkage_id].fixed_point[joint_id] = pt;
+				}
+				else {
+					selected_solutions[linkage_id].moving_point[joint_id - 2] = pt;
+				}
 				kinematics[linkage_id].diagram.joints[joint_id]->pos = pt;
 
 				//updateDefectFlag(poses[linkage_id], kinematics[linkage_id]);
@@ -1775,6 +1684,8 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 				int selectedSolution = findSolution(solutions[linkage_id], pt, joint_id);
 
 				if (selectedSolution >= 0) {
+					selected_solutions[linkage_id] = solutions[linkage_id][selectedSolution];
+
 					// move the selected joint (center point)
 					kinematics[linkage_id].diagram.joints[joint_id]->pos = solutions[linkage_id][selectedSolution].fixed_point[joint_id];
 
@@ -1847,7 +1758,8 @@ void GLWidget3D::mouseReleaseEvent(QMouseEvent *e) {
 		mode = MODE_SELECT;
 	}
 	else if (mode == MODE_KINEMATICS) {
-
+		constructKinematics();
+		update3DGeometryFromKinematics();
 	}
 
 	update();

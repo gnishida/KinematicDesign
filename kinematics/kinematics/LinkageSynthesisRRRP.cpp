@@ -57,8 +57,8 @@ namespace kinematics {
 			cv::fillPoly(img, pts, cv::Scalar(0), 4);
 			cv::Mat distMap;
 			cv::distanceTransform(img, distMap, CV_DIST_L2, 3);
-			cv::imwrite("test2.png", img);
-			cv::imwrite("test.png", distMap);
+			//cv::imwrite("test2.png", img);
+			//cv::imwrite("test.png", distMap);
 			distMap.convertTo(distMap, CV_64F);
 
 			// convert the coordinates of the enlarged regions to the local coordinate system of the first pose
