@@ -13,7 +13,6 @@ namespace kinematics {
 	KinematicDiagram::KinematicDiagram() {
 	}
 
-
 	KinematicDiagram::~KinematicDiagram() {
 	}
 
@@ -23,18 +22,18 @@ namespace kinematics {
 		// copy joints
 		for (int i = 0; i < joints.size(); ++i) {
 			if (joints[i]->type == Joint::TYPE_PIN) {
-				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new PinJoint(joints[i]->id, joints[i]->ground, joints[i]->pos));
+				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new PinJoint(joints[i]->id, joints[i]->ground, joints[i]->pos, joints[i]->z));
 				joint->determined = joints[i]->determined;
 				copied_diagram.addJoint(joint);
 			}
 			else if (joints[i]->type == Joint::TYPE_SLIDER_HINGE) {
-				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new SliderHinge(joints[i]->id, joints[i]->ground, joints[i]->pos));
+				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new SliderHinge(joints[i]->id, joints[i]->ground, joints[i]->pos, joints[i]->z));
 				joint->determined = joints[i]->determined;
 				copied_diagram.addJoint(joint);
 			}
 			else if (joints[i]->type == Joint::TYPE_GEAR) {
 				boost::shared_ptr<Gear> gear = boost::static_pointer_cast<Gear>(joints[i]);
-				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new Gear(gear->id, gear->ground, gear->pos, gear->radius, gear->speed, gear->phase));
+				boost::shared_ptr<Joint> joint = boost::shared_ptr<Joint>(new Gear(gear->id, gear->ground, gear->pos, gear->radius, gear->speed, gear->phase, gear->z));
 				joint->determined = joints[i]->determined;
 				copied_diagram.addJoint(joint);
 			}
@@ -47,7 +46,7 @@ namespace kinematics {
 				copied_joints.push_back(copied_diagram.joints[links[i]->joints[j]->id]);
 			}
 
-			copied_diagram.addLink(links[i]->driver, copied_joints);
+			copied_diagram.addLink(links[i]->driver, copied_joints, links[i]->actual_link, links[i]->z);
 		}
 
 		// copy the original shape of the links
@@ -60,10 +59,10 @@ namespace kinematics {
 		for (int i = 0; i < bodies.size(); ++i) {
 			int id1 = bodies[i]->pivot1->id;
 			int id2 = bodies[i]->pivot2->id;
-			boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(copied_diagram.joints[id1], copied_diagram.joints[id2], bodies[i]->polygon));
+			boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(copied_diagram.joints[id1], copied_diagram.joints[id2], bodies[i]->polygons));
 			/*
 			for (int j = 0; j < bodies[i]->polygon.points.size(); ++j) {
-				body->polygon.points.push_back(bodies[i]->polygon.points[j]);
+			body->polygon.points.push_back(bodies[i]->polygon.points[j]);
 			}
 			*/
 
@@ -78,7 +77,7 @@ namespace kinematics {
 	}
 
 	void KinematicDiagram::clear() {
-		joints.clear(); 
+		joints.clear();
 		links.clear();
 		bodies.clear();
 	}
@@ -122,28 +121,28 @@ namespace kinematics {
 		return newLink(false);
 	}
 
-	boost::shared_ptr<Link> KinematicDiagram::newLink(bool driver) {
+	boost::shared_ptr<Link> KinematicDiagram::newLink(bool driver, bool actual_link, double z) {
 		int id = 0;
 		if (!links.empty()) {
 			id = links.lastKey() + 1;
 		}
 
-		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver));
+		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver, actual_link, z));
 		links[id] = link;
 		return link;
 	}
 
-	boost::shared_ptr<Link> KinematicDiagram::addLink(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2) {
-		return addLink(false, joint1, joint2);
+	boost::shared_ptr<Link> KinematicDiagram::addLink(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, bool actual_link, double z) {
+		return addLink(false, joint1, joint2, actual_link, z);
 	}
 
-	boost::shared_ptr<Link> KinematicDiagram::addLink(bool driver, boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2) {
+	boost::shared_ptr<Link> KinematicDiagram::addLink(bool driver, boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, bool actual_link, double z) {
 		int id = 0;
 		if (!links.empty()) {
 			id = links.lastKey() + 1;
 		}
 
-		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver));
+		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver, actual_link, z));
 		links[id] = link;
 
 		link->addJoint(joint1);
@@ -154,17 +153,17 @@ namespace kinematics {
 		return link;
 	}
 
-	boost::shared_ptr<Link> KinematicDiagram::addLink(std::vector<boost::shared_ptr<Joint>> joints) {
-		return addLink(false, joints);
+	boost::shared_ptr<Link> KinematicDiagram::addLink(std::vector<boost::shared_ptr<Joint>> joints, bool actual_link, double z) {
+		return addLink(false, joints, actual_link, z);
 	}
 
-	boost::shared_ptr<Link> KinematicDiagram::addLink(bool driver, std::vector<boost::shared_ptr<Joint>> joints) {
+	boost::shared_ptr<Link> KinematicDiagram::addLink(bool driver, std::vector<boost::shared_ptr<Joint>> joints, bool actual_link, double z) {
 		int id = 0;
 		if (!links.empty()) {
 			id = links.lastKey() + 1;
 		}
 
-		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver));
+		boost::shared_ptr<Link> link = boost::shared_ptr<Link>(new Link(id, driver, actual_link, z));
 		links[id] = link;
 
 		for (int i = 0; i < joints.size(); ++i) {
@@ -175,8 +174,8 @@ namespace kinematics {
 		return link;
 	}
 
-	void KinematicDiagram::addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Polygon25D& polygon) {
-		boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(joint1, joint2, polygon));
+	void KinematicDiagram::addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Object25D& polygons) {
+		boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(joint1, joint2, polygons));
 
 		// setup rotation matrix
 		glm::vec2 dir = joint2->pos - joint1->pos;
@@ -186,15 +185,232 @@ namespace kinematics {
 		glm::dmat4x4 model;
 		model = glm::rotate(model, -angle, glm::dvec3(0, 0, 1));
 
-		for (int i = 0; i < polygon.points.size(); ++i) {
-			// convert the coordinates to the local coordinate system
-			glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygon.points[i].x - p1.x, polygon.points[i].y - p1.y, 0, 1));
+		for (int i = 0; i < polygons.size(); i++) {
+			for (int j = 0; j < polygons[i].points.size(); ++j) {
+				// convert the coordinates to the local coordinate system
+				glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygons[i].points[j].x - p1.x, polygons[i].points[j].y - p1.y, 0, 1));
 
-			body->polygon.points[i] = rotated_p;
+				body->polygons[i].points[j] = rotated_p;
+			}
+
+			// Somd polygon may have a top face different from the bottom face.
+			// In that case, the top face polygon is stored in Polygon25D::points2.
+			// Thus, we need to convert the coordinates of points2 as well.
+			for (int j = 0; j < polygons[i].points2.size(); ++j) {
+				// convert the coordinates to the local coordinate system
+				glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygons[i].points2[j].x - p1.x, polygons[i].points2[j].y - p1.y, 0, 1));
+
+				body->polygons[i].points2[j] = rotated_p;
+			}
 		}
 
 		bodies.push_back(body);
+	}
 
+	void KinematicDiagram::addPolygonToBody(int body_id, const Polygon25D& polygon) {
+		bodies[body_id]->polygons.push_back(polygon);
+
+		// setup rotation matrix
+		glm::vec2 dir = bodies[body_id]->pivot2->pos - bodies[body_id]->pivot1->pos;
+		double angle = atan2(dir.y, dir.x);
+
+		glm::dvec2 p1 = bodies[body_id]->pivot1->pos;
+		glm::dmat4x4 model;
+		model = glm::rotate(model, -angle, glm::dvec3(0, 0, 1));
+
+		for (int i = 0; i < polygon.points.size(); i++) {
+			// convert the coordinates to the local coordinate system
+			glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygon.points[i].x - p1.x, polygon.points[i].y - p1.y, 0, 1));
+
+			bodies[body_id]->polygons.back().points[i] = rotated_p;
+		}
+
+		// Somd polygon may have a top face different from the bottom face.
+		// In that case, the top face polygon is stored in Polygon25D::points2.
+		// Thus, we need to convert the coordinates of points2 as well.
+		for (int i = 0; i < polygon.points2.size(); i++) {
+			// convert the coordinates to the local coordinate system
+			glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygon.points2[i].x - p1.x, polygon.points2[i].y - p1.y, 0, 1));
+
+			bodies[body_id]->polygons.back().points2[i] = rotated_p;
+		}
+	}
+	
+	/**
+	 * Given the current mechanism, already added moving bodies, and input fixed bodies,
+	 * this function updates the fixed bodies and moving bodies such that
+	 * all the joints are appropriately connected to some rigid bodies.
+	 */
+	void KinematicDiagram::connectJointsToBodies(std::vector<Object25D>& fixed_body_pts) {
+		int N = fixed_body_pts.size();
+
+		// connect fixed joints to a fixed body
+		for (int j = 0; j < joints.size(); j++) {
+			boost::shared_ptr<kinematics::Joint>& joint = joints[j];
+
+			if (joint->ground) {
+				int fixed_body_id = -1;
+
+				// check if the joint is within the rigid body
+				bool is_inside = false;
+				for (int k = 0; k < N; k++) {
+					if (kinematics::withinPolygon(fixed_body_pts[k].polygons[0].points, joint->pos)) {
+						is_inside = true;
+						fixed_body_id = k;
+						break;
+					}
+				}
+
+				std::vector<glm::dvec2> pts;
+				if (is_inside) {
+					pts = generateCirclePolygon(joint->pos, link_radius);
+				}
+				else {
+					glm::dvec2 closest_point;
+
+					// find the closest point of a rigid body
+					double min_dist = std::numeric_limits<double>::max();
+					for (int k = 0; k < N; k++) {
+						glm::dvec2 cp = kinematics::closestPoint(fixed_body_pts[k].polygons[0].points, joint->pos);
+
+						// extend the point a little into the rigid body
+						glm::dvec2 v = glm::normalize(cp - joint->pos);
+						v *= link_radius;
+						cp += v;
+
+						double dist = glm::length(cp - joint->pos);
+						if (dist < min_dist) {
+							min_dist = dist;
+							closest_point = cp;
+							fixed_body_id = k;
+						}
+					}
+
+					pts = generateRoundedBarPolygon(closest_point, joint->pos, link_radius);
+				}
+
+				// Create a link-like geometry to extend the body to the joint
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, 0, link_depth));
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - link_depth, -10));
+
+				// Create the joint part of the body
+				// First, create the base
+				pts = generateCirclePolygon(joint->pos, link_radius);
+				double z = link_depth;
+				double height = joint_depth + joints[j]->z * (link_depth + joint_depth);
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+				// Second, create the rod of the joint
+				pts = generateCirclePolygon(joint->pos, joint_radius);
+				z += height;
+				height = link_depth;
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+				// Finally, create the cap of the joint
+				// For the cap, the top face is a little smaller, so we use a different polygon for that.
+				pts = generateCirclePolygon(joint->pos, joint_cap_radius1);
+				std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, joint_cap_radius2);
+				z += height;
+				height = joint_depth;
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, z, z + height, false));
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+			}
+		}
+
+		// connect moving joints to a moving body
+		for (int j = 0; j < bodies.size(); j++) {
+			if (bodies[j]->pivot1->ground ||bodies[j]->pivot2->ground) continue;
+
+			std::vector<glm::dvec2> body_pts = bodies[j]->getActualPoints()[0];
+
+			std::vector<glm::dvec2> pts;
+			if (kinematics::withinPolygon(body_pts, bodies[j]->pivot1->pos)) {
+				pts = generateCirclePolygon(bodies[j]->pivot1->pos, link_radius);
+			}
+			else {
+				// find the closest point of a rigid body
+				glm::dvec2 cp1 = kinematics::closestPoint(body_pts, bodies[j]->pivot1->pos);
+
+				// extend the point a little into the rigid body
+				glm::dvec2 v1 = glm::normalize(cp1 - bodies[j]->pivot1->pos);
+				v1 *= link_radius;
+				cp1 += v1;
+
+				pts = generateRoundedBarPolygon(cp1, bodies[j]->pivot1->pos, link_radius);
+			}
+
+			// create a geometry to extend the body to the joint
+			addPolygonToBody(j, kinematics::Polygon25D(pts, 0, link_depth));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - link_depth, -10));
+
+			// Create the joint part of the body
+			// First, create the base
+			pts = generateCirclePolygon(bodies[j]->pivot1->pos, link_radius);
+			double z = link_depth;
+			double height = joint_depth + bodies[j]->pivot1->z * (link_depth + joint_depth);
+			addPolygonToBody(j, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(bodies[j]->pivot1->pos, joint_radius);
+			z += height;
+			height = link_depth;
+			addPolygonToBody(j, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(bodies[j]->pivot1->pos, joint_cap_radius1);
+			std::vector<glm::dvec2> pts2 = generateCirclePolygon(bodies[j]->pivot1->pos, joint_cap_radius2);
+			z += height;
+			height = joint_depth;
+			addPolygonToBody(j, kinematics::Polygon25D(pts2, pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+
+			if (kinematics::withinPolygon(body_pts, bodies[j]->pivot2->pos)) {
+				pts = generateRoundedBarPolygon(bodies[j]->pivot2->pos, bodies[j]->pivot2->pos, link_radius);
+			}
+			else {
+				glm::dvec2 cp2 = kinematics::closestPoint(body_pts, bodies[j]->pivot2->pos);
+
+				// extend the point a little into the rigid body
+				glm::dvec2 v2 = glm::normalize(cp2 - bodies[j]->pivot2->pos);
+				v2 *= link_radius;
+				cp2 += v2;
+
+				pts = generateRoundedBarPolygon(cp2, bodies[j]->pivot2->pos, link_radius);
+			}
+
+			// create a geometry to extend the body to the joint
+			addPolygonToBody(j, kinematics::Polygon25D(pts, 0, link_depth));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - link_depth, -10));
+
+			// Create the joint part of the body
+			// First, create the base
+			pts = generateCirclePolygon(bodies[j]->pivot2->pos, link_radius);
+			z = link_depth;
+			height = joint_depth + bodies[j]->pivot2->z * (link_depth + joint_depth);
+			addPolygonToBody(j, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(bodies[j]->pivot2->pos, joint_radius);
+			z += height;
+			height = link_depth;
+			addPolygonToBody(j, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(bodies[j]->pivot2->pos, joint_cap_radius1);
+			pts2 = generateCirclePolygon(bodies[j]->pivot2->pos, joint_cap_radius2);
+			z += height;
+			height = joint_depth;
+			addPolygonToBody(j, kinematics::Polygon25D(pts2, pts, z, z + height, false));
+			addPolygonToBody(j, kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+		}
 	}
 
 	void KinematicDiagram::load(const QString& filename) {
@@ -271,7 +487,7 @@ namespace kinematics {
 							point_node = point_node.nextSibling();
 						}
 
-						addBody(joints[id1], joints[id2], Polygon25D(points, depth1, depth2));
+						addBody(joints[id1], joints[id2], Object25D(points, depth1, depth2));
 					}
 
 					body_node = body_node.nextSibling();
@@ -362,10 +578,13 @@ namespace kinematics {
 			bodies[i]->neighbors.clear();
 		}
 
-		// check the adjacency
+		// Check the adjacency
+		// The current implementation is not elegant.
+		// Adjacent bodies are considered to belong to the same group of a fixed body,
+		// and we do not check the collision between them.
 		for (int i = 0; i < bodies.size(); ++i) {
 			for (int j = i + 1; j < bodies.size(); ++j) {
-				if (polygonPolygonIntersection(bodies[i]->getActualPoints(), bodies[j]->getActualPoints())) {
+				if (polygonPolygonIntersection(bodies[i]->getActualPoints()[0], bodies[j]->getActualPoints()[0])) {
 					bodies[i]->neighbors[j] = true;
 					bodies[j]->neighbors[i] = true;
 				}
@@ -374,16 +593,56 @@ namespace kinematics {
 	}
 
 	bool KinematicDiagram::isCollided() const {
+		// check the collision between rigid bodies
 		for (int i = 0; i < bodies.size(); ++i) {
 			for (int j = i + 1; j < bodies.size(); ++j) {
 				// skip the neighbors
 				if (bodies[i]->neighbors.contains(j)) continue;
 
-				// if the depth is different, we do not need to check the collision between these rigid bodies
-				if (bodies[i]->polygon.depth1 >= bodies[j]->polygon.depth2 || bodies[j]->polygon.depth1 >= bodies[i]->polygon.depth2) continue;
+				for (int k = 0; k < bodies[i]->polygons.size(); k++) {
+					if (!bodies[i]->polygons[k].check_collision) continue;
+					std::vector<glm::dvec2> pts1 = bodies[i]->getActualPoints(k);
 
-				if (polygonPolygonIntersection(bodies[i]->getActualPoints(), bodies[j]->getActualPoints())) {
-					return true;
+					for (int l = 0; l < bodies[j]->polygons.size(); l++) {
+						if (!bodies[j]->polygons[l].check_collision) continue;
+						std::vector<glm::dvec2> pts2 = bodies[j]->getActualPoints(l);
+
+						// if the depth is different, we do not need to check the collision between these rigid bodies
+						if (bodies[i]->polygons[k].depth1 >= bodies[j]->polygons[l].depth2 || bodies[j]->polygons[l].depth1 >= bodies[i]->polygons[k].depth2) continue;
+
+						if (polygonPolygonIntersection(pts1, pts2)) return true;
+					}
+				}
+			}
+		}
+
+		// check the collision between links and joints
+		for (int i = 0; i < links.size(); i++) {
+			// For the coupler, we can use the moving body itself as a coupler, 
+			// so we do not need to create a coupler link.
+			if (!links[i]->actual_link) continue;
+
+			for (int j = 0; j < joints.size(); j++) {
+				// If the link i is furhter away from the body than joint j,
+				// there will be no collision between them.
+				if (links[i]->z > joints[j]->z) continue;
+
+				// If joint j belongs to link i, skip it for collision check.
+				bool excluded = false;
+				for (int k = 0; k < links[i]->joints.size(); k++) {
+					if (joints[j] == links[i]->joints[k]) {
+						excluded = true;
+						break;
+					}
+				}
+				if (excluded) continue;
+
+				for (int k = 0; k < links[i]->joints.size(); k++) {
+					for (int l = k + 1; l < links[i]->joints.size(); l++) {
+						if (distanceToSegment(links[i]->joints[k]->pos, links[i]->joints[l]->pos, joints[j]->pos) < link_radius * 2) {
+							return true;
+						}
+					}
 				}
 			}
 		}

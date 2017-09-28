@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
+	connect(ui.actionExportSTL, SIGNAL(triggered()), this, SLOT(onExportSTL()));
+	connect(ui.actionExportSCAD, SIGNAL(triggered()), this, SLOT(onExportSCAD()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(onUndo()));
 	connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(onRedo()));
@@ -106,6 +108,18 @@ void MainWindow::onSave() {
 
 	glWidget->save(filename);
 	setWindowTitle("Canvas 3D - " + QFileInfo(filename).fileName());
+}
+
+void MainWindow::onExportSTL() {
+	QString dirname = QFileDialog::getExistingDirectory(0, ("Select Output Folder"), QDir::currentPath());
+	if (dirname.isEmpty()) return;
+	glWidget->saveSTL(dirname);
+}
+
+void MainWindow::onExportSCAD() {
+	QString dirname = QFileDialog::getExistingDirectory(0, ("Select Output Folder"), QDir::currentPath());
+	if (dirname.isEmpty()) return;
+	glWidget->saveSCAD(dirname);
 }
 
 void MainWindow::onUndo() {

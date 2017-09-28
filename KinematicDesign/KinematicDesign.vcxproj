@@ -101,7 +101,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\opencv\lib;..\glew;$(CGAL_DIR)\lib;$(CGAL_DIR)\auxiliary\gmp\lib;$(BOOST_LIBRARYDIR);..\dlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;opencv_world300d.lib;glew32.lib;CGAL-vc120-mt-gd-4.8.1.lib;CGAL_Core-vc120-mt-gd-4.8.1.lib;CGAL_ImageIO-vc120-mt-gd-4.8.1.lib;libgmp-10.lib;libmpfr-4.lib;libboost_thread-vc120-mt-gd-1_58.lib;dlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;opencv_world300d.lib;glew32.lib;CGAL-vc120-mt-gd-4.10.1.lib;CGAL_Core-vc120-mt-gd-4.10.1.lib;CGAL_ImageIO-vc120-mt-gd-4.10.1.lib;libgmp-10.lib;libmpfr-4.lib;libboost_thread-vc120-mt-gd-1_58.lib;dlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,7 +133,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\opencv\lib;..\glew;$(CGAL_DIR)\lib;$(CGAL_DIR)\auxiliary\gmp\lib;$(BOOST_LIBRARYDIR);..\dlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Xml.lib;opencv_world300d.lib;glew32.lib;CGAL-vc120-mt-4.8.1.lib;CGAL_Core-vc120-mt-4.8.1.lib;CGAL_ImageIO-vc120-mt-4.8.1.lib;libgmp-10.lib;libmpfr-4.lib;libboost_thread-vc120-mt-1_58.lib;dlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Xml.lib;opencv_world300d.lib;glew32.lib;CGAL-vc120-mt-4.10.1.lib;CGAL_Core-vc120-mt-4.10.1.lib;CGAL_ImageIO-vc120-mt-4.10.1.lib;libgmp-10.lib;libmpfr-4.lib;libboost_thread-vc120-mt-1_58.lib;dlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -200,9 +200,11 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="SCADExporter.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Shape.cpp" />
+    <ClCompile Include="STLExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -311,9 +313,11 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="SCADExporter.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="STLExporter.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@ namespace kinematics {
 
 	class PinJoint : public Joint {
 	public:
-		PinJoint(int id, bool ground, const glm::dvec2& pos);
+		PinJoint(int id, bool ground, const glm::dvec2& pos, double z);
 		PinJoint(QDomElement& node);
 
 		void draw(QPainter& painter, const QPointF& origin, float scale);

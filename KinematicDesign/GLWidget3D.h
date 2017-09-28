@@ -59,8 +59,8 @@ public:
 	std::vector<kinematics::Solution> selected_solutions; // currently selected solution
 	std::vector<std::vector<kinematics::Solution>> solutions; // all the candidates
 	std::pair<int, int> selectedJoint;
-	std::vector<kinematics::Polygon25D> fixed_body_pts;
-	std::vector<kinematics::Polygon25D> body_pts;
+	std::vector<kinematics::Object25D> fixed_body_pts;
+	std::vector<kinematics::Object25D> body_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dmat3x3>> poses;
 	int linkage_type;
@@ -88,18 +88,16 @@ public:
 	void setLayer(int layer_id);
 	void open(const QString& filename);
 	void save(const QString& filename);
+	void saveSTL(const QString& dirname);
+	void saveSCAD(const QString& dirname);
 	glm::dvec2 screenToWorldCoordinates(const glm::dvec2& p);
 	glm::dvec2 screenToWorldCoordinates(double x, double y);
 	glm::dvec2 worldToScreenCoordinates(const glm::dvec2& p);
 	double scale();
 	void update3DGeometry();
 	void update3DGeometryFromKinematics();
-	std::vector<glm::dvec2> generateBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_width);
-	std::vector<glm::dvec2> generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices = 24);
-
 	void calculateSolutions(int linkae_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight);
 	void constructKinematics();
-	void connectJointsToRigidBodies();
 	int findSolution(const std::vector<kinematics::Solution>& solutions, const glm::dvec2& pt, int joint_id);
 	void run();
 	void runBackward();

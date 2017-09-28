@@ -4,11 +4,12 @@
 
 namespace kinematics {
 
-	SliderHinge::SliderHinge(int id, bool ground, const glm::dvec2& pos) : Joint() {
+	SliderHinge::SliderHinge(int id, bool ground, const glm::dvec2& pos, double z) : Joint() {
 		this->id = id;
 		this->type = TYPE_SLIDER_HINGE;
 		this->ground = ground;
 		this->pos = pos;
+		this->z = z;
 	}
 
 	SliderHinge::SliderHinge(QDomElement& node) : Joint() {
@@ -17,6 +18,7 @@ namespace kinematics {
 		this->ground = node.attribute("ground").toLower() == "true";
 		pos.x = node.attribute("x").toDouble();
 		pos.y = node.attribute("y").toDouble();
+		z = 0;
 	}
 
 	void SliderHinge::draw(QPainter& painter, const QPointF& origin, float scale) {

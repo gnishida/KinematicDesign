@@ -10,7 +10,7 @@ namespace kinematics {
 		double theta;
 
 	public:
-		SliderHinge(int id, bool ground, const glm::dvec2& pos);
+		SliderHinge(int id, bool ground, const glm::dvec2& pos, double z);
 		SliderHinge(QDomElement& node);
 
 		void draw(QPainter& painter, const QPointF& origin, float scale);

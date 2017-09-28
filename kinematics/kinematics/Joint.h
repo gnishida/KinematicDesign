@@ -21,6 +21,7 @@ namespace kinematics {
 		glm::dvec2 pos;
 		std::vector<boost::shared_ptr<Link>> links;
 		bool determined;
+		double z;
 
 	public:
 		Joint();

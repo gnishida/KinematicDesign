@@ -194,6 +194,27 @@ namespace kinematics {
 		return true;
 	}
 
+	/**
+	 * Calculate the distance from the segment a-b to point c.
+	 */
+	double distanceToSegment(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c) {
+		float r_numerator = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
+		float r_denomenator = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+
+		if (r_denomenator <= 0.0) {
+			return glm::length(a - c);
+		}
+
+		float r = r_numerator / r_denomenator;
+
+		if (r < 0 || r > 1) {
+			return std::min(glm::length(c - a), glm::length(c - b));
+		}
+		else {
+			return abs((a.y - c.y) * (b.x - a.x) - (a.x - c.x) * (b.y - a.y)) / sqrt(r_denomenator);
+		}
+	}
+
 	glm::dvec2 circleCenterFromThreePoints(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c) {
 		glm::dvec2 m1 = (a + b) * 0.5;
 		glm::dvec2 v1 = b - a;
@@ -489,6 +510,52 @@ namespace kinematics {
 			max_y = std::max(max_y, points[i].y);
 		}
 		return BBox(glm::dvec2(min_x, min_y), glm::dvec2(max_x, max_y));
+	}
+
+	std::vector<glm::dvec2> generateBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_width) {
+		std::vector<glm::dvec2> ans;
+
+		glm::dvec2 vec = glm::normalize(p2 - p1);
+		glm::dvec2 perp(-vec.y, vec.x);
+		perp *= link_width * 0.5;
+
+		ans.push_back(p1 + perp);
+		ans.push_back(p1 - perp);
+		ans.push_back(p2 - perp);
+		ans.push_back(p2 + perp);
+
+		return ans;
+	}
+
+	std::vector<glm::dvec2> generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices) {
+		std::vector<glm::dvec2> ans;
+
+		double theta0 = atan2(p2.y - p1.y, p2.x - p1.x) + M_PI * 0.5;
+		for (int k = 0; k <= num_slices / 2; k++) {
+			if (p1 != p2 || k < num_slices / 2) {
+				double theta = theta0 + M_PI * 2 / num_slices * k;
+				ans.push_back(glm::dvec2(cos(theta) * link_radius + p1.x, sin(theta) * link_radius + p1.y));
+			}
+		}
+		theta0 += M_PI;
+		for (int k = 0; k <= num_slices / 2; k++) {
+			if (p1 != p2 || k < num_slices / 2) {
+				double theta = theta0 + M_PI * 2 / num_slices * k;
+				ans.push_back(glm::dvec2(cos(theta) * link_radius + p2.x, sin(theta) * link_radius + p2.y));
+			}
+		}
+
+		return ans;
+	}
+
+	std::vector<glm::dvec2> generateCirclePolygon(const glm::dvec2& p, float radius, int num_slices) {
+		std::vector<glm::dvec2> ans;
+
+		for (int k = 0; k < num_slices; k++) {
+			double theta = M_PI * 2 / num_slices * k;
+			ans.push_back(glm::dvec2(cos(theta) * radius + p.x, sin(theta) * radius + p.y));
+		}
+		return ans;
 	}
 
 }

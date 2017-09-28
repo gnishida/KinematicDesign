@@ -8,12 +8,16 @@ namespace kinematics {
 		this->id = id;
 		this->angle = 0;
 		this->driver = false;
+		this->actual_link = true;
+		this->z = 0;
 	}
 
-	Link::Link(int id, bool driver) {
+	Link::Link(int id, bool driver, bool actual_link, double z) {
 		this->id = id;
 		this->angle = 0;
 		this->driver = driver;
+		this->actual_link = actual_link;
+		this->z = z;
 	}
 
 	bool Link::isDetermined() {
