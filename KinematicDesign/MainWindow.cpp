@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include <QFileDialog>
 #include "LinkageSynthesisOptionDialog.h"
+#include "OptionDialog.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionStepForward, SIGNAL(triggered()), this, SLOT(onStepForward()));
 	connect(ui.actionStepBackward, SIGNAL(triggered()), this, SLOT(onStepBackward()));
 	connect(ui.actionCollisionCheck, SIGNAL(triggered()), this, SLOT(onCollisionCheck()));
+	connect(ui.actionOptions, SIGNAL(triggered()), this, SLOT(onOptions()));
 	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
 	connect(ui.actionRenderBasic, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderSSAO, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
@@ -281,6 +283,38 @@ void MainWindow::onStepBackward() {
 
 void MainWindow::onCollisionCheck() {
 	glWidget->collision_check = ui.actionCollisionCheck->isChecked();
+}
+
+void MainWindow::onOptions() {
+	OptionDialog dlg;
+	dlg.setGap(kinematics::options->gap);
+	dlg.setLinkWidth(kinematics::options->link_width);
+	dlg.setLinkDepth(kinematics::options->link_depth);
+	dlg.setHoleRadius(kinematics::options->hole_radius);
+	dlg.setHoleRadius(kinematics::options->hole_radius);
+	dlg.setJointRaidus(kinematics::options->joint_radius);
+	dlg.setJointCapRaidus1(kinematics::options->joint_cap_radius1);
+	dlg.setJointCapRaidus2(kinematics::options->joint_cap_radius2);
+	dlg.setJointCapDepth(kinematics::options->joint_cap_depth);
+	dlg.setSliderBarWidth(kinematics::options->slider_bar_width);
+	dlg.setSliderBarDepth(kinematics::options->slider_bar_depth);
+	dlg.setSliderWidth(kinematics::options->slider_width);
+	dlg.setSliderDepth(kinematics::options->slider_depth);
+
+	if (dlg.exec()) {
+		kinematics::options->gap = dlg.getGap();
+		kinematics::options->link_width = dlg.getLinkWidth();
+		kinematics::options->link_depth = dlg.getLinkDepth();
+		kinematics::options->hole_radius = dlg.getHoleRadius();
+		kinematics::options->joint_radius = dlg.getJointRadius();
+		kinematics::options->joint_cap_radius1 = dlg.getJointCapRadius1();
+		kinematics::options->joint_cap_radius2 = dlg.getJointCapRadius2();
+		kinematics::options->joint_cap_depth = dlg.getJointCapDepth();
+		kinematics::options->slider_bar_width = dlg.getSliderBarWidth();
+		kinematics::options->slider_bar_depth = dlg.getSliderBarDepth();
+		kinematics::options->slider_width = dlg.getSliderWidth();
+		kinematics::options->slider_depth = dlg.getSliderDepth();
+	}
 }
 
 void MainWindow::onShowSolutions() {

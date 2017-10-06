@@ -64,7 +64,7 @@ public:
     {
         if (LinkageSynthesisOptionDialog->objectName().isEmpty())
             LinkageSynthesisOptionDialog->setObjectName(QStringLiteral("LinkageSynthesisOptionDialog"));
-        LinkageSynthesisOptionDialog->resize(352, 520);
+        LinkageSynthesisOptionDialog->resize(352, 505);
         label = new QLabel(LinkageSynthesisOptionDialog);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(30, 10, 61, 21));

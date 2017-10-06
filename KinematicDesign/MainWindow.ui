@@ -91,6 +91,7 @@
     <addaction name="actionStepBackward"/>
     <addaction name="separator"/>
     <addaction name="actionCollisionCheck"/>
+    <addaction name="actionOptions"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -361,6 +362,11 @@
   <action name="actionExportSCAD">
    <property name="text">
     <string>SCAD</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Options</string>
    </property>
   </action>
  </widget>

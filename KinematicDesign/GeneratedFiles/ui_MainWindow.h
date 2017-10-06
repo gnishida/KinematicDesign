@@ -61,6 +61,7 @@ public:
     QAction *actionSaveSTL;
     QAction *actionExportSTL;
     QAction *actionExportSCAD;
+    QAction *actionOptions;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -160,6 +161,8 @@ public:
         actionExportSTL->setObjectName(QStringLiteral("actionExportSTL"));
         actionExportSCAD = new QAction(MainWindowClass);
         actionExportSCAD->setObjectName(QStringLiteral("actionExportSCAD"));
+        actionOptions = new QAction(MainWindowClass);
+        actionOptions->setObjectName(QStringLiteral("actionOptions"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -233,6 +236,7 @@ public:
         menuKinematics->addAction(actionStepBackward);
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionCollisionCheck);
+        menuKinematics->addAction(actionOptions);
         menuView->addAction(actionShowSolutions);
         menuView->addSeparator();
         menuView->addAction(actionRenderBasic);
@@ -294,6 +298,7 @@ public:
         actionSaveSTL->setText(QApplication::translate("MainWindowClass", "Save STL", 0));
         actionExportSTL->setText(QApplication::translate("MainWindowClass", "STL", 0));
         actionExportSCAD->setText(QApplication::translate("MainWindowClass", "SCAD", 0));
+        actionOptions->setText(QApplication::translate("MainWindowClass", "Options", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
