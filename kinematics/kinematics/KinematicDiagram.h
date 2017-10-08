@@ -29,7 +29,7 @@ namespace kinematics {
 
 	protected:
 		Options() {
-			gap = 0.01f;
+			gap = 0.04f;
 			link_width = 1.0f;
 			link_depth = 0.3f;
 			hole_radius = 0.26f;
@@ -76,6 +76,8 @@ namespace kinematics {
 		void addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Object25D& polygons);
 		void addPolygonToBody(int body_id, const Polygon25D& polygon);
 		void connectJointsToBodies(std::vector<Object25D>& fixed_body_pts);
+		void connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_body_pts);
+		void connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& body_pts);
 		void load(const QString& filename);
 		void save(const QString& filename);
 		void updateBodyAdjacency();

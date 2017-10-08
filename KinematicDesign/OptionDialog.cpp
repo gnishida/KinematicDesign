@@ -3,17 +3,7 @@
 OptionDialog::OptionDialog(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);
 
-	ui.lineEditLinkWidth->setText("1.0");
-	ui.lineEditLinkDepth->setText("0.3");
-	ui.lineEditHoleRadius->setText("0.26");
-	ui.lineEditJointRadius->setText("0.25");
-	ui.lineEditJointCapRadius1->setText("0.23");
-	ui.lineEditJointCapRadius2->setText("0.28");
-	ui.lineEditJointCapDepth->setText("0.15");
-	ui.lineEditSliderBarWidth->setText("0.6");
-	ui.lineEditSliderBarDepth->setText("0.3");
-	ui.lineEditSliderWidth->setText("1.0");
-	ui.lineEditSliderDepth->setText("0.5");
+	onSmall();
 
 	connect(ui.pushButtonSmall, SIGNAL(clicked()), this, SLOT(onSmall()));
 	connect(ui.pushButtonLarge, SIGNAL(clicked()), this, SLOT(onLarge()));
@@ -121,7 +111,7 @@ float OptionDialog::getSliderDepth() {
 }
 
 void OptionDialog::onSmall() {
-	ui.lineEditGap->setText("0.005");
+	ui.lineEditGap->setText("0.04");
 	ui.lineEditLinkWidth->setText("1.0");
 	ui.lineEditLinkDepth->setText("0.3");
 	ui.lineEditHoleRadius->setText("0.26");

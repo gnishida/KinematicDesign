@@ -147,6 +147,21 @@ public:
         pushButtonCancel = new QPushButton(OptionDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
         pushButtonCancel->setGeometry(QRect(160, 340, 101, 31));
+        QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
+        QWidget::setTabOrder(pushButtonCancel, pushButtonSmall);
+        QWidget::setTabOrder(pushButtonSmall, pushButtonLarge);
+        QWidget::setTabOrder(pushButtonLarge, lineEditGap);
+        QWidget::setTabOrder(lineEditGap, lineEditLinkWidth);
+        QWidget::setTabOrder(lineEditLinkWidth, lineEditLinkDepth);
+        QWidget::setTabOrder(lineEditLinkDepth, lineEditHoleRadius);
+        QWidget::setTabOrder(lineEditHoleRadius, lineEditJointRadius);
+        QWidget::setTabOrder(lineEditJointRadius, lineEditJointCapRadius1);
+        QWidget::setTabOrder(lineEditJointCapRadius1, lineEditJointCapRadius2);
+        QWidget::setTabOrder(lineEditJointCapRadius2, lineEditJointCapDepth);
+        QWidget::setTabOrder(lineEditJointCapDepth, lineEditSliderBarWidth);
+        QWidget::setTabOrder(lineEditSliderBarWidth, lineEditSliderBarDepth);
+        QWidget::setTabOrder(lineEditSliderBarDepth, lineEditSliderWidth);
+        QWidget::setTabOrder(lineEditSliderWidth, lineEditSliderDepth);
 
         retranslateUi(OptionDialog);
 

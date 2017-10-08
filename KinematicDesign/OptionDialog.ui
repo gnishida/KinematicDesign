@@ -356,6 +356,24 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>pushButtonOK</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>pushButtonSmall</tabstop>
+  <tabstop>pushButtonLarge</tabstop>
+  <tabstop>lineEditGap</tabstop>
+  <tabstop>lineEditLinkWidth</tabstop>
+  <tabstop>lineEditLinkDepth</tabstop>
+  <tabstop>lineEditHoleRadius</tabstop>
+  <tabstop>lineEditJointRadius</tabstop>
+  <tabstop>lineEditJointCapRadius1</tabstop>
+  <tabstop>lineEditJointCapRadius2</tabstop>
+  <tabstop>lineEditJointCapDepth</tabstop>
+  <tabstop>lineEditSliderBarWidth</tabstop>
+  <tabstop>lineEditSliderBarDepth</tabstop>
+  <tabstop>lineEditSliderWidth</tabstop>
+  <tabstop>lineEditSliderDepth</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
