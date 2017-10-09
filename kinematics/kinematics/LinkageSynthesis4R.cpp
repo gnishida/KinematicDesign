@@ -138,14 +138,14 @@ namespace kinematics {
 				if (glm::length(A0 - B0) < min_link_length) continue;
 				if (glm::length(A1 - B1) < min_link_length) continue;
 
-				if (checkFolding(A0, B0, A1, B1)) continue;
-				if (rotatable_crank && checkRotatableCrankDefect(A0, B0, A1, B1)) continue;
-				if (avoid_branch_defect && checkBranchDefect(perturbed_poses, A0, B0, A1, B1)) continue;
-				if (checkCircuitDefect(perturbed_poses, A0, B0, A1, B1)) continue;
-				if (checkOrderDefect(perturbed_poses, A0, B0, A1, B1)) continue;
+				if (checkFolding({ A0, B0, A1, B1 })) continue;
+				if (rotatable_crank && checkRotatableCrankDefect({ A0, B0, A1, B1 })) continue;
+				if (avoid_branch_defect && checkBranchDefect(perturbed_poses, { A0, B0, A1, B1 })) continue;
+				if (checkCircuitDefect(perturbed_poses, { A0, B0, A1, B1 })) continue;
+				if (checkOrderDefect(perturbed_poses, { A0, B0, A1, B1 })) continue;
 
 				// collision check
-				if (checkCollision(perturbed_poses, A0, B0, A1, B1, fixed_body_pts, body_pts)) continue;
+				if (checkCollision(perturbed_poses, { A0, B0, A1, B1 }, fixed_body_pts, body_pts)) continue;
 
 				// calculate the distance of the joints from the user-specified linkage region
 				double dist = 0.0;
@@ -154,7 +154,7 @@ namespace kinematics {
 				dist += distMap.at<double>(B0.y - enlarged_bbox_world.minPt.y, B0.x - enlarged_bbox_world.minPt.x);
 				dist += distMap.at<double>(B1.y - enlarged_bbox_world.minPt.y, B1.x - enlarged_bbox_world.minPt.x);
 
-				solutions.push_back(Solution(A0, A1, B0, B1, position_error, orientation_error, dist, perturbed_poses));
+				solutions.push_back(Solution({ A0, B0, A1, B1 }, position_error, orientation_error, dist, perturbed_poses));
 				cnt++;
 			}
 		}
@@ -284,8 +284,8 @@ namespace kinematics {
 				double position_error = solutions[i].position_error;
 				double orientation_error = solutions[i].orientation_error;
 				double linkage_location = solutions[i].dist;
-				double tortuosity = tortuosityOfTrajectory(solutions[i].poses, solutions[i].fixed_point[0], solutions[i].fixed_point[1], solutions[i].moving_point[0], solutions[i].moving_point[1], body_pts);
-				double size = glm::length(solutions[i].fixed_point[0] - solutions[i].moving_point[0]) + glm::length(solutions[i].fixed_point[1] - solutions[i].moving_point[1]) + glm::length(solutions[i].moving_point[0] - solutions[i].moving_point[1]);
+				double tortuosity = tortuosityOfTrajectory(solutions[i].poses, { solutions[i].points[0], solutions[i].points[1], solutions[i].points[2], solutions[i].points[3] }, body_pts);
+				double size = glm::length(solutions[i].points[0] - solutions[i].points[2]) + glm::length(solutions[i].points[1] - solutions[i].points[3]) + glm::length(solutions[i].points[2] - solutions[i].points[3]);
 				double cost = position_error * position_error_weight + orientation_error * orientation_error_weight + linkage_location * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 				if (cost < min_cost) {
 					min_cost = cost;
@@ -296,7 +296,7 @@ namespace kinematics {
 			return solutions[best];
 		}
 		else {
-			return Solution({ 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 }, 0, 0, 0, poses);
+			return Solution({ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, 0, poses);
 		}
 	}
 
@@ -312,11 +312,11 @@ namespace kinematics {
 	* 6 -- Non-Grashof (pi-0 Rocker)
 	* 7 -- Non-Grashof (0-pi Rocker)
 	*/
-	int LinkageSynthesis4R::getType(const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3) {
-		double g = glm::length(p0 - p1);
-		double a = glm::length(p0 - p2);
-		double b = glm::length(p1 - p3);
-		double h = glm::length(p2 - p3);
+	int LinkageSynthesis4R::getType(const std::vector<glm::dvec2>& points) {
+		double g = glm::length(points[0] - points[1]);
+		double a = glm::length(points[0] - points[2]);
+		double b = glm::length(points[1] - points[3]);
+		double h = glm::length(points[2] - points[3]);
 
 		double T1 = g + h - a - b;
 		double T2 = b + g - a - h;
@@ -351,11 +351,11 @@ namespace kinematics {
 		}
 	}
 
-	bool LinkageSynthesis4R::checkFolding(const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3) {
-		double g = glm::length(p0 - p1);
-		double a = glm::length(p0 - p2);
-		double b = glm::length(p1 - p3);
-		double h = glm::length(p2 - p3);
+	bool LinkageSynthesis4R::checkFolding(const std::vector<glm::dvec2>& points) {
+		double g = glm::length(points[0] - points[1]);
+		double a = glm::length(points[0] - points[2]);
+		double b = glm::length(points[1] - points[3]);
+		double h = glm::length(points[2] - points[3]);
 
 		double T1 = g + h - a - b;
 		double T2 = b + g - a - h;
@@ -365,11 +365,11 @@ namespace kinematics {
 		else return false;
 	}
 
-	std::pair<double, double> LinkageSynthesis4R::checkRange(const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3) {
-		double g = glm::length(p0 - p1);
-		double a = glm::length(p0 - p2);
-		double b = glm::length(p1 - p3);
-		double h = glm::length(p2 - p3);
+	std::pair<double, double> LinkageSynthesis4R::checkRange(const std::vector<glm::dvec2>& points) {
+		double g = glm::length(points[0] - points[1]);
+		double a = glm::length(points[0] - points[2]);
+		double b = glm::length(points[1] - points[3]);
+		double h = glm::length(points[2] - points[3]);
 
 		double T1 = g + h - a - b;
 		double T2 = b + g - a - h;
@@ -378,9 +378,9 @@ namespace kinematics {
 		double theta_min = 0;
 		double theta_max = M_PI * 2;
 
-		int linkage_type = getType(p0, p1, p2, p3);
+		int linkage_type = getType(points);
 		if (linkage_type == 2) {
-			if (crossProduct(p0 - p2, p1 - p0) >= 0) {
+			if (crossProduct(points[0] - points[2], points[1] - points[0]) >= 0) {
 				theta_min = acos((a * a + g * g - (h - b) * (h - b)) / 2 / a / g);
 				theta_max = acos((a * a + g * g - (h + b) * (h + b)) / 2 / a / g);
 			}
@@ -390,7 +390,7 @@ namespace kinematics {
 			}
 		}
 		else if (linkage_type == 3) {
-			if (crossProduct(p0 - p2, p1 - p0) >= 0) {
+			if (crossProduct(points[0] - points[2], points[1] - points[0]) >= 0) {
 				theta_min = acos((a * a + g * g - (b - h) * (b - h)) / 2 / a / g);
 				theta_max = acos((a * a + g * g - (b + h) * (b + h)) / 2 / a / g);
 			}
@@ -419,8 +419,8 @@ namespace kinematics {
 	* Check if the linkage has a rotatable crank defect.
 	* If the crank is not fully rotatable, true is returned.
 	*/
-	bool LinkageSynthesis4R::checkRotatableCrankDefect(const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3) {
-		int linkage_type = getType(p0, p1, p2, p3);
+	bool LinkageSynthesis4R::checkRotatableCrankDefect(const std::vector<glm::dvec2>& points) {
+		int linkage_type = getType(points);
 
 		if (linkage_type == 0 || linkage_type == 1) {
 			return false;
@@ -435,11 +435,11 @@ namespace kinematics {
 	* If there is an order defect, true is returned.
 	* Otherwise, false is returned.
 	*/
-	bool LinkageSynthesis4R::checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, bool debug) {
-		glm::dvec2 inv_W = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(p2, 1));
+	bool LinkageSynthesis4R::checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
+		glm::dvec2 inv_W = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
 
-		int linkage_type = getType(p0, p1, p2, p3);
-		std::pair<double, double> range = checkRange(p0, p1, p2, p3);
+		int linkage_type = getType(points);
+		std::pair<double, double> range = checkRange(points);
 
 		double total_cw = 0;
 		double total_ccw = 0;
@@ -450,7 +450,7 @@ namespace kinematics {
 			//std::cout << X.x << "," << X.y << std::endl;
 
 			// calculate the direction from the ground pivot (center point) of the driving crank to the circle point
-			glm::dvec2 dir = X - p0;
+			glm::dvec2 dir = X - points[0];
 
 			// calculate its angle
 			double theta = atan2(dir.y, dir.x);
@@ -510,8 +510,8 @@ namespace kinematics {
 	* @param p3		the world coordinates of the moving point of the follower at the first pose
 	* @return		true if the branch defect is detected, false otherwise
 	*/
-	bool LinkageSynthesis4R::checkBranchDefect(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, bool debug) {
-		int type = getType(p0, p1, p2, p3);
+	bool LinkageSynthesis4R::checkBranchDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
+		int type = getType(points);
 
 		// drag-link and crank-rocker always do not have a branch defect
 		if (type == 0 || type == 1) return false;
@@ -519,33 +519,21 @@ namespace kinematics {
 		int orig_sign = 1;
 
 		// calculate the local coordinates of the circle points
-		glm::dvec2 W1 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(p2, 1));
-		glm::dvec2 W2 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(p3, 1));
+		glm::dvec2 W1 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
+		glm::dvec2 W2 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[3], 1));
 
-		if (debug) {
-			std::cout << "Branch defect debug..." << std::endl;
-			std::cout << "P0: (" << p0.x << ", " << p0.y << "), P1: (" << p1.x << ", " << p1.y << ")" << std::endl;
-		}
 		for (int i = 0; i < poses.size(); i++) {
 			// calculate the coordinates of the circle point of the driving/driven cranks in the world coordinate system
 			glm::dvec2 X1 = glm::dvec2(poses[i] * glm::dvec3(W1, 1));
 			glm::dvec2 X2 = glm::dvec2(poses[i] * glm::dvec3(W2, 1));
 
-			if (debug) {
-				std::cout << "X1: (" << X1.x << "," << X1.y << "), X2: (" << X2.x << ", " << X2.y << ")" << std::endl;
-				std::cout << "Sign: " << (crossProduct(X2 - p1, X1 - X2) >= 0 ? 1 : -1) << std::endl;
-			}
-
 			// calculate its sign
 			if (i == 0) {
-				orig_sign = crossProduct(X2 - p1, X1 - X2) >= 0 ? 1 : -1;
+				orig_sign = crossProduct(X2 - points[1], X1 - X2) >= 0 ? 1 : -1;
 			}
 			else {
-				int sign = crossProduct(X2 - p1, X1 - X2) >= 0 ? 1 : -1;
+				int sign = crossProduct(X2 - points[1], X1 - X2) >= 0 ? 1 : -1;
 				if (sign != orig_sign) {
-					if (debug) {
-						std::cout << "Sign is different" << std::endl;
-					}
 					return true;
 				}
 			}
@@ -554,8 +542,8 @@ namespace kinematics {
 		return false;
 	}
 
-	bool LinkageSynthesis4R::checkCircuitDefect(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, bool debug) {
-		int type = getType(p0, p1, p2, p3);
+	bool LinkageSynthesis4R::checkCircuitDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
+		int type = getType(points);
 
 		// Non-grashof type does not have a circuit defect
 		if (type >= 4) return false;
@@ -566,69 +554,44 @@ namespace kinematics {
 		int orig_sign3 = 1;
 
 		// calculate the local coordinates of the circle points
-		glm::dvec2 W1 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(p2, 1));
-		glm::dvec2 W2 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(p3, 1));
-
-		if (debug) {
-			std::cout << "Circuit defect debug..." << std::endl;
-			std::cout << "P0: (" << p0.x << ", " << p0.y << "), P1: (" << p1.x << ", " << p1.y << ")" << std::endl;
-		}
+		glm::dvec2 W1 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
+		glm::dvec2 W2 = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[3], 1));
 
 		for (int i = 0; i < poses.size(); i++) {
 			// calculate the coordinates of the circle point of the driving/driven cranks in the world coordinate system
 			glm::dvec2 X1 = glm::dvec2(poses[i] * glm::dvec3(W1, 1));
 			glm::dvec2 X2 = glm::dvec2(poses[i] * glm::dvec3(W2, 1));
 
-			if (debug) {
-				std::cout << "X1: (" << X1.x << "," << X1.y << "), X2: (" << X2.x << ", " << X2.y << ")" << std::endl;
-				std::cout << "Sign0: " << (crossProduct(p0 - p1, X1 - p0) >= 0 ? 1 : -1) << std::endl;
-				std::cout << "Sign1: " << (crossProduct(p1 - X2, p0 - p1) >= 0 ? 1 : -1) << std::endl;
-				std::cout << "Sign2: " << (crossProduct(X1 - p0, X2 - X1) >= 0 ? 1 : -1) << std::endl;
-				std::cout << "Sign3: " << (crossProduct(X2 - X1, p1 - X2) >= 0 ? 1 : -1) << std::endl;
-			}
-
 			// calculate its sign
 			if (i == 0) {
-				orig_sign0 = crossProduct(p0 - p1, X1 - p0) >= 0 ? 1 : -1;
-				orig_sign1 = crossProduct(p1 - X2, p0 - p1) >= 0 ? 1 : -1;
-				orig_sign2 = crossProduct(X1 - p0, X2 - X1) >= 0 ? 1 : -1;
-				orig_sign3 = crossProduct(X2 - X1, p1 - X2) >= 0 ? 1 : -1;
+				orig_sign0 = crossProduct(points[0] - points[1], X1 - points[0]) >= 0 ? 1 : -1;
+				orig_sign1 = crossProduct(points[1] - X2, points[0] - points[1]) >= 0 ? 1 : -1;
+				orig_sign2 = crossProduct(X1 - points[0], X2 - X1) >= 0 ? 1 : -1;
+				orig_sign3 = crossProduct(X2 - X1, points[1] - X2) >= 0 ? 1 : -1;
 			}
 			else {
-				int sign0 = crossProduct(p0 - p1, X1 - p0) >= 0 ? 1 : -1;
-				int sign1 = crossProduct(p1 - X2, p0 - p1) >= 0 ? 1 : -1;
-				int sign2 = crossProduct(X1 - p0, X2 - X1) >= 0 ? 1 : -1;
-				int sign3 = crossProduct(X2 - X1, p1 - X2) >= 0 ? 1 : -1;
+				int sign0 = crossProduct(points[0] - points[1], X1 - points[0]) >= 0 ? 1 : -1;
+				int sign1 = crossProduct(points[1] - X2, points[0] - points[1]) >= 0 ? 1 : -1;
+				int sign2 = crossProduct(X1 - points[0], X2 - X1) >= 0 ? 1 : -1;
+				int sign3 = crossProduct(X2 - X1, points[1] - X2) >= 0 ? 1 : -1;
 
 				if (type == 0) {
 					if (sign2 != orig_sign2 || sign3 != orig_sign3) {
-						if (debug) {
-							std::cout << "Sign is different" << std::endl;
-						}
 						return true;
 					}
 				}
 				else if (type == 1) {
 					if (sign1 != orig_sign1 || sign3 != orig_sign3) {
-						if (debug) {
-							std::cout << "Sign is different" << std::endl;
-						}
 						return true;
 					}
 				}
 				else if (type == 2) {
 					if (sign0 != orig_sign0 || sign2 != orig_sign2) {
-						if (debug) {
-							std::cout << "Sign is different" << std::endl;
-						}
 						return true;
 					}
 				}
 				else if (type == 3) {
 					if (sign0 != orig_sign0 || sign1 != orig_sign1) {
-						if (debug) {
-							std::cout << "Sign is different" << std::endl;
-						}
 						return true;
 					}
 				}
@@ -638,17 +601,17 @@ namespace kinematics {
 		return false;
 	}
 
-	bool LinkageSynthesis4R::checkCollision(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts) {
+	bool LinkageSynthesis4R::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts) {
 		kinematics::Kinematics kinematics;
 
 		// construct a linkage
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(0, true, p0, 0)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(1, true, p1, 1)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(2, false, p2, 0)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(3, false, p3, 1)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(0, true, points[0], 0)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(1, true, points[1], 1)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(2, false, points[2], 0)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(3, false, points[3], 1)));
 		kinematics.diagram.addLink(true, kinematics.diagram.joints[0], kinematics.diagram.joints[2], true, 0);
 		kinematics.diagram.addLink(false, kinematics.diagram.joints[1], kinematics.diagram.joints[3], true, 1);
-		kinematics.diagram.addLink(false, kinematics.diagram.joints[2], kinematics.diagram.joints[3], false, 0);
+		kinematics.diagram.addLink(false, kinematics.diagram.joints[2], kinematics.diagram.joints[3], false);
 
 		// set the geometry
 		kinematics.diagram.addBody(kinematics.diagram.joints[2], kinematics.diagram.joints[3], body_pts);
@@ -664,25 +627,14 @@ namespace kinematics {
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
 		// i.e., angles[0] = first pose, angles[1] = second pose, angles[2] = last pose
 		std::vector<double> angles(3);
-		glm::dvec2 w(glm::inverse(poses[0]) * glm::dvec3(p2, 1));
+		glm::dvec2 w(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
 		for (int i = 0; i < 2; i++) {
 			glm::dvec2 W = glm::dvec2(poses[i] * glm::dvec3(w, 1));
-			angles[i] = atan2(W.y - p0.y, W.x - p0.x);
+			angles[i] = atan2(W.y - points[0].y, W.x - points[0].x);
 		}
 		{
 			glm::dvec2 W = glm::dvec2(poses.back() * glm::dvec3(w, 1));
-			angles[2] = atan2(W.y - p0.y, W.x - p0.x);
-		}
-
-		//////////////////////////////////////////
-		// DEBUG
-		if (false) {
-			std::cout << "angles:" << std::endl;
-			for (int i = 0; i < poses.size(); i++) {
-				glm::dvec2 W = glm::dvec2(poses[i] * glm::dvec3(w, 1));
-				double angle = atan2(W.y - p0.y, W.x - p0.x);
-				std::cout << angle / M_PI * 180 << std::endl;
-			}
+			angles[2] = atan2(W.y - points[0].y, W.x - points[0].x);
 		}
 
 		// order the angles based on their signs
@@ -728,13 +680,6 @@ namespace kinematics {
 			kinematics.invertSpeed();
 		}
 
-		//////////////////////////////////////////
-		// DEBUG
-		if (false) {
-			std::cout << "angles:" << std::endl;
-			std::cout << "type: " << type << std::endl;
-		}
-
 		// initialize the visited flag
 		std::vector<bool> visited(angles.size(), false);
 		visited[0] = true;
@@ -752,7 +697,7 @@ namespace kinematics {
 			}
 
 			// calculate the angle of the driving crank
-			double angle = atan2(kinematics.diagram.joints[2]->pos.y - p0.y, kinematics.diagram.joints[2]->pos.x - p0.x);
+			double angle = atan2(kinematics.diagram.joints[2]->pos.y - points[0].y, kinematics.diagram.joints[2]->pos.x - points[0].x);
 
 			// convert the sign of the angle
 			if (type == 1 && angle > 0) {
@@ -809,7 +754,7 @@ namespace kinematics {
 		return false;
 	}
 
-	double LinkageSynthesis4R::tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const glm::dvec2& p0, const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& p3, const Object25D& body_pts) {
+	double LinkageSynthesis4R::tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const Object25D& body_pts) {
 		// calculate the local coordinates of the body points
 		glm::dmat3x3 inv_pose0 = glm::inverse(poses[0]);
 		std::vector<glm::dvec2> body_pts_local(body_pts.polygons[0].points.size());
@@ -833,10 +778,10 @@ namespace kinematics {
 		kinematics::Kinematics kinematics(0.1);
 
 		// construct a linkage
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(0, true, p0, 0)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(1, true, p1, 1)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(2, false, p2, 0)));
-		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(3, false, p3, 1)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(0, true, points[0], 0)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(1, true, points[1], 1)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(2, false, points[2], 0)));
+		kinematics.diagram.addJoint(boost::shared_ptr<PinJoint>(new PinJoint(3, false, points[3], 1)));
 		kinematics.diagram.addLink(true, kinematics.diagram.joints[0], kinematics.diagram.joints[2], true, 0);
 		kinematics.diagram.addLink(false, kinematics.diagram.joints[1], kinematics.diagram.joints[3], true, 1);
 		kinematics.diagram.addLink(false, kinematics.diagram.joints[2], kinematics.diagram.joints[3], false);
@@ -853,14 +798,14 @@ namespace kinematics {
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
 		// i.e., angles[0] = first pose, angles[1] = second pose, angles[2] = last pose
 		std::vector<double> angles(3);
-		glm::dvec2 w(glm::inverse(poses[0]) * glm::dvec3(p2, 1));
+		glm::dvec2 w(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
 		for (int i = 0; i < 2; i++) {
 			glm::dvec2 W = glm::dvec2(poses[i] * glm::dvec3(w, 1));
-			angles[i] = atan2(W.y - p0.y, W.x - p0.x);
+			angles[i] = atan2(W.y - points[0].y, W.x - points[0].x);
 		}
 		{
 			glm::dvec2 W = glm::dvec2(poses.back() * glm::dvec3(w, 1));
-			angles[2] = atan2(W.y - p0.y, W.x - p0.x);
+			angles[2] = atan2(W.y - points[0].y, W.x - points[0].x);
 		}
 
 		// order the angles based on their signs
@@ -923,7 +868,7 @@ namespace kinematics {
 			}
 
 			// calculate the angle of the driving crank
-			double angle = atan2(kinematics.diagram.joints[2]->pos.y - p0.y, kinematics.diagram.joints[2]->pos.x - p0.x);
+			double angle = atan2(kinematics.diagram.joints[2]->pos.y - points[0].y, kinematics.diagram.joints[2]->pos.x - points[0].x);
 
 			// update the lengths of the trajectory of the moving body
 			std::vector<glm::dvec2> next_body_pts = kinematics.diagram.bodies[0]->getActualPoints()[0];

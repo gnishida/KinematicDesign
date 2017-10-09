@@ -332,8 +332,8 @@ namespace kinematics {
 		pts = generateCirclePolygon(joint->pos, options->link_width / 2);
 		z += height;
 		height = options->gap + options->link_depth + options->joint_cap_depth + joint->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
+		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
 		// Second, create the rod of the joint
 		pts = generateCirclePolygon(joint->pos, options->joint_radius);
@@ -396,8 +396,8 @@ namespace kinematics {
 		pts = generateCirclePolygon(joint->pos, options->link_width / 2);
 		z += height;
 		height = options->joint_cap_depth + joint->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height, false));
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+		addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
+		addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
 		// Second, create the rod of the joint
 		pts = generateCirclePolygon(joint->pos, options->joint_radius);
@@ -619,6 +619,7 @@ namespace kinematics {
 			}
 		}
 
+#if 1
 		// check the collision between links and joints
 		for (int i = 0; i < links.size(); i++) {
 			// For the coupler, we can use the moving body itself as a coupler, 
@@ -649,6 +650,7 @@ namespace kinematics {
 				}
 			}
 		}
+#endif
 
 		return false;
 	}

@@ -784,10 +784,8 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 			// link 1
 			{
 				glm::dvec2& p1 = kinematics[i].diagram.links[1]->joints[0]->pos;
-				glm::dvec2& p2 = kinematics[i].diagram.links[1]->joints[1]->pos;
-				if (!kinematics[i].diagram.links[0]->joints[0]->ground) {
-					std::swap(p1, p2);
-				}
+				glm::dvec2& p2 = kinematics[i].diagram.links[1]->joints[2]->pos;
+
 				std::vector<glm::dvec2> pts = kinematics::generateBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), kinematics::options->slider_bar_width);
 
 				// HACK
@@ -807,9 +805,10 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
 				
 				// slider
+				glm::dvec2& p3 = kinematics[i].diagram.links[1]->joints[1]->pos;
 				glm::vec2 vec = glm::normalize(p2 - p1);
 				vec *= kinematics::options->slider_depth * 2;
-				std::vector<glm::dvec2> pts2 = kinematics::generateBarPolygon(glm::vec2(p2.x - vec.x, p2.y - vec.y), glm::vec2(p2.x + vec.x, p2.y + vec.y), kinematics::options->slider_width);
+				std::vector<glm::dvec2> pts2 = kinematics::generateBarPolygon(glm::vec2(p3.x - vec.x, p3.y - vec.y), glm::vec2(p3.x + vec.x, p3.y + vec.y), kinematics::options->slider_width);
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5)), vertices);
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - kinematics::options->slider_depth)), vertices);
 			}
@@ -900,7 +899,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
 		}
-		else if (solutions[i].size() == 0) {
+		else if (solutions[i].size() == 1) {
 			mainWin->ui.statusBar->showMessage("1 candidate was found.");
 		}
 		else {
@@ -973,10 +972,10 @@ void GLWidget3D::constructKinematics() {
 		if (linkage_type == LINKAGE_4R) {
 			// construct a linkage
 			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].fixed_point[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].fixed_point[1], 1)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].moving_point[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, selected_solutions[i].moving_point[1], 1)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].points[0], 0)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].points[1], 1)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].points[2], 0)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, selected_solutions[i].points[3], 1)));
 			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
 			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 1);
 			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
@@ -992,12 +991,13 @@ void GLWidget3D::constructKinematics() {
 		else if (linkage_type == LINKAGE_RRRP) {
 			// construct a linkage
 			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].fixed_point[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].fixed_point[1], 1)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].moving_point[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, selected_solutions[i].moving_point[1], 1)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].points[0], 0)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].points[1], 1)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].points[2], 0)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, selected_solutions[i].points[3], 1)));
+			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(4, true, selected_solutions[i].points[4], 1)));
 			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
-			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 1);
+			kin.diagram.addLink(false, { kin.diagram.joints[1], kin.diagram.joints[3], kin.diagram.joints[4] }, true, 1);
 			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
 
 			// update the geometry
@@ -1040,7 +1040,7 @@ int GLWidget3D::findSolution(const std::vector<kinematics::Solution>& solutions,
 	double min_dist = std::numeric_limits<double>::max();
 
 	for (int i = 0; i < solutions.size(); i++) {
-		double dist = glm::length(solutions[i].fixed_point[joint_id] - pt);
+		double dist = glm::length(solutions[i].points[joint_id] - pt);
 		if (dist < min_dist) {
 			min_dist = dist;
 			ans = i;
@@ -1323,12 +1323,12 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 				painter.setPen(QPen(QColor(255, 128, 128, 64), 1));
 				painter.setBrush(QBrush(QColor(255, 128, 128, 64)));
 				for (int i = 0; i < solutions[linkage_id].size(); i++) {
-					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].fixed_point[0].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].fixed_point[0].y * scale(), 3, 3);
+					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[0].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[0].y * scale(), 3, 3);
 				}
 				painter.setPen(QPen(QColor(128, 128, 255, 64), 1));
 				painter.setBrush(QBrush(QColor(128, 128, 255, 64)));
 				for (int i = 0; i < solutions[linkage_id].size(); i++) {
-					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].fixed_point[1].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].fixed_point[1].y * scale(), 3, 3);
+					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[1].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[1].y * scale(), 3, 3);
 				}
 			}
 
@@ -1643,12 +1643,7 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 
 			if (ctrlPressed) {
 				// move the selected joint
-				if (joint_id < 2) {
-					selected_solutions[linkage_id].fixed_point[joint_id] = pt;
-				}
-				else {
-					selected_solutions[linkage_id].moving_point[joint_id - 2] = pt;
-				}
+				//selected_solutions[linkage_id].points[joint_id] = pt;
 				kinematics[linkage_id].diagram.joints[joint_id]->pos = pt;
 
 				//updateDefectFlag(poses[linkage_id], kinematics[linkage_id]);
@@ -1661,25 +1656,20 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 				if (selectedSolution >= 0) {
 					selected_solutions[linkage_id] = solutions[linkage_id][selectedSolution];
 
-					// move the selected joint (center point)
-					kinematics[linkage_id].diagram.joints[joint_id]->pos = solutions[linkage_id][selectedSolution].fixed_point[joint_id];
+					// move the joints according to the selected solution
+					for (int i = 0; i < solutions[linkage_id][selectedSolution].points.size(); i++) {
+						kinematics[linkage_id].diagram.joints[i]->pos = solutions[linkage_id][selectedSolution].points[i];
+					}
 
-					// move the other end joint (circle point)
-					kinematics[linkage_id].diagram.joints[joint_id + 2]->pos = solutions[linkage_id][selectedSolution].moving_point[joint_id];
-
-					// initialize the other link
-					joint_id = 1 - joint_id;
-					kinematics[linkage_id].diagram.joints[joint_id]->pos = solutions[linkage_id][selectedSolution].fixed_point[joint_id];
-					kinematics[linkage_id].diagram.joints[joint_id + 2]->pos = solutions[linkage_id][selectedSolution].moving_point[joint_id];
-
-					// initialize the other linkages
+					// move the other linkages back to the first pose
 					for (int i = 0; i < kinematics.size(); i++) {
 						if (i == linkage_id) continue;
 
 						int selectedSolution = findSolution(solutions[i], kinematics[i].diagram.joints[0]->pos, 0);
 						if (selectedSolution >= 0) {
-							kinematics[i].diagram.joints[2]->pos = solutions[i][selectedSolution].moving_point[0];
-							kinematics[i].diagram.joints[3]->pos = solutions[i][selectedSolution].moving_point[1];
+							for (int j = 0; j < solutions[i][selectedSolution].points.size(); j++) {
+								kinematics[i].diagram.joints[j]->pos = solutions[i][selectedSolution].points[j];
+							}
 						}
 					}
 

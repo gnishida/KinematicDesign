@@ -7,8 +7,7 @@ namespace kinematics {
 
 	class Solution {
 	public:
-		glm::dvec2 fixed_point[2];
-		glm::dvec2 moving_point[2];
+		std::vector<glm::dvec2> points;
 		double position_error;
 		double orientation_error;
 		double dist;	// how far the linkage is from the user-specified region
@@ -16,8 +15,8 @@ namespace kinematics {
 
 	public:
 		Solution() {}
-		Solution(const glm::dvec2& fixed_point1, const glm::dvec2& moving_point1, const glm::dvec2& fixed_point2, const glm::dvec2& moving_point2, double position_error, double orientation_error, double dist);
-		Solution(const glm::dvec2& fixed_point1, const glm::dvec2& moving_point1, const glm::dvec2& fixed_point2, const glm::dvec2& moving_point2, double pose_error, double orientation_error, double dist, const std::vector<glm::dmat3x3>& poses);
+		Solution(const std::vector<glm::dvec2>& points, double position_error, double orientation_error, double dist);
+		Solution(const std::vector<glm::dvec2>& points, double pose_error, double orientation_error, double dist, const std::vector<glm::dmat3x3>& poses);
 	};
 
 }
