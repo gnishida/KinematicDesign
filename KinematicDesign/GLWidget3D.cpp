@@ -763,8 +763,6 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 			}
 		}
 		else if (linkage_type == LINKAGE_RRRP) {
-
-
 			// link 0
 			{
 				glm::dvec2& p1 = kinematics[i].diagram.links[0]->joints[0]->pos;
@@ -778,18 +776,9 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// This part is currently very unorganized.
 				// For each type of mechanism, I have to hard code the depth of each link.
 				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = (kinematics::options->link_depth + kinematics::options->joint_cap_depth) + kinematics::options->slider_depth - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 + kinematics::options->joint_cap_depth + (kinematics::options->link_depth + kinematics::options->joint_cap_depth);
+				float z = kinematics::options->link_depth * 2 + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth + kinematics[i].diagram.links[0]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) + kinematics::options->gap;
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
-
-				// joints
-				float height1 = kinematics::options->joint_cap_depth + kinematics::options->slider_depth - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 + kinematics::options->joint_cap_depth + (kinematics::options->link_depth + kinematics::options->joint_cap_depth) * 2;
-				float height2 = kinematics::options->link_depth + kinematics::options->joint_cap_depth * 2;
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height1, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, kinematics::options->link_depth)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height2, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z - kinematics::options->joint_cap_depth)), vertices, 36);
-
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height1, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - kinematics::options->link_depth - height1)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height2, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z + kinematics::options->joint_cap_depth - height2)), vertices, 36);
 			}
 
 			// link 1
@@ -805,47 +794,24 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// This part is currently very unorganized.
 				// For each type of mechanism, I have to hard code the depth of each link.
 				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = kinematics::options->link_depth + kinematics::options->joint_cap_depth;
+				float z = kinematics::options->link_depth * 2 + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth + kinematics[i].diagram.links[1]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) + kinematics::options->gap;
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
 
+				// end of bar
+				pts = kinematics::generateCirclePolygon(p1, kinematics::options->slider_width / 2);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
+				pts = kinematics::generateCirclePolygon(p2, kinematics::options->slider_width / 2);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
+				
 				// slider
 				glm::vec2 vec = glm::normalize(p2 - p1);
 				vec *= kinematics::options->slider_depth * 2;
 				std::vector<glm::dvec2> pts2 = kinematics::generateBarPolygon(glm::vec2(p2.x - vec.x, p2.y - vec.y), glm::vec2(p2.x + vec.x, p2.y + vec.y), kinematics::options->slider_width);
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5)), vertices);
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - kinematics::options->slider_depth)), vertices);
-
-				// joints
-				float height = kinematics::options->slider_bar_depth + kinematics::options->joint_cap_depth * 2;
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z - kinematics::options->joint_cap_depth)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5)), vertices, 36);
-
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - z + kinematics::options->joint_cap_depth - height)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - height)), vertices, 36);
-			}
-
-			// link 2
-			{
-				glm::dvec2& p1 = kinematics[i].diagram.links[2]->joints[0]->pos;
-				glm::dvec2& p2 = kinematics[i].diagram.links[2]->joints[1]->pos;
-				std::vector<glm::dvec2> pts = kinematics::generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), kinematics::options->link_width / 2);
-
-				// HACK
-				// This part is currently very unorganized.
-				// For each type of mechanism, I have to hard code the depth of each link.
-				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = (kinematics::options->link_depth + kinematics::options->joint_cap_depth) + kinematics::options->slider_depth - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 + kinematics::options->joint_cap_depth;
-				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
-
-				// joints
-				float height = kinematics::options->link_depth + kinematics::options->joint_cap_depth * 2;
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z - kinematics::options->joint_cap_depth)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z - kinematics::options->joint_cap_depth)), vertices, 36);
-
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - z + kinematics::options->joint_cap_depth - height)), vertices, 36);
-				glutils::drawCylinderZ(kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, kinematics::options->joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z + kinematics::options->joint_cap_depth - height)), vertices, 36);
 			}
 		}
 	}
@@ -1030,9 +996,9 @@ void GLWidget3D::constructKinematics() {
 			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].fixed_point[1], 1)));
 			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].moving_point[0], 0)));
 			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, selected_solutions[i].moving_point[1], 1)));
-			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2]);
-			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3]);
-			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3]);
+			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
+			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 1);
+			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
 
 			// update the geometry
 			kin.diagram.bodies.clear();
