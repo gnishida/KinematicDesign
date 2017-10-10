@@ -880,7 +880,9 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 	}
 
-	solutions.resize(body_pts.size(), std::vector<kinematics::Solution>(2));
+	kinematics.clear();
+
+	solutions.resize(body_pts.size());
 	selected_solutions.resize(body_pts.size());
 	for (int i = 0; i < body_pts.size(); i++) {
 		time_t start = clock();
@@ -910,18 +912,20 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << solutions[i].size() << " candidates." << std::endl;
 
 		start = clock();
-		if (linkage_type == LINKAGE_4R) {
-			selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
-		}
-		else if (linkage_type == LINKAGE_RRRP) {
-			selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
-		}
+
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, body_pts[i], true, fixed_body_pts);
+
+		kinematics.push_back(kin);
 
 		end = clock();
 		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for finding the best solution. " << std::endl;
 	}
 
-	constructKinematics();
+	// setup the kinematic system
+	for (int i = 0; i < kinematics.size(); i++) {
+		kinematics[i].diagram.initialize();
+	}
 
 	time_t end = clock();
 	std::cout << "Total computation time was " << (double)(end - start) / CLOCKS_PER_SEC << " sec." << std::endl;
@@ -967,61 +971,20 @@ void GLWidget3D::constructKinematics() {
 		}
 	}
 
+	boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
+	if (linkage_type == LINKAGE_4R) {
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
+	}
+	else if (linkage_type == LINKAGE_RRRP) {
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
+	}
+
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
-		if (linkage_type == LINKAGE_4R) {
-			// construct a linkage
-			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].points[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].points[1], 1)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].points[2], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, selected_solutions[i].points[3], 1)));
-			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
-			kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 1);
-			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
-
-			// update the geometry
-			kin.diagram.bodies.clear();
-			kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], body_pts[i]);
-
-			kinematics.push_back(kin);
-
-			//updateDefectFlag(solution.poses, kinematics[0]);
-		}
-		else if (linkage_type == LINKAGE_RRRP) {
-			// construct a linkage
-			kinematics::Kinematics kin;
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, selected_solutions[i].points[0], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, selected_solutions[i].points[1], 1)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, selected_solutions[i].points[2], 0)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, selected_solutions[i].points[3], 1)));
-			kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(4, true, selected_solutions[i].points[4], 1)));
-			kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
-			kin.diagram.addLink(false, { kin.diagram.joints[1], kin.diagram.joints[3], kin.diagram.joints[4] }, true, 1);
-			kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
-
-			// update the geometry
-			kin.diagram.bodies.clear();
-			kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], body_pts[i]);
-
-			kinematics.push_back(kin);
-
-			//updateDefectFlag(solution.poses, kinematics[0]);
-		}
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, body_pts[i], true, fixed_body_pts);
+		kinematics.push_back(kin);
 	}
 	
-	// connect joints to rigid bodies
-	for (int i = 0; i < kinematics.size(); i++) {
-		kinematics[i].diagram.connectJointsToBodies(fixed_body_pts);
-	}
-
-	// add the fixed rigid bodies to the fixed joints of all the linkages
-	for (int i = 0; i < fixed_body_pts.size(); i++) {
-		for (int j = 0; j < kinematics.size(); j++) {
-			kinematics[j].diagram.addBody(kinematics[j].diagram.joints[0], kinematics[j].diagram.joints[1], fixed_body_pts[i]);
-		}
-	}
-
 	// setup the kinematic system
 	for (int i = 0; i < kinematics.size(); i++) {
 		kinematics[i].diagram.initialize();
