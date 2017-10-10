@@ -7,6 +7,8 @@ OptionDialog::OptionDialog(QWidget *parent) : QDialog(parent) {
 
 	connect(ui.pushButtonSmall, SIGNAL(clicked()), this, SLOT(onSmall()));
 	connect(ui.pushButtonLarge, SIGNAL(clicked()), this, SLOT(onLarge()));
+	connect(ui.pushButtonHalf, SIGNAL(clicked()), this, SLOT(onHalf()));
+	connect(ui.pushButtonTwice, SIGNAL(clicked()), this, SLOT(onTwice()));
 	connect(ui.pushButtonOK, SIGNAL(clicked()), this, SLOT(onOK()));
 	connect(ui.pushButtonCancel, SIGNAL(clicked()), this, SLOT(onCancel()));
 }
@@ -138,6 +140,36 @@ void OptionDialog::onLarge() {
 	ui.lineEditSliderBarDepth->setText("0.6");
 	ui.lineEditSliderWidth->setText("2.0");
 	ui.lineEditSliderDepth->setText("1.0");
+}
+
+void OptionDialog::onHalf() {
+	ui.lineEditGap->setText(QString::number(ui.lineEditGap->text().toDouble() * 0.5));
+	ui.lineEditLinkWidth->setText(QString::number(ui.lineEditLinkWidth->text().toDouble() * 0.5));
+	ui.lineEditLinkDepth->setText(QString::number(ui.lineEditLinkDepth->text().toDouble() * 0.5));
+	ui.lineEditHoleRadius->setText(QString::number(ui.lineEditHoleRadius->text().toDouble() * 0.5));
+	ui.lineEditJointRadius->setText(QString::number(ui.lineEditJointRadius->text().toDouble() * 0.5));
+	ui.lineEditJointCapRadius1->setText(QString::number(ui.lineEditJointCapRadius1->text().toDouble() * 0.5));
+	ui.lineEditJointCapRadius2->setText(QString::number(ui.lineEditJointCapRadius2->text().toDouble() * 0.5));
+	ui.lineEditJointCapDepth->setText(QString::number(ui.lineEditJointCapDepth->text().toDouble() * 0.5));
+	ui.lineEditSliderBarWidth->setText(QString::number(ui.lineEditSliderBarWidth->text().toDouble() * 0.5));
+	ui.lineEditSliderBarDepth->setText(QString::number(ui.lineEditSliderBarDepth->text().toDouble() * 0.5));
+	ui.lineEditSliderWidth->setText(QString::number(ui.lineEditSliderWidth->text().toDouble() * 0.5));
+	ui.lineEditSliderDepth->setText(QString::number(ui.lineEditSliderDepth->text().toDouble() * 0.5));
+}
+
+void OptionDialog::onTwice() {
+	ui.lineEditGap->setText(QString::number(ui.lineEditGap->text().toDouble() * 2));
+	ui.lineEditLinkWidth->setText(QString::number(ui.lineEditLinkWidth->text().toDouble() * 2));
+	ui.lineEditLinkDepth->setText(QString::number(ui.lineEditLinkDepth->text().toDouble() * 2));
+	ui.lineEditHoleRadius->setText(QString::number(ui.lineEditHoleRadius->text().toDouble() * 2));
+	ui.lineEditJointRadius->setText(QString::number(ui.lineEditJointRadius->text().toDouble() * 2));
+	ui.lineEditJointCapRadius1->setText(QString::number(ui.lineEditJointCapRadius1->text().toDouble() * 2));
+	ui.lineEditJointCapRadius2->setText(QString::number(ui.lineEditJointCapRadius2->text().toDouble() * 2));
+	ui.lineEditJointCapDepth->setText(QString::number(ui.lineEditJointCapDepth->text().toDouble() * 2));
+	ui.lineEditSliderBarWidth->setText(QString::number(ui.lineEditSliderBarWidth->text().toDouble() * 2));
+	ui.lineEditSliderBarDepth->setText(QString::number(ui.lineEditSliderBarDepth->text().toDouble() * 2));
+	ui.lineEditSliderWidth->setText(QString::number(ui.lineEditSliderWidth->text().toDouble() * 2));
+	ui.lineEditSliderDepth->setText(QString::number(ui.lineEditSliderDepth->text().toDouble() * 2));
 }
 
 void OptionDialog::onOK() {

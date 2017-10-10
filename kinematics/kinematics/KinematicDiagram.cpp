@@ -252,7 +252,9 @@ namespace kinematics {
 			boost::shared_ptr<kinematics::Joint>& joint = joints[j];
 
 			if (joint->ground) {
-				connectFixedJointToBody(joints[j], fixed_body_pts);
+				double z = 0;
+				if (j == 1) z = 0;
+				connectFixedJointToBody(joints[j], fixed_body_pts, z);
 			}
 		}
 
@@ -261,12 +263,19 @@ namespace kinematics {
 			if (bodies[j]->pivot1->ground ||bodies[j]->pivot2->ground) continue;
 
 			std::vector<glm::dvec2> body_pts = bodies[j]->getActualPoints()[0];
-			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts);
-			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts);
+			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, 2);
+			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, 2);
 		}
 	}
 
-	void KinematicDiagram::connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_body_pts) {
+	/**
+	 * Connect fixed joint to a body by adding a connector
+	 * Joint has a information of z order that indicates the z order of the connected link.
+	 *
+	 * @param joint	joint
+	 * @param z		z order of the connector
+	 */
+	void KinematicDiagram::connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_body_pts, double link_z) {
 		int fixed_body_id = -1;
 
 		// check if the joint is within the rigid body
@@ -287,7 +296,7 @@ namespace kinematics {
 			// create a geometry to extend the body to the joint
 			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
 			z = 0;
-			height = options->link_depth + options->gap;
+			height = options->link_depth + options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 		}
@@ -315,7 +324,7 @@ namespace kinematics {
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_point, options->link_width / 2);
 			z = 0;
-			height = options->gap;
+			height = options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
@@ -327,32 +336,61 @@ namespace kinematics {
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 		}
 
-		// Create the joint part of the body
-		// First, create the base
-		pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-		z += height;
-		height = options->gap + options->link_depth + options->joint_cap_depth + joint->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+		if (joint->z >= link_z) {
+			// Create the joint part of the body
+			// First, create the base
+			if (joint->z > link_z) {
+				pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+				z += height;
+				height = -options->gap - options->link_depth + (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
+				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+			}
 
-		// Second, create the rod of the joint
-		pts = generateCirclePolygon(joint->pos, options->joint_radius);
-		z += height;
-		height = options->link_depth + options->gap * 2;
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(joint->pos, options->joint_radius);
+			z += height;
+			height = options->link_depth + options->gap * 2;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
 
-		// Finally, create the cap of the joint
-		// For the cap, the top face is a little smaller, so we use a different polygon for that.
-		pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
-		std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
-		z += height;
-		height = options->joint_cap_depth;
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, z, z + height, false));
-		fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
+			std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
+			z += height;
+			height = options->joint_cap_depth;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, z, z + height, false));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+		}
+		else {
+			// Create the joint part of the body
+			// First, create the base
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			height = -options->gap - options->link_depth + (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+			z -= height;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(joint->pos, options->joint_radius);
+			height = options->link_depth + options->gap * 2;
+			z -= height;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height, false));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
+			std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
+			height = options->joint_cap_depth;
+			z -= height;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, z, z + height, false));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, -10 - z - height, -10 - z, false));
+		}
 	}
 
-	void KinematicDiagram::connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& body_pts) {
+	void KinematicDiagram::connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& body_pts, double link_z) {
 		std::vector<glm::dvec2> pts;
 		glm::dvec2 closest_pt;
 		double z = 0;
@@ -362,10 +400,9 @@ namespace kinematics {
 			// create a geometry to extend the body to the joint
 			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
 			z = 0;
-			height = options->link_depth * 2 + options->gap * 2;
+			height = options->link_depth + options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
-
 		}
 		else {
 			// find the closest point of a rigid body
@@ -379,7 +416,7 @@ namespace kinematics {
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_pt, options->link_width / 2);
 			z = 0;
-			height = options->link_depth + options->gap * 2;
+			height = options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
@@ -391,29 +428,58 @@ namespace kinematics {
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 		}
 
-		// Create the joint part of the body
-		// First, create the base
-		pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-		z += height;
-		height = options->joint_cap_depth + joint->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+		if (joint->z >= link_z) {
+			// Create the joint part of the body
+			if (joint->z > link_z) {
+				// First, create the base
+				pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+				z += height;
+				height = -options->gap - options->link_depth + (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+				addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
+				addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+			}
 
-		// Second, create the rod of the joint
-		pts = generateCirclePolygon(joint->pos, options->joint_radius);
-		z += height;
-		height = options->link_depth + options->gap * 2;
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height, false));
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(joint->pos, options->joint_radius);
+			z += height;
+			height = options->link_depth + options->gap * 2;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
 
-		// Finally, create the cap of the joint
-		// For the cap, the top face is a little smaller, so we use a different polygon for that.
-		pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
-		std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
-		z += height;
-		height = options->joint_cap_depth;
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts2, pts, z, z + height, false));
-		addPolygonToBody(body_id, kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
+			std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
+			z += height;
+			height = options->joint_cap_depth;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts2, pts, z, z + height, false));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
+		}
+		else {
+			// Create the joint part of the body
+			// First, create the base
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			height = -options->gap - options->link_depth + (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+			z -= height;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+
+			// Second, create the rod of the joint
+			pts = generateCirclePolygon(joint->pos, options->joint_radius);
+			height = options->link_depth + options->gap * 2;
+			z -= height;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height, false));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z, false));
+
+			// Finally, create the cap of the joint
+			// For the cap, the top face is a little smaller, so we use a different polygon for that.
+			pts = generateCirclePolygon(joint->pos, options->joint_cap_radius1);
+			std::vector<glm::dvec2> pts2 = generateCirclePolygon(joint->pos, options->joint_cap_radius2);
+			height = options->joint_cap_depth;
+			z -= height;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, pts2, z, z + height, false));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts2, pts, -10 - z - height, -10 - z, false));
+		}
 	}
 
 	void KinematicDiagram::load(const QString& filename) {
@@ -603,10 +669,18 @@ namespace kinematics {
 				if (bodies[i]->neighbors.contains(j)) continue;
 
 				for (int k = 0; k < bodies[i]->polygons.size(); k++) {
+					/////// DEBUG //////////
+					if (k > 0) continue;
+					/////// DEBUG //////////
+
 					if (!bodies[i]->polygons[k].check_collision) continue;
 					std::vector<glm::dvec2> pts1 = bodies[i]->getActualPoints(k);
 
 					for (int l = 0; l < bodies[j]->polygons.size(); l++) {
+						/////// DEBUG //////////
+						if (l > 0) continue;
+						/////// DEBUG //////////
+
 						if (!bodies[j]->polygons[l].check_collision) continue;
 						std::vector<glm::dvec2> pts2 = bodies[j]->getActualPoints(l);
 

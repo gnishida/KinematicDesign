@@ -127,15 +127,25 @@ namespace kinematics {
 				if (!sampleSlider(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_world, enlarged_bbox_local, B0, B1)) continue;
 				glm::dvec2 slider_dir = B1 - B0;
 
+
+
+
+				/////////////////////////////////////////////////////////////////////////////////////////////////
+				// DEBUG
 				/*
-				A0 = glm::dvec2(7.09984, 2.07151);
-				A1 = glm::dvec2(9.43474, 8.70731);
-				B0 = glm::dvec2(20.8874, 14.9064);
-				B1 = glm::dvec2(18.6356, 12.1481);
+				A0 = glm::dvec2(11.9797, 11.6618);
+				A1 = glm::dvec2(8.17667, 10.0813);
+				B0 = glm::dvec2(7.13406, 0.596937);
+				B1 = glm::dvec2(8.41977, 2.12891);
 				slider_dir = glm::normalize(B1 - B0);
-				B0 = B0 - slider_dir;				
+				B0 = B1 - slider_dir * 2.0;				
 				if (!withinPolygon(linkage_region_pts, B0)) continue;
 				*/
+				/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 
 				// check hard constraints
 				if (glm::length(A0 - B0) < min_link_length) continue;
@@ -147,7 +157,7 @@ namespace kinematics {
 
 				// collision check
 				glm::dvec2 slider_end_pos1, slider_end_pos2;
-				if (checkCollision(perturbed_poses, { A0, B0, A1, B1, B1 }, fixed_body_pts, body_pts, slider_end_pos1, slider_end_pos2)) continue;
+				if (checkCollision(perturbed_poses, { A0, B0, A1, B1, B0 }, fixed_body_pts, body_pts, slider_end_pos1, slider_end_pos2)) continue;
 
 				// locate the two endpoints of the bar
 				glm::dvec2 B2;
@@ -382,13 +392,13 @@ namespace kinematics {
 	*/
 	Kinematics LinkageSynthesisRRRP::constructKinematics(const std::vector<glm::dvec2>& points, const Object25D& body_pts, bool connect_joints, std::vector<Object25D>& fixed_body_pts) {
 		kinematics::Kinematics kin;
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], 0)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], 1)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, points[2], 0)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, points[3], 1)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(4, true, points[4], 1)));
-		kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 0);
-		kin.diagram.addLink(false, { kin.diagram.joints[1], kin.diagram.joints[3], kin.diagram.joints[4] }, true, 1);
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], 1)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], 2)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, points[2], 1)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::SliderHinge>(new kinematics::SliderHinge(3, false, points[3], 2)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(4, true, points[4], 2)));
+		kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 1);
+		kin.diagram.addLink(false, { kin.diagram.joints[1], kin.diagram.joints[3], kin.diagram.joints[4] }, true, 2);
 		kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
 
 		// update the geometry

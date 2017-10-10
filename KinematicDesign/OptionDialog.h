@@ -42,6 +42,8 @@ public:
 public slots:
 	void onSmall();
 	void onLarge();
+	void onHalf();
+	void onTwice();
 	void onOK();
 	void onCancel();
 };
