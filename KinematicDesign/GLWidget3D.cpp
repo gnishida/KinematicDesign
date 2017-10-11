@@ -757,7 +757,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// This part is currently very unorganized.
 				// For each type of mechanism, I have to hard code the depth of each link.
 				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = kinematics::options->gap + kinematics[i].diagram.links[j]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth);
+				float z = kinematics[i].diagram.links[j]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
 			}
@@ -776,7 +776,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// This part is currently very unorganized.
 				// For each type of mechanism, I have to hard code the depth of each link.
 				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = kinematics::options->gap + kinematics[i].diagram.links[0]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth);
+				float z = kinematics[i].diagram.links[0]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
 			}
@@ -792,7 +792,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// This part is currently very unorganized.
 				// For each type of mechanism, I have to hard code the depth of each link.
 				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = kinematics::options->gap + kinematics[i].diagram.links[1]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth);
+				float z = kinematics[i].diagram.links[1]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
 

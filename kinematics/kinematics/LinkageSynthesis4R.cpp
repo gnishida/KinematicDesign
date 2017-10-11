@@ -305,12 +305,12 @@ namespace kinematics {
 	*/
 	Kinematics LinkageSynthesis4R::constructKinematics(const std::vector<glm::dvec2>& points, const Object25D& body_pts, bool connect_joints, std::vector<Object25D>& fixed_body_pts) {
 		Kinematics kin;
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], 1)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], 1)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, points[2], 1)));
-		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, points[3], 1)));
-		kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 1);
-		kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 1);
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], 3)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], 2)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, points[2], 3)));
+		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(3, false, points[3], 2)));
+		kin.diagram.addLink(true, kin.diagram.joints[0], kin.diagram.joints[2], true, 3);
+		kin.diagram.addLink(false, kin.diagram.joints[1], kin.diagram.joints[3], true, 2);
 		kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
 
 		// update the geometry

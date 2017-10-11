@@ -252,9 +252,7 @@ namespace kinematics {
 			boost::shared_ptr<kinematics::Joint>& joint = joints[j];
 
 			if (joint->ground) {
-				double z = 0;
-				if (j == 1) z = 0;
-				connectFixedJointToBody(joints[j], fixed_body_pts, z);
+				connectFixedJointToBody(joints[j], fixed_body_pts, 1);
 			}
 		}
 
@@ -264,7 +262,7 @@ namespace kinematics {
 
 			std::vector<glm::dvec2> body_pts = bodies[j]->getActualPoints()[0];
 			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, 2);
-			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, 2);
+			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, 0);
 		}
 	}
 
@@ -292,15 +290,7 @@ namespace kinematics {
 		double z = 0;
 		double height = 0;
 
-		if (is_inside) {
-			// create a geometry to extend the body to the joint
-			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-			z = 0;
-			height = options->link_depth + options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
-			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
-			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
-		}
-		else {
+		if (!is_inside) {
 			glm::dvec2 closest_point;
 
 			// find the closest point of a rigid body
@@ -324,7 +314,7 @@ namespace kinematics {
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_point, options->link_width / 2);
 			z = 0;
-			height = options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
+			height = link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2) - options->link_depth;
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
@@ -336,16 +326,14 @@ namespace kinematics {
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 		}
 
-		if (joint->z >= link_z) {
+		if (joint->z > link_z) {
 			// Create the joint part of the body
 			// First, create the base
-			if (joint->z > link_z) {
-				pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-				z += height;
-				height = -options->gap - options->link_depth + (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
-				fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
-			}
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			z += height;
+			height = (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth - options->gap;
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
 			// Second, create the rod of the joint
 			pts = generateCirclePolygon(joint->pos, options->joint_radius);
@@ -363,11 +351,11 @@ namespace kinematics {
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, z, z + height, false));
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
 		}
-		else {
+		else if (joint->z < link_z) {
 			// Create the joint part of the body
 			// First, create the base
 			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-			height = -options->gap - options->link_depth + (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+			height = (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth - options->gap;
 			z -= height;
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
 			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
@@ -396,15 +384,7 @@ namespace kinematics {
 		double z = 0;
 		double height = 0;
 
-		if (kinematics::withinPolygon(body_pts, joint->pos)) {
-			// create a geometry to extend the body to the joint
-			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-			z = 0;
-			height = options->link_depth + options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
-			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
-			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
-		}
-		else {
+		if (!kinematics::withinPolygon(body_pts, joint->pos)) {
 			// find the closest point of a rigid body
 			closest_pt = kinematics::closestPoint(body_pts, joint->pos);
 
@@ -416,7 +396,7 @@ namespace kinematics {
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_pt, options->link_width / 2);
 			z = 0;
-			height = options->gap + link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
+			height = link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2) - options->link_depth;
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
@@ -428,16 +408,14 @@ namespace kinematics {
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 		}
 
-		if (joint->z >= link_z) {
+		if (joint->z > link_z) {
 			// Create the joint part of the body
-			if (joint->z > link_z) {
-				// First, create the base
-				pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-				z += height;
-				height = -options->gap - options->link_depth + (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
-				addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
-				addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
-			}
+			// First, create the base
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			z += height;
+			height = (joint->z - link_z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth - options->gap;
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
 
 			// Second, create the rod of the joint
 			pts = generateCirclePolygon(joint->pos, options->joint_radius);
@@ -455,11 +433,11 @@ namespace kinematics {
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts2, pts, z, z + height, false));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, pts2, -10 - z - height, -10 - z, false));
 		}
-		else {
+		else if (joint->z < link_z) {
 			// Create the joint part of the body
 			// First, create the base
 			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
-			height = -options->gap - options->link_depth + (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth);
+			height = (link_z - joint->z) * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth - options->gap;
 			z -= height;
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
