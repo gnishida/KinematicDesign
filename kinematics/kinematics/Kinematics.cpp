@@ -35,7 +35,16 @@ namespace kinematics {
 		diagram.save(filename);
 	}
 
-	void Kinematics::forwardKinematics(bool collision_check) {
+	/**
+	 * Step forward the linkage.
+	 *
+	 * @param collision_check	0 - no collision check
+	 *                          1 - check collision and throw exception if collision occurs
+	 *                          2 - check collision only for the main bodies and throw exception if collision occurs
+	 *                          3 - only record the collision between connectors
+	 *                          
+	 */
+	void Kinematics::forwardKinematics(int collision_check) {
 		std::list<boost::shared_ptr<Joint>> queue;
 
 		// put the joints whose position has not been determined into the queue
@@ -58,12 +67,15 @@ namespace kinematics {
 			}
 		}
 
-		if (collision_check && isCollided()) {
-			throw "collision is detected.";
+		if (collision_check == 1 || collision_check == 2) {
+			if (diagram.isCollided(collision_check == 2)) throw "collision is detected.";
+		}
+		else if (collision_check == 3) {
+			diagram.recordCollisionForConnectors();
 		}
 	}
 
-	void Kinematics::stepForward(bool collision_check, bool need_recovery_for_collision) {
+	void Kinematics::stepForward(int collision_check, bool need_recovery_for_collision) {
 		// save the current state
 		KinematicDiagram prev_state;
 		if (need_recovery_for_collision) {
@@ -102,7 +114,7 @@ namespace kinematics {
 		}
 	}
 
-	void Kinematics::stepBackward(bool collision_check, bool need_recovery_for_collision) {
+	void Kinematics::stepBackward(int collision_check, bool need_recovery_for_collision) {
 		// save the current state
 		KinematicDiagram prev_state;
 		if (need_recovery_for_collision) {
@@ -139,10 +151,6 @@ namespace kinematics {
 				throw ex;
 			}
 		}
-	}
-
-	bool Kinematics::isCollided() {
-		return diagram.isCollided();
 	}
 
 	void Kinematics::draw(QPainter& painter, const QPointF& origin, float scale) const {

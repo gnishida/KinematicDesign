@@ -30,10 +30,9 @@ namespace kinematics {
 		void clear();
 		void load(const QString& filename);
 		void save(const QString& filename);
-		void forwardKinematics(bool collision_check);
-		void stepForward(bool collision_check, bool need_recovery_for_collision = true);
-		void stepBackward(bool collision_check, bool need_recovery_for_collision = true);
-		bool isCollided();
+		void forwardKinematics(int collision_check);
+		void stepForward(int collision_check, bool need_recovery_for_collision = true);
+		void stepBackward(int collision_check, bool need_recovery_for_collision = true);
 		void draw(QPainter& painter, const QPointF& origin, float scale) const;
 		void speedUp();
 		void speedDown();

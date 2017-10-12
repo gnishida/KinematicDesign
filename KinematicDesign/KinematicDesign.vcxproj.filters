@@ -170,6 +170,12 @@
     <ClCompile Include="GeneratedFiles\Release\moc_OptionDialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\JointConnector.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\ZOrder.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -305,6 +311,12 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_OptionDialog.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\JointConnector.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\ZOrder.h">
+      <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

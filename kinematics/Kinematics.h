@@ -8,6 +8,7 @@
 #include "kinematics/Gear.h"
 #include "kinematics/Link.h"
 #include "kinematics/BodyGeometry.h"
+#include "kinematics/JointConnector.h"
 #include "kinematics/KinematicUtils.h"
 #include "kinematics/BBox.h"
 #include "kinematics/LinkageSynthesis.h"
@@ -15,3 +16,4 @@
 #include "kinematics/LinkageSynthesisRRRP.h"
 #include "kinematics/LeastSquareSolver.h"
 #include "kinematics/Solution.h"
+#include "kinematics/ZOrder.h"

@@ -7,6 +7,7 @@
 #include "Joint.h"
 #include "Link.h"
 #include "BodyGeometry.h"
+#include "JointConnector.h"
 #include "Vertex.h"
 
 namespace kinematics {
@@ -57,6 +58,7 @@ namespace kinematics {
 		QMap<int, boost::shared_ptr<Joint>> joints;
 		QMap<int, boost::shared_ptr<Link>> links;
 		std::vector<boost::shared_ptr<BodyGeometry>> bodies;
+		std::vector<JointConnector> connectors;
 
 	public:
 		KinematicDiagram();
@@ -75,13 +77,14 @@ namespace kinematics {
 		boost::shared_ptr<Link> addLink(bool driver, std::vector<boost::shared_ptr<Joint>> joints, bool actual_link = true, double z = 0);
 		void addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Object25D& polygons);
 		void addPolygonToBody(int body_id, const Polygon25D& polygon);
-		void connectJointsToBodies(std::vector<Object25D>& fixed_body_pts);
+		void connectJointsToBodies(std::vector<Object25D>& fixed_body_pts, const std::vector<std::vector<int>>& zorder);
 		void connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_body_pts, double link_z);
 		void connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& body_pts, double link_z);
 		void load(const QString& filename);
 		void save(const QString& filename);
 		void updateBodyAdjacency();
-		bool isCollided() const;
+		bool isCollided(bool main_body_only) const;
+		void recordCollisionForConnectors();
 		void draw(QPainter& painter, const QPointF& origin, float scale, bool show_bodies, bool show_links) const;
 	};
 

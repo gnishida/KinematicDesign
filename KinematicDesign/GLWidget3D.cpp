@@ -914,7 +914,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		start = clock();
 
 		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, body_pts[i], true, fixed_body_pts);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
 
 		kinematics.push_back(kin);
 
@@ -981,7 +981,7 @@ void GLWidget3D::constructKinematics() {
 
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, body_pts[i], true, fixed_body_pts);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
 		kinematics.push_back(kin);
 	}
 	
@@ -1051,7 +1051,7 @@ void GLWidget3D::stepForward() {
 	if (animation_timer == NULL) {
 		for (int i = 0; i < kinematics.size(); i++) {
 			try {
-				kinematics[i].stepForward(collision_check);
+				kinematics[i].stepForward(collision_check ? 1 : 0);
 			}
 			catch (char* ex) {
 				kinematics[i].invertSpeed();
@@ -1070,7 +1070,7 @@ void GLWidget3D::stepBackward() {
 	if (animation_timer == NULL) {
 		for (int i = 0; i < kinematics.size(); i++) {
 			try {
-				kinematics[i].stepBackward(collision_check);
+				kinematics[i].stepBackward(collision_check ? 1 : 0);
 			}
 			catch (char* ex) {
 				kinematics[i].invertSpeed();
@@ -1127,7 +1127,7 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent* e) {
 void GLWidget3D::animation_update() {
 	for (int i = 0; i < kinematics.size(); i++) {
 		try {
-			kinematics[i].stepForward(collision_check);
+			kinematics[i].stepForward(collision_check ? 1 : 0);
 		}
 		catch (char* ex) {
 			kinematics[i].invertSpeed();
@@ -1617,6 +1617,11 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 				int selectedSolution = findSolution(solutions[linkage_id], pt, joint_id);
 
 				if (selectedSolution >= 0) {
+					for (int xx = 0; xx < solutions[linkage_id][selectedSolution].points.size(); xx++) {
+						std::cout << "(" << solutions[linkage_id][selectedSolution].points[xx].x << "," << solutions[linkage_id][selectedSolution].points[xx].y << "), ";
+					}
+					std::cout << std::endl;
+
 					selected_solutions[linkage_id] = solutions[linkage_id][selectedSolution];
 
 					// move the joints according to the selected solution

@@ -180,30 +180,21 @@ namespace kinematics {
 	void KinematicDiagram::addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Object25D& polygons) {
 		boost::shared_ptr<BodyGeometry> body = boost::shared_ptr<BodyGeometry>(new BodyGeometry(joint1, joint2, polygons));
 
-		// setup rotation matrix
-		glm::vec2 dir = joint2->pos - joint1->pos;
-		double angle = atan2(dir.y, dir.x);
-
-		glm::dvec2 p1 = joint1->pos;
-		glm::dmat4x4 model;
-		model = glm::rotate(model, -angle, glm::dvec3(0, 0, 1));
+		// get the world to local matrix
+		glm::dmat3x2 model = body->getWorldToLocalModel();
 
 		for (int i = 0; i < polygons.size(); i++) {
 			for (int j = 0; j < polygons[i].points.size(); ++j) {
 				// convert the coordinates to the local coordinate system
-				glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygons[i].points[j].x - p1.x, polygons[i].points[j].y - p1.y, 0, 1));
-
-				body->polygons[i].points[j] = rotated_p;
+				body->polygons[i].points[j] = model * glm::dvec3(polygons[i].points[j], 1);
 			}
 
-			// Somd polygon may have a top face different from the bottom face.
+			// Some polygon may have a top face different from the bottom face.
 			// In that case, the top face polygon is stored in Polygon25D::points2.
 			// Thus, we need to convert the coordinates of points2 as well.
 			for (int j = 0; j < polygons[i].points2.size(); ++j) {
 				// convert the coordinates to the local coordinate system
-				glm::dvec2 rotated_p = glm::dvec2(model * glm::dvec4(polygons[i].points2[j].x - p1.x, polygons[i].points2[j].y - p1.y, 0, 1));
-
-				body->polygons[i].points2[j] = rotated_p;
+				body->polygons[i].points2[j] = model * glm::dvec3(polygons[i].points[j], 1);
 			}
 		}
 
@@ -244,25 +235,49 @@ namespace kinematics {
 	 * this function updates the fixed bodies and moving bodies such that
 	 * all the joints are properly connected to some rigid bodies.
 	 */
-	void KinematicDiagram::connectJointsToBodies(std::vector<Object25D>& fixed_body_pts) {
+	void KinematicDiagram::connectJointsToBodies(std::vector<Object25D>& fixed_body_pts, const std::vector<std::vector<int>>& zorder) {
 		int N = fixed_body_pts.size();
 
-		// connect fixed joints to a fixed body
-		for (int j = 0; j < joints.size(); j++) {
-			boost::shared_ptr<kinematics::Joint>& joint = joints[j];
+		// clear the connectors
+		connectors.clear();
 
-			if (joint->ground) {
-				connectFixedJointToBody(joints[j], fixed_body_pts, 1);
+		// connect fixed joints to a fixed body
+		int cnt = 0;
+		for (int j = 0; j < joints.size(); j++) {
+			if (joints[j]->ground) {
+				connectFixedJointToBody(joints[j], fixed_body_pts, zorder.size() == 3 ? zorder[0][cnt++] : 1);
 			}
 		}
 
 		// connect moving joints to a moving body
+		cnt = 0;
 		for (int j = 0; j < bodies.size(); j++) {
 			if (bodies[j]->pivot1->ground ||bodies[j]->pivot2->ground) continue;
 
 			std::vector<glm::dvec2> body_pts = bodies[j]->getActualPoints()[0];
-			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, 2);
-			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, 0);
+			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
+			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
+		}
+
+		// add links as additional connectors
+		for (int i = 0; i < links.size(); i++) {
+			if (links[i]->actual_link) {
+				connectors.push_back(JointConnector(links[i]->joints[0], links[i]->joints[1]));
+			}
+		}
+
+		// check the adjacency between link and connector
+		for (int i = 0; i < connectors.size(); i++) {
+			for (int j = i + 1; j < connectors.size(); j++) {
+				for (int k = 0; k < connectors[i].joints.size(); k++) {
+					for (int l = 0; l < connectors[j].joints.size(); l++) {
+						if (connectors[i].joints[k] == connectors[j].joints[l]) {
+							connectors[i].neighbors[j] = true;
+							connectors[j].neighbors[i] = true;
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -290,7 +305,17 @@ namespace kinematics {
 		double z = 0;
 		double height = 0;
 
-		if (!is_inside) {
+		if (is_inside) {
+			// create connector object
+			connectors.push_back(JointConnector(joint, joint->pos));
+
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			z = 0;
+			height = link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, z, z + height));
+			fixed_body_pts[fixed_body_id].push_back(kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+		}
+		else {
 			glm::dvec2 closest_point;
 
 			// find the closest point of a rigid body
@@ -310,6 +335,9 @@ namespace kinematics {
 					fixed_body_id = k;
 				}
 			}
+
+			// create connector object
+			connectors.push_back(JointConnector(joint, closest_point));
 
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_point, options->link_width / 2);
@@ -380,18 +408,30 @@ namespace kinematics {
 
 	void KinematicDiagram::connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& body_pts, double link_z) {
 		std::vector<glm::dvec2> pts;
-		glm::dvec2 closest_pt;
 		double z = 0;
 		double height = 0;
 
-		if (!kinematics::withinPolygon(body_pts, joint->pos)) {
+		if (kinematics::withinPolygon(body_pts, joint->pos)) {
+			// create connector object
+			connectors.push_back(JointConnector(joint, bodies[body_id]->worldToLocal(joint->pos), bodies[body_id]));
+
+			pts = generateCirclePolygon(joint->pos, options->link_width / 2);
+			z = 0;
+			height = link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2);
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
+			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -10 - z - height, -10 - z));
+		}
+		else {
 			// find the closest point of a rigid body
-			closest_pt = kinematics::closestPoint(body_pts, joint->pos);
+			glm::dvec2 closest_pt = kinematics::closestPoint(body_pts, joint->pos);
 
 			// extend the point a little into the rigid body
 			glm::dvec2 v1 = glm::normalize(closest_pt - joint->pos);
 			v1 *= options->link_width / 2;
 			closest_pt += v1;
+
+			// create connector object
+			connectors.push_back(JointConnector(joint, bodies[body_id]->worldToLocal(closest_pt), bodies[body_id]));
 
 			// Create the base of the connecting part
 			pts = generateCirclePolygon(closest_pt, options->link_width / 2);
@@ -639,7 +679,7 @@ namespace kinematics {
 		}
 	}
 
-	bool KinematicDiagram::isCollided() const {
+	bool KinematicDiagram::isCollided(bool main_body_only) const {
 		// check the collision between rigid bodies
 		for (int i = 0; i < bodies.size(); ++i) {
 			for (int j = i + 1; j < bodies.size(); ++j) {
@@ -648,7 +688,7 @@ namespace kinematics {
 
 				for (int k = 0; k < bodies[i]->polygons.size(); k++) {
 					/////// DEBUG //////////
-					if (k > 0) continue;
+					if (main_body_only && k > 0) continue;
 					/////// DEBUG //////////
 
 					if (!bodies[i]->polygons[k].check_collision) continue;
@@ -656,7 +696,7 @@ namespace kinematics {
 
 					for (int l = 0; l < bodies[j]->polygons.size(); l++) {
 						/////// DEBUG //////////
-						if (l > 0) continue;
+						if (main_body_only && l > 0) continue;
 						/////// DEBUG //////////
 
 						if (!bodies[j]->polygons[l].check_collision) continue;
@@ -671,7 +711,7 @@ namespace kinematics {
 			}
 		}
 
-#if 1
+#if 0
 		// check the collision between links and joints
 		for (int i = 0; i < links.size(); i++) {
 			// For the coupler, we can use the moving body itself as a coupler, 
@@ -705,6 +745,84 @@ namespace kinematics {
 #endif
 
 		return false;
+	}
+
+	/**
+	 * Record collision between links, connectors and joints.
+	 * This information is then used for z-ordering the links and connectors.
+	 */
+	void KinematicDiagram::recordCollisionForConnectors() {
+		// check if connector i collide with joints of connector j
+		for (int i = 0; i < connectors.size(); i++) {
+			glm::dvec2 pt1a = connectors[i].joints[0]->pos;
+			glm::dvec2 pt1b = connectors[i].closest_pt;
+			if (connectors[i].type == 1) {
+				pt1b = connectors[i].body->localToWorld(connectors[i].closest_pt);
+			}
+			else if (connectors[i].type == 2) {
+				pt1b = connectors[i].joints[1]->pos;
+			}
+
+			for (int j = 0; j < connectors.size(); j++) {
+				if (i == j) continue;
+				if (connectors[i].type == 0 && connectors[j].type == 0) continue;
+				
+				// check the collision for the first point of connector j
+				if (connectors[i].joints[0] != connectors[j].joints[0] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[0])) {
+					if (distanceToSegment(pt1a, pt1b, connectors[j].joints[0]->pos) < options->link_width) {
+						bool fixed_connector = false;
+						std::vector<int> list;
+						list.push_back(j);
+						for (int k = 0; k < connectors.size(); k++) {
+							if (k == j || k == i) continue;
+							if (connectors[k].joints[0] == connectors[j].joints[0]) {
+								list.push_back(k);
+								if (connectors[k].type == 0) fixed_connector = true;
+							}
+							else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[0]) {
+								list.push_back(k);
+							}
+						}
+						if (!(connectors[i].type == 0 && fixed_connector)) {
+							connectors[i].collisions1[connectors[j].joints[0]->id] = list;
+						}
+					}
+				}
+				
+				// check the collision for the second point of connector j
+				if (connectors[j].type == 0 || connectors[j].type == 1) {
+					glm::dvec2 pt2b = connectors[j].closest_pt;
+					if (connectors[j].type == 1) {
+						pt2b = connectors[j].body->localToWorld(connectors[j].closest_pt);
+					}
+					if (distanceToSegment(pt1a, pt1b, pt2b) < options->link_width) {
+						connectors[i].collisions2[j] = true;
+					}
+				}
+				else if (connectors[j].type == 2) {
+					if (connectors[i].joints[0] != connectors[j].joints[1] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[1])) {
+						if (distanceToSegment(pt1a, pt1b, connectors[j].joints[1]->pos) < options->link_width) {
+							bool fixed_connector = false;
+							std::vector<int> list;
+							list.push_back(j);
+							for (int k = 0; k < connectors.size(); k++) {
+								if (k == j || k == i) continue;
+								if (connectors[k].joints[0] == connectors[j].joints[1]) {
+									list.push_back(k);
+									if (connectors[k].type == 0) fixed_connector = true;
+								}
+								else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[1]) {
+									list.push_back(k);
+								}
+							}
+							if (!(connectors[i].type == 0 && fixed_connector)) {
+								connectors[i].collisions1[connectors[j].joints[1]->id] = list;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void KinematicDiagram::draw(QPainter& painter, const QPointF& origin, float scale, bool show_bodies, bool show_links) const {

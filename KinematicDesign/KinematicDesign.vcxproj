@@ -142,6 +142,7 @@
     <ClCompile Include="..\kinematics\kinematics\Burmester.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Gear.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Joint.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\JointConnector.cpp" />
     <ClCompile Include="..\kinematics\kinematics\KinematicDiagram.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Kinematics.cpp" />
     <ClCompile Include="..\kinematics\kinematics\KinematicUtils.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="..\kinematics\kinematics\PinJoint.cpp" />
     <ClCompile Include="..\kinematics\kinematics\SliderHinge.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Solution.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\ZOrder.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Circle.cpp" />
@@ -263,6 +265,7 @@
     <ClInclude Include="..\kinematics\kinematics\Burmester.h" />
     <ClInclude Include="..\kinematics\kinematics\Gear.h" />
     <ClInclude Include="..\kinematics\kinematics\Joint.h" />
+    <ClInclude Include="..\kinematics\kinematics\JointConnector.h" />
     <ClInclude Include="..\kinematics\kinematics\KinematicDiagram.h" />
     <ClInclude Include="..\kinematics\kinematics\Kinematics.h" />
     <ClInclude Include="..\kinematics\kinematics\KinematicUtils.h" />
@@ -274,6 +277,7 @@
     <ClInclude Include="..\kinematics\kinematics\PinJoint.h" />
     <ClInclude Include="..\kinematics\kinematics\SliderHinge.h" />
     <ClInclude Include="..\kinematics\kinematics\Solution.h" />
+    <ClInclude Include="..\kinematics\kinematics\ZOrder.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle.h" />
