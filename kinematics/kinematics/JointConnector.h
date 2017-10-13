@@ -15,7 +15,6 @@ namespace kinematics {
 	public:
 		int type;	// 0 - connector to fixed body / 1 - connector to moving body / 2 - link
 		std::vector<boost::shared_ptr<Joint>> joints;
-		//boost::shared_ptr<Joint> joint2;	// this is for a link, which has two joints
 		glm::dvec2 closest_pt;	// the point on the body that is closest to the joint
 		boost::shared_ptr<BodyGeometry> body;	// the moving body to which the connector is attached (for the fixed body, we do not need this because closest pt does not move)
 		QMap<int, bool> collisions1;	// store all the indices of connectors that this connector collide
@@ -26,7 +25,7 @@ namespace kinematics {
 	public:
 		JointConnector(boost::shared_ptr<Joint> joint, const glm::dvec2& closest_pt);
 		JointConnector(boost::shared_ptr<Joint> joint, const glm::dvec2& closest_pt, boost::shared_ptr<BodyGeometry> body);
-		JointConnector(boost::shared_ptr<Joint> joint, boost::shared_ptr<Joint> joint2);
+		JointConnector(const std::vector<boost::shared_ptr<Joint>>& joints);
 	};
 
 }

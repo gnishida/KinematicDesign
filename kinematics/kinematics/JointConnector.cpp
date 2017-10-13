@@ -17,10 +17,9 @@ namespace kinematics {
 		joints.push_back(joint);
 	}
 
-	JointConnector::JointConnector(boost::shared_ptr<Joint> joint, boost::shared_ptr<Joint> joint2) {
+	JointConnector::JointConnector(const  std::vector<boost::shared_ptr<Joint>>& joints) {
 		type = 2;
-		joints.push_back(joint);
-		joints.push_back(joint2);
+		this->joints = joints;
 	}
 	
 }

@@ -262,7 +262,7 @@ namespace kinematics {
 		// add links as additional connectors
 		for (int i = 0; i < links.size(); i++) {
 			if (links[i]->actual_link) {
-				connectors.push_back(JointConnector(links[i]->joints[0], links[i]->joints[1]));
+				connectors.push_back(JointConnector(links[i]->joints));
 			}
 		}
 
