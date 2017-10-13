@@ -300,7 +300,7 @@ namespace kinematics {
 				double position_error = solutions[i].position_error;
 				double orientation_error = solutions[i].orientation_error;
 				double linkage_location = solutions[i].dist;
-				double tortuosity = tortuosityOfTrajectory(solutions[i].poses, { solutions[i].points[0], solutions[i].points[1], solutions[i].points[2], solutions[i].points[3] }, body_pts);
+				double tortuosity = tortuosityOfTrajectory(solutions[i].poses, solutions[i].points, body_pts);
 				double size = glm::length(solutions[i].points[0] - solutions[i].points[2]) + glm::length(solutions[i].points[1] - solutions[i].points[3]) + glm::length(solutions[i].points[2] - solutions[i].points[3]);
 				double cost = position_error * position_error_weight + orientation_error * orientation_error_weight + linkage_location * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 				if (cost < min_cost) {

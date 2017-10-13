@@ -128,26 +128,6 @@ namespace kinematics {
 				if (!sampleSlider(perturbed_poses, enlarged_linkage_region_pts, enlarged_region_local, enlarged_bbox_world, enlarged_bbox_local, B0, B1)) continue;
 				glm::dvec2 slider_dir = B1 - B0;
 
-
-
-
-				/////////////////////////////////////////////////////////////////////////////////////////////////
-				// DEBUG
-				/*
-				A0 = glm::dvec2(11.9797, 11.6618);
-				A1 = glm::dvec2(8.17667, 10.0813);
-				B0 = glm::dvec2(7.13406, 0.596937);
-				B1 = glm::dvec2(8.41977, 2.12891);
-				slider_dir = glm::normalize(B1 - B0);
-				B0 = B1 - slider_dir * 2.0;				
-				if (!withinPolygon(linkage_region_pts, B0)) continue;
-				*/
-				/////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
 				// check hard constraints
 				if (glm::length(A0 - B0) < min_link_length) continue;
 				if (glm::length(A1 - B1) < min_link_length) continue;
@@ -384,7 +364,7 @@ namespace kinematics {
 				double position_error = solutions[i].position_error;
 				double orientation_error = solutions[i].orientation_error;
 				double linkage_location = solutions[i].dist;
-				double tortuosity = tortuosityOfTrajectory(poses, { solutions[i].points[0], solutions[i].points[1], solutions[i].points[2], solutions[i].points[3] }, body_pts);
+				double tortuosity = tortuosityOfTrajectory(poses, solutions[i].points, body_pts);
 				double size = glm::length(solutions[i].points[0] - solutions[i].points[2]) + glm::length(solutions[i].points[1] - solutions[i].points[3]) + glm::length(solutions[i].points[2] - solutions[i].points[3]);
 				double cost = position_error * position_error_weight + orientation_error * orientation_error_weight + linkage_location * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 				if (cost < min_cost) {
