@@ -10,12 +10,12 @@ namespace kinematics {
 		std::vector<std::pair<int, int>> differences;
 
 		for (int i = 0; i < connectors.size(); i++) {
-			for (auto it = connectors[i].collisions2.begin(); it != connectors[i].collisions2.end(); it++) {
+			for (auto it = connectors[i].collisions1.begin(); it != connectors[i].collisions1.end(); it++) {
 				int j = it.key();
 				inequalities.push_back(std::make_pair(i, j));
 			}
 
-			for (auto it = connectors[i].collisions1.begin(); it != connectors[i].collisions1.end(); it++) {
+			for (auto it = connectors[i].collisions2.begin(); it != connectors[i].collisions2.end(); it++) {
 				not_betweens.push_back(std::make_pair(i, it.value()));
 			}
 

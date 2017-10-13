@@ -790,7 +790,7 @@ namespace kinematics {
 							}
 						}
 						if (!same_body) {
-							connectors[i].collisions1[connectors[j].joints[0]->id] = list;
+							connectors[i].collisions2[connectors[j].joints[0]->id] = list;
 						}
 					}
 				}
@@ -802,7 +802,7 @@ namespace kinematics {
 						pt2b = connectors[j].body->localToWorld(connectors[j].closest_pt);
 					}
 					if (distanceToSegment(pt1a, pt1b, pt2b) < options->link_width) {
-						connectors[i].collisions2[j] = true;
+						connectors[i].collisions1[j] = true;
 					}
 				}
 				else if (connectors[j].type == 2) {
@@ -823,7 +823,7 @@ namespace kinematics {
 								}
 							}
 							if (!same_body) {
-								connectors[i].collisions1[connectors[j].joints[1]->id] = list;
+								connectors[i].collisions2[connectors[j].joints[1]->id] = list;
 							}
 						}
 					}
