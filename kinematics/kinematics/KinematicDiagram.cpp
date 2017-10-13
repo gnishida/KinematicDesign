@@ -765,25 +765,31 @@ namespace kinematics {
 
 			for (int j = 0; j < connectors.size(); j++) {
 				if (i == j) continue;
+
+				// if both connectors are attached to the fixed body, skip the collision check.
 				if (connectors[i].type == 0 && connectors[j].type == 0) continue;
+
+				// if both connectors are attached to the same moving body, skip the collision check.
+				if (connectors[i].type == 1 && connectors[j].type == 1 && connectors[i].body == connectors[j].body) continue;
 				
 				// check the collision for the first point of connector j
 				if (connectors[i].joints[0] != connectors[j].joints[0] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[0])) {
 					if (distanceToSegment(pt1a, pt1b, connectors[j].joints[0]->pos) < options->link_width) {
-						bool fixed_connector = false;
+						bool same_body = false;
 						std::vector<int> list;
 						list.push_back(j);
 						for (int k = 0; k < connectors.size(); k++) {
 							if (k == j || k == i) continue;
 							if (connectors[k].joints[0] == connectors[j].joints[0]) {
 								list.push_back(k);
-								if (connectors[k].type == 0) fixed_connector = true;
+								if (connectors[i].type == 0 && connectors[k].type == 0) same_body = true;
+								if (connectors[i].type == 1 && connectors[k].type == 1 && connectors[i].body == connectors[k].body) same_body = true;
 							}
 							else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[0]) {
 								list.push_back(k);
 							}
 						}
-						if (!(connectors[i].type == 0 && fixed_connector)) {
+						if (!same_body) {
 							connectors[i].collisions1[connectors[j].joints[0]->id] = list;
 						}
 					}
@@ -802,20 +808,21 @@ namespace kinematics {
 				else if (connectors[j].type == 2) {
 					if (connectors[i].joints[0] != connectors[j].joints[1] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[1])) {
 						if (distanceToSegment(pt1a, pt1b, connectors[j].joints[1]->pos) < options->link_width) {
-							bool fixed_connector = false;
+							bool same_body = false;
 							std::vector<int> list;
 							list.push_back(j);
 							for (int k = 0; k < connectors.size(); k++) {
 								if (k == j || k == i) continue;
 								if (connectors[k].joints[0] == connectors[j].joints[1]) {
 									list.push_back(k);
-									if (connectors[k].type == 0) fixed_connector = true;
+									if (connectors[i].type == 0 && connectors[k].type == 0) same_body = true;
+									if (connectors[i].type == 1 && connectors[k].type == 1 && connectors[i].body == connectors[k].body) same_body = true;
 								}
 								else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[1]) {
 									list.push_back(k);
 								}
 							}
-							if (!(connectors[i].type == 0 && fixed_connector)) {
+							if (!same_body) {
 								connectors[i].collisions1[connectors[j].joints[1]->id] = list;
 							}
 						}

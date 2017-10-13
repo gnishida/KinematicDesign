@@ -128,24 +128,41 @@ namespace kinematics {
 
 	bool ZOrder::hasCycle(const std::vector<std::unordered_map<int, bool>>& E) {
 		int N = E.size();
-		for (int i = 0; i < N; i++) {
-			std::vector<bool> visited(N, false);
-			visited[i] = true;
-			std::queue<int> Q;
-			Q.push(i);
-			while (!Q.empty()) {
-				int u = Q.front();
-				Q.pop();
-				for (auto it = E[u].begin(); it != E[u].end(); it++) {
-					int v = it->first;
-					if (visited[v]) return true;
+		std::vector<bool> visited(N, false);
+		std::vector<bool> path(N, false);
 
-					visited[v] = true;
-					Q.push(v);
-				}
-			}
+		for (int i = 0; i < N; i++) {
+			if (visited[i]) continue;
+
+			visited[i] = true;
+			path[i] = true;
+
+			if (hasCycle(E, i, path, visited)) return true;
+			visited[i] = false;
+			path[i] = false;
 		}
 
+		return false;
+	}
+
+	/**
+	 * Check if there is a cycle traversing from the node u.
+	 *
+	 * @param path		the nodes that are on the current traversal
+	 * @param visited	the nodes that are already checked for the cycle
+	 * @return			true if there is a cycle
+	 */
+	bool ZOrder::hasCycle(const std::vector<std::unordered_map<int, bool>>& E, int u, std::vector<bool>& path, std::vector<bool>& visited) {
+		for (auto it = E[u].begin(); it != E[u].end(); it++) {
+			int v = it->first;
+			if (path[v]) return true;
+			if (visited[v]) continue;
+			visited[v] = true;
+			path[v] = true;
+			if (hasCycle(E, v, path, visited)) return true;
+			//visited[v] = false;
+			path[v] = false;
+		}
 		return false;
 	}
 
