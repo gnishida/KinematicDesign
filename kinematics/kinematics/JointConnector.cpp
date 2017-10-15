@@ -22,4 +22,11 @@ namespace kinematics {
 		this->joints = joints;
 	}
 	
+	bool JointConnector::hasJoint(const boost::shared_ptr<Joint>& joint) const {
+		for (int i = 0; i < joints.size(); i++) {
+			if (joints[i] == joint) return true;
+		}
+		return false;
+	}
+
 }

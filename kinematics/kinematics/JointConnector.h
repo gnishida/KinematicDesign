@@ -26,6 +26,8 @@ namespace kinematics {
 		JointConnector(boost::shared_ptr<Joint> joint, const glm::dvec2& closest_pt);
 		JointConnector(boost::shared_ptr<Joint> joint, const glm::dvec2& closest_pt, boost::shared_ptr<BodyGeometry> body);
 		JointConnector(const std::vector<boost::shared_ptr<Joint>>& joints);
+
+		bool hasJoint(const boost::shared_ptr<Joint>& joint) const;
 	};
 
 }

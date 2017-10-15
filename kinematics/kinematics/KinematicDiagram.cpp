@@ -772,30 +772,10 @@ namespace kinematics {
 				// if both connectors are attached to the same moving body, skip the collision check.
 				if (connectors[i].type == 1 && connectors[j].type == 1 && connectors[i].body == connectors[j].body) continue;
 				
-				// check the collision for the first point of connector j
-				if (connectors[i].joints[0] != connectors[j].joints[0] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[0])) {
-					if (distanceToSegment(pt1a, pt1b, connectors[j].joints[0]->pos) < options->link_width) {
-						bool same_body = false;
-						std::vector<int> list;
-						list.push_back(j);
-						for (int k = 0; k < connectors.size(); k++) {
-							if (k == j || k == i) continue;
-							if (connectors[k].joints[0] == connectors[j].joints[0]) {
-								list.push_back(k);
-								if (connectors[i].type == 0 && connectors[k].type == 0) same_body = true;
-								if (connectors[i].type == 1 && connectors[k].type == 1 && connectors[i].body == connectors[k].body) same_body = true;
-							}
-							else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[0]) {
-								list.push_back(k);
-							}
-						}
-						if (!same_body) {
-							connectors[i].collisions2[connectors[j].joints[0]->id] = list;
-						}
-					}
-				}
-				
-				// check the collision for the second point of connector j
+
+
+
+				// check the collision for the connector base of connector j, which is case 1.
 				if (connectors[j].type == 0 || connectors[j].type == 1) {
 					glm::dvec2 pt2b = connectors[j].closest_pt;
 					if (connectors[j].type == 1) {
@@ -805,26 +785,26 @@ namespace kinematics {
 						connectors[i].collisions1[j] = true;
 					}
 				}
-				else if (connectors[j].type == 2) {
-					if (connectors[i].joints[0] != connectors[j].joints[1] && (connectors[i].joints.size() == 1 || connectors[i].joints[1] != connectors[j].joints[1])) {
-						if (distanceToSegment(pt1a, pt1b, connectors[j].joints[1]->pos) < options->link_width) {
-							bool same_body = false;
-							std::vector<int> list;
-							list.push_back(j);
-							for (int k = 0; k < connectors.size(); k++) {
-								if (k == j || k == i) continue;
-								if (connectors[k].joints[0] == connectors[j].joints[1]) {
-									list.push_back(k);
-									if (connectors[i].type == 0 && connectors[k].type == 0) same_body = true;
-									if (connectors[i].type == 1 && connectors[k].type == 1 && connectors[i].body == connectors[k].body) same_body = true;
-								}
-								else if (connectors[k].type == 2 && connectors[k].joints[1] == connectors[j].joints[1]) {
-									list.push_back(k);
-								}
+
+				// check the collision for the joint of connector j, which is case 2.
+				for (int k = 0; k < connectors[j].joints.size(); k++) {
+					if (connectors[i].hasJoint(connectors[j].joints[k])) continue;
+
+					// check the collision for k-th joint of connector j, which is case 2.
+					if (distanceToSegment(pt1a, pt1b, connectors[j].joints[k]->pos) < options->link_width) {
+						bool same_body = false;
+						std::vector<int> list;
+						list.push_back(j);
+						for (int l = 0; l < connectors.size(); l++) {
+							if (l == j || l == i) continue;
+							if (connectors[l].hasJoint(connectors[j].joints[k])) {
+								list.push_back(l);
+								if (connectors[i].type == 0 && connectors[l].type == 0) same_body = true;
+								if (connectors[i].type == 1 && connectors[l].type == 1 && connectors[i].body == connectors[l].body) same_body = true;
 							}
-							if (!same_body) {
-								connectors[i].collisions2[connectors[j].joints[1]->id] = list;
-							}
+						}
+						if (!same_body) {
+							connectors[i].collisions2[connectors[j].joints[k]->id] = list;
 						}
 					}
 				}
