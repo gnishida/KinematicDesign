@@ -760,7 +760,11 @@ namespace kinematics {
 				pt1b = connectors[i].body->localToWorld(connectors[i].closest_pt);
 			}
 			else if (connectors[i].type == 2) {
-				pt1b = connectors[i].joints[1]->pos;
+				// pt1b = connectors[i].joints[1]->pos;
+				// Bug Fixed!
+				// Since the guide of the slider crank has three joints, [0] one end of the guide, [1] slider, and [2] the other end of the guide,
+				// we have to use [0] as pt1a and [2] as pt1b to represent the guide.
+				pt1b = connectors[i].joints.back()->pos;
 			}
 
 			for (int j = 0; j < connectors.size(); j++) {
