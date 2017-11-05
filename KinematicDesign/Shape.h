@@ -36,8 +36,8 @@ namespace canvas {
 		int getType() { return type; }
 		int getSubType() { return subtype; }
 		virtual boost::shared_ptr<Shape> clone() const = 0;
-		virtual void draw(QPainter& painter, const QPointF& origin, double scale) const = 0;
-		virtual QDomElement toXml(QDomDocument& doc) const = 0;
+		virtual void draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const = 0;
+		virtual QDomElement toXml(QDomDocument& doc, const QString& node_name) const = 0;
 		glm::dmat3x3 getModelMatrix() const;
 		virtual void addPoint(const glm::dvec2& point) = 0;
 		virtual std::vector<glm::dvec2> getPoints() const = 0;
@@ -58,6 +58,7 @@ namespace canvas {
 		glm::dvec2 getRotationMarkerPosition(double scale) const;
 		glm::dvec2 localCoordinate(const glm::dvec2& point) const; 
 		glm::dvec2 worldCoordinate(const glm::dvec2& point) const;
+		glm::dvec2 worldCoordinate(double x, double y) const;
 		void update3DGeometry();
 	};
 

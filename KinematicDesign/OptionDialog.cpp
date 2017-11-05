@@ -16,6 +16,15 @@ OptionDialog::OptionDialog(QWidget *parent) : QDialog(parent) {
 OptionDialog::~OptionDialog() {
 }
 
+
+void OptionDialog::setBodyMargin(float body_margin) {
+	ui.lineEditBodyMargin->setText(QString::number(body_margin));
+}
+
+float OptionDialog::getBodyMargin() {
+	return ui.lineEditBodyMargin->text().toFloat();
+}
+
 void OptionDialog::setGap(float gap) {
 	ui.lineEditGap->setText(QString::number(gap));
 }
@@ -113,6 +122,7 @@ float OptionDialog::getSliderDepth() {
 }
 
 void OptionDialog::onSmall() {
+	ui.lineEditBodyMargin->setText("0.3");
 	ui.lineEditGap->setText("0.04");
 	ui.lineEditLinkWidth->setText("1.0");
 	ui.lineEditLinkDepth->setText("0.3");
@@ -128,6 +138,7 @@ void OptionDialog::onSmall() {
 }
 
 void OptionDialog::onLarge() {
+	ui.lineEditBodyMargin->setText("0.3");
 	ui.lineEditGap->setText("0.07");
 	ui.lineEditLinkWidth->setText("2.5");
 	ui.lineEditLinkDepth->setText("0.9");

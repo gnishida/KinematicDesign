@@ -37,7 +37,8 @@ namespace kinematics {
 		BBox bbox_local = boundingBox(region_local);
 
 		int cnt = 0;
-		for (int scale = 1; scale <= 3 && cnt < num_samples; scale++) {
+		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
+		//for (int scale = 1; scale <= 3 && cnt < num_samples; scale++) {
 			// calculate the enlarged linkage region for the sampling region
 			std::vector<glm::dvec2> enlarged_linkage_region_pts;
 			for (int i = 0; i < linkage_region_pts.size(); i++) {

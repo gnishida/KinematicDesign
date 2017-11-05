@@ -13,7 +13,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "Shape.h"
 #include "Operation.h"
-#include "Layer.h"
+#include "Design.h"
 #include "History.h"
 #include <kinematics.h>
 
@@ -23,7 +23,7 @@ class GLWidget3D : public QGLWidget {
 	Q_OBJECT
 
 public:
-	static enum { MODE_SELECT = 0, MODE_MOVE, MODE_ROTATION, MODE_RESIZE, MODE_RECTANGLE, MODE_CIRCLE, MODE_POLYGON, MODE_LINKAGE_REGION, MODE_LINKAGE_AVOIDANCE, MODE_KINEMATICS };
+	static enum { MODE_SELECT = 0, MODE_MOVE, MODE_ROTATION, MODE_RESIZE, MODE_FIXED_RECTANGLE, MODE_FIXED_CIRCLE, MODE_FIXED_POLYGON, MODE_MOVING_RECTANGLE, MODE_MOVING_CIRCLE, MODE_MOVING_POLYGON, MODE_LINKAGE_REGION, MODE_LINKAGE_AVOIDANCE, MODE_KINEMATICS };
 	static enum { LINKAGE_4R = 0, LINKAGE_RRRP };
 
 public:
@@ -51,8 +51,9 @@ public:
 	boost::shared_ptr<canvas::Operation> operation;
 	boost::shared_ptr<canvas::Shape> selected_shape;
 	std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
-	std::vector<canvas::Layer> layers;
-	int layer_id;
+	//std::vector<canvas::Layer> layers;
+	canvas::Design design;
+	//int layer_id;
 	canvas::History history;
 
 	std::vector<kinematics::Kinematics> kinematics;

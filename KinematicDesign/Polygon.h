@@ -17,8 +17,8 @@ namespace canvas {
 		~Polygon();
 
 		boost::shared_ptr<Shape> clone() const;
-		void draw(QPainter& painter, const QPointF& origin, double scale) const;
-		QDomElement toXml(QDomDocument& doc) const;
+		void draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const;
+		QDomElement toXml(QDomDocument& doc, const QString& node_name) const;
 		void addPoint(const glm::dvec2& point);
 		std::vector<glm::dvec2> getPoints() const;
 		void updateByNewPoint(const glm::dvec2& point, bool shiftPressed);

@@ -15,9 +15,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	// group for mode
 	QActionGroup* groupMode = new QActionGroup(this);
 	groupMode->addAction(ui.actionSelect);
-	groupMode->addAction(ui.actionRectangle);
-	groupMode->addAction(ui.actionCircle);
-	groupMode->addAction(ui.actionPolygon);
+	groupMode->addAction(ui.actionFixedRectangle);
+	groupMode->addAction(ui.actionFixedCircle);
+	groupMode->addAction(ui.actionFixedPolygon);
+	groupMode->addAction(ui.actionMovingRectangle);
+	groupMode->addAction(ui.actionMovingCircle);
+	groupMode->addAction(ui.actionMovingPolygon);
 	groupMode->addAction(ui.actionLinkageRegion);
 	groupMode->addAction(ui.actionKinematics);
 	ui.actionSelect->setChecked(true);
@@ -46,9 +49,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionDelete, SIGNAL(triggered()), this, SLOT(onDelete()));
 	connect(ui.actionSelectAll, SIGNAL(triggered()), this, SLOT(onSelectAll()));
 	connect(ui.actionSelect, SIGNAL(triggered()), this, SLOT(onModeChanged()));
-	connect(ui.actionRectangle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
-	connect(ui.actionCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
-	connect(ui.actionPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionFixedRectangle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionFixedCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionFixedPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionMovingRectangle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionMovingCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionMovingPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionLinkageRegion, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionKinematics, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionAddLayer, SIGNAL(triggered()), this, SLOT(onAddLayer()));
@@ -160,14 +166,23 @@ void MainWindow::onModeChanged() {
 	if (ui.actionSelect->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_SELECT);
 	}
-	else if (ui.actionRectangle->isChecked()) {
-		glWidget->setMode(GLWidget3D::MODE_RECTANGLE);
+	else if (ui.actionFixedRectangle->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_FIXED_RECTANGLE);
 	}
-	else if (ui.actionCircle->isChecked()) {
-		glWidget->setMode(GLWidget3D::MODE_CIRCLE);
+	else if (ui.actionFixedCircle->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_FIXED_CIRCLE);
 	}
-	else if (ui.actionPolygon->isChecked()) {
-		glWidget->setMode(GLWidget3D::MODE_POLYGON);
+	else if (ui.actionFixedPolygon->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_FIXED_POLYGON);
+	}
+	else if (ui.actionMovingRectangle->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_MOVING_RECTANGLE);
+	}
+	else if (ui.actionMovingCircle->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_MOVING_CIRCLE);
+	}
+	else if (ui.actionMovingPolygon->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_MOVING_POLYGON);
 	}
 	else if (ui.actionLinkageRegion->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_LINKAGE_REGION);
@@ -287,6 +302,7 @@ void MainWindow::onCollisionCheck() {
 
 void MainWindow::onOptions() {
 	OptionDialog dlg;
+	dlg.setBodyMargin(kinematics::options->body_margin);
 	dlg.setGap(kinematics::options->gap);
 	dlg.setLinkWidth(kinematics::options->link_width);
 	dlg.setLinkDepth(kinematics::options->link_depth);
@@ -302,6 +318,7 @@ void MainWindow::onOptions() {
 	dlg.setSliderDepth(kinematics::options->slider_depth);
 
 	if (dlg.exec()) {
+		kinematics::options->body_margin = dlg.getBodyMargin();
 		kinematics::options->gap = dlg.getGap();
 		kinematics::options->link_width = dlg.getLinkWidth();
 		kinematics::options->link_depth = dlg.getLinkDepth();

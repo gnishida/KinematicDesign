@@ -13,7 +13,9 @@ private:
 public:
 	OptionDialog(QWidget *parent = 0);
 	~OptionDialog();
-
+	
+	void setBodyMargin(float body_margin);
+	float getBodyMargin();
 	void setGap(float gap);
 	float getGap();
 	void setLinkWidth(float link_width);

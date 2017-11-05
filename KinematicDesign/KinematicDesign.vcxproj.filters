@@ -89,9 +89,6 @@
     <ClCompile Include="History.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\kinematics\kinematics\BBox.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
@@ -176,6 +173,12 @@
     <ClCompile Include="..\kinematics\kinematics\ZOrder.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
+    <ClCompile Include="Design.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\clipper.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -246,9 +249,6 @@
     <ClInclude Include="History.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Layer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\BBox.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
@@ -316,6 +316,12 @@
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\ZOrder.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Design.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\clipper.hpp">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>

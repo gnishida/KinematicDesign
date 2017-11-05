@@ -45,10 +45,26 @@
     <property name="title">
      <string>Mode</string>
     </property>
+    <widget class="QMenu" name="menuFixed_Body">
+     <property name="title">
+      <string>Fixed Body</string>
+     </property>
+     <addaction name="actionFixedRectangle"/>
+     <addaction name="actionFixedCircle"/>
+     <addaction name="actionFixedPolygon"/>
+    </widget>
+    <widget class="QMenu" name="menuMovingBody">
+     <property name="title">
+      <string>MovingBody</string>
+     </property>
+     <addaction name="actionMovingRectangle"/>
+     <addaction name="actionMovingCircle"/>
+     <addaction name="actionMovingPolygon"/>
+    </widget>
     <addaction name="actionSelect"/>
-    <addaction name="actionRectangle"/>
-    <addaction name="actionCircle"/>
-    <addaction name="actionPolygon"/>
+    <addaction name="separator"/>
+    <addaction name="menuFixed_Body"/>
+    <addaction name="menuMovingBody"/>
     <addaction name="separator"/>
     <addaction name="actionLinkageRegion"/>
     <addaction name="separator"/>
@@ -133,7 +149,7 @@
     <string>Select</string>
    </property>
   </action>
-  <action name="actionRectangle">
+  <action name="actionFixedRectangle">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -141,7 +157,7 @@
     <string>Rectangle</string>
    </property>
   </action>
-  <action name="actionCircle">
+  <action name="actionFixedCircle">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -149,7 +165,7 @@
     <string>Circle</string>
    </property>
   </action>
-  <action name="actionPolygon">
+  <action name="actionFixedPolygon">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -367,6 +383,40 @@
   <action name="actionOptions">
    <property name="text">
     <string>Options</string>
+   </property>
+  </action>
+  <action name="actionMovingRectangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rectangle</string>
+   </property>
+  </action>
+  <action name="actionMovingCircle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Circle</string>
+   </property>
+  </action>
+  <action name="actionMovingPolygon">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Polygon</string>
+   </property>
+  </action>
+  <action name="actionFixedRectangle_2">
+   <property name="text">
+    <string>Rectangle</string>
+   </property>
+  </action>
+  <action name="actionAho">
+   <property name="text">
+    <string>Aho</string>
    </property>
   </action>
  </widget>

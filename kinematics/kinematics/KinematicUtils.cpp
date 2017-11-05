@@ -1,5 +1,6 @@
 #include "KinematicUtils.h"
 #include <random>
+#include "clipper.hpp"
 
 namespace kinematics {
 
@@ -409,9 +410,45 @@ namespace kinematics {
 	}
 
 	/**
+	* Find the closest point of a polygon from the specified point.
+	*/
+	glm::dvec2 closestOffsetPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, double margin, int num_samples) {
+		ClipperLib::Path subj;
+		for (int i = 0; i < points.size(); i++) {
+			subj.push_back(ClipperLib::IntPoint(points[i].x * 100, points[i].y * 100));
+		}
+
+		ClipperLib::Paths solution;
+		ClipperLib::ClipperOffset co;
+		co.AddPath(subj, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+		co.Execute(solution, -margin);
+
+		double min_dist = std::numeric_limits<double>::max();
+		glm::dvec2 ans;
+		for (int i = 0; i < solution.size(); i++) {
+			std::vector<glm::dvec2> offset_points;
+			for (int j = 0; j < solution[i].size(); j++) {
+				double x = solution[i][j].X * 0.01;
+				double y = solution[i][j].Y * 0.01;
+				offset_points.push_back(glm::dvec2(x, y));
+			}
+
+			double dist;
+			glm::dvec2 a = closestPoint(offset_points, p, dist, num_samples);
+
+			if (dist < min_dist) {
+				min_dist = dist;
+				ans = a;
+			}
+		}
+
+		return ans;
+	}
+
+	/**
 	 * Find the closest point of a polygon from the specified point.
 	 */
-	glm::dvec2 closestPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, int num_samples) {
+	glm::dvec2 closestPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, double& dist, int num_samples) {
 		std::vector<double> edge_lengths(points.size());
 		double length = 0.0;
 		for (int i = 0; i < points.size(); i++) {
@@ -440,12 +477,12 @@ namespace kinematics {
 		}
 
 		// find the cloest point
-		double min_dist = std::numeric_limits<double>::max();
+		dist = std::numeric_limits<double>::max();
 		glm::dvec2 ans;
 		for (int i = 0; i < num_samples; i++) {
-			double dist = glm::length(sampled_points[i] - p);
-			if (dist < min_dist) {
-				min_dist = dist;
+			double d = glm::length(sampled_points[i] - p);
+			if (d < dist) {
+				dist = d;
 				ans = sampled_points[i];
 			}
 		}

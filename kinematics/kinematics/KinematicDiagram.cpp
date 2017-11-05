@@ -321,7 +321,7 @@ namespace kinematics {
 			// find the closest point of a rigid body
 			double min_dist = std::numeric_limits<double>::max();
 			for (int k = 0; k < fixed_body_pts.size(); k++) {
-				glm::dvec2 cp = kinematics::closestPoint(fixed_body_pts[k].polygons[0].points, joint->pos);
+				glm::dvec2 cp = kinematics::closestOffsetPoint(fixed_body_pts[k].polygons[0].points, joint->pos, options->body_margin);
 
 				// extend the point a little into the rigid body
 				glm::dvec2 v = glm::normalize(cp - joint->pos);
@@ -423,7 +423,7 @@ namespace kinematics {
 		}
 		else {
 			// find the closest point of a rigid body
-			glm::dvec2 closest_pt = kinematics::closestPoint(body_pts, joint->pos);
+			glm::dvec2 closest_pt = kinematics::closestOffsetPoint(body_pts, joint->pos, options->body_margin);
 
 			// extend the point a little into the rigid body
 			glm::dvec2 v1 = glm::normalize(closest_pt - joint->pos);

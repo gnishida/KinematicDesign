@@ -140,6 +140,7 @@
     <ClCompile Include="..\kinematics\kinematics\BBox.cpp" />
     <ClCompile Include="..\kinematics\kinematics\BodyGeometry.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Burmester.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\clipper.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Gear.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Joint.cpp" />
     <ClCompile Include="..\kinematics\kinematics\JointConnector.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Circle.cpp" />
+    <ClCompile Include="Design.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_GLWidget3D.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -202,7 +204,6 @@
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="GLWidget3D.cpp" />
     <ClCompile Include="History.cpp" />
-    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="LinkageSynthesisOptionDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="..\kinematics\kinematics\BBox.h" />
     <ClInclude Include="..\kinematics\kinematics\BodyGeometry.h" />
     <ClInclude Include="..\kinematics\kinematics\Burmester.h" />
+    <ClInclude Include="..\kinematics\kinematics\clipper.hpp" />
     <ClInclude Include="..\kinematics\kinematics\Gear.h" />
     <ClInclude Include="..\kinematics\kinematics\Joint.h" />
     <ClInclude Include="..\kinematics\kinematics\JointConnector.h" />
@@ -281,6 +283,7 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle.h" />
+    <ClInclude Include="Design.h" />
     <ClInclude Include="GeneratedFiles\ui_LinkageSynthesisOptionDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_MainWindow.h" />
     <ClInclude Include="GeneratedFiles\ui_OptionDialog.h" />
@@ -304,7 +307,6 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtXml" "-I.\..\glm" "-I.\..\glew" "-I.\..\opencv\include" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(BOOST_INCLUDEDIR)\." "-I.\..\dlib\include" "-I.\..\kinematics"</Command>
     </CustomBuild>
     <ClInclude Include="History.h" />
-    <ClInclude Include="Layer.h" />
     <CustomBuild Include="LinkageSynthesisOptionDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing LinkageSynthesisOptionDialog.h...</Message>

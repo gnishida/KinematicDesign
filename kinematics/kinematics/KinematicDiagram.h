@@ -15,6 +15,7 @@ namespace kinematics {
 	class Options {
 	public:
 		static Options* instance;
+		float body_margin;
 		float gap;
 		float link_width;
 		float link_depth;
@@ -30,6 +31,7 @@ namespace kinematics {
 
 	protected:
 		Options() {
+			body_margin = 0.3f;
 			gap = 0.04f;
 			link_width = 1.0f;
 			link_depth = 0.3f;

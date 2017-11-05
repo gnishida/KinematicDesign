@@ -46,7 +46,7 @@ namespace canvas {
 		return boost::shared_ptr<Shape>(new Circle(*this));
 	}
 
-	void Circle::draw(QPainter& painter, const QPointF& origin, double scale) const {
+	void Circle::draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const {
 		painter.save();
 
 		painter.translate(origin.x() + pos.x * scale, origin.y() - pos.y * scale);
@@ -58,12 +58,7 @@ namespace canvas {
 		else {
 			painter.setPen(QPen(QColor(0, 0, 0), 1));
 		}
-		if (currently_drawing) {
-			painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
-		}
-		else {
-			painter.setBrush(brushes[subtype]);
-		}
+		painter.setBrush(brush_color);
 
 		// draw circle
 		QPolygonF pol;
@@ -91,8 +86,8 @@ namespace canvas {
 		painter.restore();
 	}
 
-	QDomElement Circle::toXml(QDomDocument& doc) const {
-		QDomElement shape_node = doc.createElement("shape");
+	QDomElement Circle::toXml(QDomDocument& doc, const QString& node_name) const {
+		QDomElement shape_node = doc.createElement(node_name);
 		shape_node.setAttribute("type", "circle");
 		shape_node.setAttribute("subtype", subtype);
 

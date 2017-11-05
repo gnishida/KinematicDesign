@@ -1,0 +1,56 @@
+<design version="1.0" date="07/24/2017" author="Gen Nishida">
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
+        </shape>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="5" x="30.50000000000001"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
+        </shape>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0.1011965966177499" y="18.71162803965818" x="29.60562227385768"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
+        </shape>
+    </layer>
+    <layer>
+        <shape subtype="0" type="rectangle">
+            <pose theta="0" y="0" x="0"/>
+            <params width="30" height="5"/>
+        </shape>
+        <shape subtype="0" type="rectangle">
+            <pose theta="-4.708336317668167" y="5.471651968704812" x="16.01018911324163"/>
+            <params width="5" height="-14"/>
+        </shape>
+        <shape subtype="1" type="polygon">
+            <pose theta="0" y="7.324498693774068" x="17.87175878989915"/>
+            <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>
+            <point y="0.1742681410100062" x="18.50234668186124"/>
+            <point y="-16.4683393254433" x="18.41862565615154"/>
+            <point y="-16.55547339594829" x="10.38140718801266"/>
+            <point y="-8.974809262014059" x="0.5023261542586979"/>
+        </shape>
+    </layer>
+</design>

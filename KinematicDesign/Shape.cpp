@@ -81,6 +81,10 @@ namespace canvas {
 		return glm::dvec2(point.x * cos(theta) - point.y * sin(theta) + pos.x, point.x * sin(theta) + point.y * cos(theta) + pos.y);
 	}
 
+	glm::dvec2 Shape::worldCoordinate(double x, double y) const {
+		return glm::dvec2(x * cos(theta) - y * sin(theta) + pos.x, x * sin(theta) + y * cos(theta) + pos.y);
+	}
+
 	void Shape::update3DGeometry() {
 		vertices.clear();
 
