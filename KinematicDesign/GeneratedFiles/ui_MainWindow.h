@@ -67,6 +67,7 @@ public:
     QAction *actionMovingPolygon;
     QAction *actionFixedRectangle_2;
     QAction *actionAho;
+    QAction *actionLinkageAvoidanceRegion;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -183,6 +184,9 @@ public:
         actionFixedRectangle_2->setObjectName(QStringLiteral("actionFixedRectangle_2"));
         actionAho = new QAction(MainWindowClass);
         actionAho->setObjectName(QStringLiteral("actionAho"));
+        actionLinkageAvoidanceRegion = new QAction(MainWindowClass);
+        actionLinkageAvoidanceRegion->setObjectName(QStringLiteral("actionLinkageAvoidanceRegion"));
+        actionLinkageAvoidanceRegion->setCheckable(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -235,6 +239,7 @@ public:
         menuMode->addAction(menuMovingBody->menuAction());
         menuMode->addSeparator();
         menuMode->addAction(actionLinkageRegion);
+        menuMode->addAction(actionLinkageAvoidanceRegion);
         menuMode->addSeparator();
         menuMode->addAction(actionKinematics);
         menuFixed_Body->addAction(actionFixedRectangle);
@@ -334,6 +339,7 @@ public:
         actionMovingPolygon->setText(QApplication::translate("MainWindowClass", "Polygon", 0));
         actionFixedRectangle_2->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
         actionAho->setText(QApplication::translate("MainWindowClass", "Aho", 0));
+        actionLinkageAvoidanceRegion->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

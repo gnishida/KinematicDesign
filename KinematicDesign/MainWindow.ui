@@ -67,6 +67,7 @@
     <addaction name="menuMovingBody"/>
     <addaction name="separator"/>
     <addaction name="actionLinkageRegion"/>
+    <addaction name="actionLinkageAvoidanceRegion"/>
     <addaction name="separator"/>
     <addaction name="actionKinematics"/>
    </widget>
@@ -417,6 +418,14 @@
   <action name="actionAho">
    <property name="text">
     <string>Aho</string>
+   </property>
+  </action>
+  <action name="actionLinkageAvoidanceRegion">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Linkage Avoidance Region</string>
    </property>
   </action>
  </widget>

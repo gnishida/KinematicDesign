@@ -1,5 +1,5 @@
-<design date="08/08/2017" version="1.0" author="Gen Nishida">
-    <fixed_body subtype="0" type="polygon">
+<design author="Gen Nishida" version="1.0" date="11/06/2017">
+    <fixed_body type="polygon">
         <pose y="11.17160864345741" x="0.02214885954379159" theta="0"/>
         <point y="0" x="0"/>
         <point y="0" x="13.52040816326531"/>
@@ -11,19 +11,19 @@
         <point y="-11.12244897959184" x="-0.05102040816326532"/>
     </fixed_body>
     <moving_body>
-        <shape subtype="0" type="rectangle">
+        <shape type="rectangle">
             <pose y="11.36141680369562" x="15.53790287061196" theta="-4.70937904967319"/>
-            <params height="-9.489795918367349" width="3.673469387755105"/>
+            <params width="3.673469387755105" height="-9.489795918367349"/>
         </shape>
-        <shape subtype="0" type="rectangle">
+        <shape type="rectangle">
             <pose y="7.501410113041137" x="15.86237505029573" theta="-3.822081716814781"/>
-            <params height="-9.489795918367349" width="3.673469387755105"/>
+            <params width="3.673469387755105" height="-9.489795918367349"/>
         </shape>
-        <shape subtype="0" type="rectangle">
+        <shape type="rectangle">
             <pose y="1.882664448955197" x="11.29089864302792" theta="-3.817881048220537"/>
-            <params height="-9.489795918367349" width="3.673469387755105"/>
+            <params width="3.673469387755105" height="-9.489795918367349"/>
         </shape>
-        <linkage_region subtype="1" type="polygon">
+        <linkage_region type="polygon">
             <pose y="14.90482537815303" x="-4.756428158922532" theta="0"/>
             <point y="0" x="-3.150257832373882e-015"/>
             <point y="0.03933498379651684" x="34.66078564013248"/>

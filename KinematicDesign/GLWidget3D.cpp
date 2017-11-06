@@ -779,6 +779,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	fixed_body_pts.clear();
 	body_pts.clear();
 	linkage_region_pts.clear();
+	linkage_avoidance_pts.clear();
 	poses.clear();
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
@@ -798,13 +799,18 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		else {
 			// use a bounding box as a default linkage region
 			canvas::BoundingBox bbox;
-			for (int i = 0; i < design.fixed_bodies.size(); i++) {
-				bbox.addPoints(design.fixed_bodies[i]->getPoints());
+			for (int j = 0; j < design.fixed_bodies.size(); j++) {
+				bbox.addPoints(design.fixed_bodies[j]->getPoints());
 			}
-			for (int i = 0; i < design.moving_bodies.size(); i++) {
-				bbox.addPoints(design.moving_bodies[i].poses[0]->getPoints());
-			}
+			bbox.addPoints(design.moving_bodies[i].poses[0]->getPoints());
 			linkage_region_pts.push_back({ bbox.minPt, glm::dvec2(bbox.minPt.x, bbox.maxPt.y), bbox.maxPt, glm::dvec2(bbox.maxPt.x, bbox.minPt.y) });
+		}
+
+		if (design.moving_bodies[i].linkage_avoidance) {
+			linkage_avoidance_pts.push_back(design.moving_bodies[i].linkage_avoidance->getPoints());
+		}
+		else {
+			linkage_avoidance_pts.push_back({});
 		}
 	}
 
@@ -824,7 +830,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 
 		// calculate the circle point curve and center point curve
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
+		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
 
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
@@ -877,8 +883,26 @@ void GLWidget3D::constructKinematics() {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
-		body_pts.push_back(kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0));		
-		linkage_region_pts.push_back(design.moving_bodies[i].linkage_region->getPoints());
+		body_pts.push_back(kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0));	
+		if (design.moving_bodies[i].linkage_region) {
+			linkage_region_pts.push_back(design.moving_bodies[i].linkage_region->getPoints());
+		}
+		else {
+			// use a bounding box as a default linkage region
+			canvas::BoundingBox bbox;
+			for (int j = 0; j < design.fixed_bodies.size(); j++) {
+				bbox.addPoints(design.fixed_bodies[j]->getPoints());
+			}
+			bbox.addPoints(design.moving_bodies[i].poses[0]->getPoints());
+			linkage_region_pts.push_back({ bbox.minPt, glm::dvec2(bbox.minPt.x, bbox.maxPt.y), bbox.maxPt, glm::dvec2(bbox.maxPt.x, bbox.minPt.y) });
+		}
+		
+		if (design.moving_bodies[i].linkage_avoidance) {
+			linkage_avoidance_pts.push_back(design.moving_bodies[i].linkage_avoidance->getPoints());
+		}
+		else {
+			linkage_avoidance_pts.push_back({});
+		}
 	}
 
 	boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
@@ -1184,6 +1208,9 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 				if (design.moving_bodies[i].linkage_region) {
 					design.moving_bodies[i].linkage_region->draw(painter, QColor(0, 0, 255, 30), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
 				}
+				if (design.moving_bodies[i].linkage_avoidance) {
+					design.moving_bodies[i].linkage_avoidance->draw(painter, QColor(255, 0, 0, 30), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
+				}
 			}
 
 			// render currently drawing shape
@@ -1266,7 +1293,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 			if (!current_shape) {
 				// start drawing a rectangle
 				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Rectangle(canvas::Shape::TYPE_BODY, screenToWorldCoordinates(e->x(), e->y())));
+				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Rectangle(screenToWorldCoordinates(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
@@ -1275,7 +1302,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 			if (!current_shape) {
 				// start drawing a rectangle
 				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Circle(canvas::Shape::TYPE_BODY, screenToWorldCoordinates(e->x(), e->y())));
+				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Circle(screenToWorldCoordinates(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
@@ -1287,7 +1314,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 			else {
 				// start drawing a rectangle
 				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(canvas::Shape::TYPE_BODY, screenToWorldCoordinates(e->x(), e->y())));
+				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(screenToWorldCoordinates(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
@@ -1299,7 +1326,19 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 			else {
 				// start drawing a polygon
 				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(canvas::Shape::TYPE_LINKAGE_REGION, screenToWorldCoordinates(e->x(), e->y())));
+				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(screenToWorldCoordinates(e->x(), e->y())));
+				current_shape->startDrawing();
+				setMouseTracking(true);
+			}
+		}
+		else if (mode == MODE_LINKAGE_AVOIDANCE) {
+			if (current_shape) {
+				current_shape->addPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())));
+			}
+			else {
+				// start drawing a polygon
+				unselectAll();
+				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(screenToWorldCoordinates(e->x(), e->y())));
 				current_shape->startDrawing();
 				setMouseTracking(true);
 			}
@@ -1380,7 +1419,7 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 		op->pivot = screenToWorldCoordinates(e->x(), e->y());
 		update();
 	}
-	else if (mode == MODE_FIXED_RECTANGLE || mode == MODE_FIXED_CIRCLE || mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_RECTANGLE || mode == MODE_MOVING_CIRCLE || mode == MODE_MOVING_POLYGON || mode == MODE_LINKAGE_REGION) {
+	else if (mode == MODE_FIXED_RECTANGLE || mode == MODE_FIXED_CIRCLE || mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_RECTANGLE || mode == MODE_MOVING_CIRCLE || mode == MODE_MOVING_POLYGON || mode == MODE_LINKAGE_REGION || mode == MODE_LINKAGE_AVOIDANCE) {
 		if (current_shape) {
 			current_shape->updateByNewPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())), shiftPressed);
 		}
@@ -1504,8 +1543,19 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent* e) {
 				}
 			}
 		}
+		else if (mode == MODE_LINKAGE_AVOIDANCE) {
+			// The shape is created.
+			current_shape->completeDrawing();
+			for (int i = 0; i < design.moving_bodies.size(); i++) {
+				if (!design.moving_bodies[i].linkage_avoidance) {
+					design.moving_bodies[i].linkage_avoidance = current_shape->clone();
+					design.moving_bodies[i].linkage_avoidance->select();
+					break;
+				}
+			}
+		}
 
-		if (mode == MODE_FIXED_RECTANGLE || mode == MODE_FIXED_CIRCLE || mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_RECTANGLE || mode == MODE_MOVING_CIRCLE || mode == MODE_MOVING_POLYGON || mode == MODE_LINKAGE_REGION) {
+		if (mode == MODE_FIXED_RECTANGLE || mode == MODE_FIXED_CIRCLE || mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_RECTANGLE || mode == MODE_MOVING_CIRCLE || mode == MODE_MOVING_POLYGON || mode == MODE_LINKAGE_REGION || mode == MODE_LINKAGE_AVOIDANCE) {
 			// update 3D geometry
 			update3DGeometry();
 

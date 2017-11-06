@@ -2,14 +2,14 @@
 
 namespace canvas {
 
-	Rectangle::Rectangle(int subtype) : Shape(subtype) {
+	Rectangle::Rectangle() {
 		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
 		theta = 0;
 	}
 
-	Rectangle::Rectangle(int subtype, const glm::dvec2& point) : Shape(subtype) {
+	Rectangle::Rectangle(const glm::dvec2& point) {
 		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
@@ -20,7 +20,7 @@ namespace canvas {
 	/**
 	 * Construct a rectangle from the xml dom node.
 	 */
-	Rectangle::Rectangle(int subtype, QDomNode& node) : Shape(subtype) {
+	Rectangle::Rectangle(QDomNode& node) {
 		type = TYPE_RECTANGLE;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
@@ -91,7 +91,6 @@ namespace canvas {
 	QDomElement Rectangle::toXml(QDomDocument& doc, const QString& node_name) const {
 		QDomElement shape_node = doc.createElement(node_name);
 		shape_node.setAttribute("type", "rectangle");
-		shape_node.setAttribute("subtype", subtype);
 
 		QDomElement pose_node = doc.createElement("pose");
 		pose_node.setAttribute("x", pos.x);

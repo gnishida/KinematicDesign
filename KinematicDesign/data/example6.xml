@@ -1,39 +1,39 @@
-<design author="Gen Nishida" version="1.0" date="11/05/2017">
-    <fixed_body subtype="0" type="rectangle">
-        <pose y="0.4278168654931376" x="-11.05193569190606" theta="0"/>
-        <params height="-2.281689949296734" width="67.52376193700022"/>
+<design date="11/06/2017" author="Gen Nishida" version="1.0">
+    <fixed_body type="rectangle">
+        <pose x="-11.05193569190606" y="0.4278168654931376" theta="0"/>
+        <params width="67.52376193700022" height="-2.281689949296734"/>
     </fixed_body>
     <moving_body>
-        <shape subtype="0" type="rectangle">
-            <pose y="10.4" x="8.399999999999999" theta="0"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="8.399999999999999" y="10.4" theta="0"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <shape subtype="0" type="rectangle">
-            <pose y="6.635448633158675" x="15.75307999925125" theta="0.02900167323461722"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="15.75307999925125" y="6.635448633158675" theta="0.02900167323461722"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <shape subtype="0" type="rectangle">
-            <pose y="11.00346784592804" x="23.90048564278323" theta="0.361161995504272"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="23.90048564278323" y="11.00346784592804" theta="0.361161995504272"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <shape subtype="0" type="rectangle">
-            <pose y="14.34686035802784" x="22.17995730186216" theta="0.7586626903080851"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="22.17995730186216" y="14.34686035802784" theta="0.7586626903080851"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <shape subtype="0" type="rectangle">
-            <pose y="15.94203451414259" x="17.91199322846784" theta="-4.961009056011712"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="17.91199322846784" y="15.94203451414259" theta="-4.961009056011712"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <shape subtype="0" type="rectangle">
-            <pose y="15.25966971714668" x="12.61818756779844" theta="-4.718024306759709"/>
-            <params height="-3.4" width="11.3"/>
+        <shape type="rectangle">
+            <pose x="12.61818756779844" y="15.25966971714668" theta="-4.718024306759709"/>
+            <params width="11.3" height="-3.4"/>
         </shape>
-        <linkage_region subtype="1" type="polygon">
-            <pose y="27.49186543749306" x="0.9456304462133782" theta="0"/>
-            <point y="6.675215935558754e-015" x="-1.509872111543489e-014"/>
-            <point y="0.1875435950548758" x="33.32370550601777"/>
-            <point y="-27.00627768790134" x="33.32370550601777"/>
-            <point y="-26.91250589037393" x="-1.509872111543489e-014"/>
+        <linkage_region type="polygon">
+            <pose x="0.9456304462133782" y="27.49186543749306" theta="0"/>
+            <point x="-1.509872111543489e-014" y="6.675215935558754e-015"/>
+            <point x="33.32370550601777" y="0.1875435950548758"/>
+            <point x="33.32370550601777" y="-27.00627768790134"/>
+            <point x="-1.509872111543489e-014" y="-26.91250589037393"/>
         </linkage_region>
     </moving_body>
 </design>

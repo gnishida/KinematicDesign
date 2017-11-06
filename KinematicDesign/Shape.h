@@ -30,11 +30,11 @@ namespace canvas {
 		static std::vector<QBrush> brushes;
 
 	public:
-		Shape(int subtype);
+		Shape();
 		~Shape();
 
 		int getType() { return type; }
-		int getSubType() { return subtype; }
+		//int getSubType() { return subtype; }
 		virtual boost::shared_ptr<Shape> clone() const = 0;
 		virtual void draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const = 0;
 		virtual QDomElement toXml(QDomDocument& doc, const QString& node_name) const = 0;

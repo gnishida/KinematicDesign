@@ -1,52 +1,52 @@
-<design date="11/03/2017" author="Gen Nishida" version="1.0">
-    <fixed_body type="rectangle" subtype="0">
-        <pose x="-4.999999999999981" y="0" theta="0"/>
+<design author="Gen Nishida" version="1.0" date="11/06/2017">
+    <fixed_body type="rectangle">
+        <pose y="0" x="-4.999999999999981" theta="0"/>
         <params width="34.99999999999997" height="5"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
-            <pose x="30.50000000000001" y="5" theta="0"/>
+        <shape type="rectangle">
+            <pose y="5" x="30.50000000000001" theta="0"/>
             <params width="5" height="-14"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="29.60562227385768" y="18.71162803965818" theta="0.1011965966177499"/>
+        <shape type="rectangle">
+            <pose y="18.71162803965818" x="29.60562227385768" theta="0.1011965966177499"/>
             <params width="5" height="-14"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="16.01018911324163" y="5.471651968704812" theta="-4.708336317668167"/>
+        <shape type="rectangle">
+            <pose y="5.471651968704812" x="16.01018911324163" theta="-4.708336317668167"/>
             <params width="5" height="-14"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose x="19.319470936579" y="6.8" theta="0"/>
-            <point x="-1.318389841742373e-015" y="0"/>
-            <point x="16.980529063421" y="0"/>
-            <point x="16.980529063421" y="-15.69565791221207"/>
-            <point x="8.363544165565569" y="-15.69565791221207"/>
-            <point x="-0.2534407322898331" y="-8.65273449006563"/>
-            <point x="-0.2534407322898331" y="-0.1006131917449488"/>
+        <linkage_region type="polygon">
+            <pose y="6.8" x="19.319470936579" theta="0"/>
+            <point y="0" x="-1.318389841742373e-015"/>
+            <point y="0" x="16.980529063421"/>
+            <point y="-15.69565791221207" x="16.980529063421"/>
+            <point y="-15.69565791221207" x="8.363544165565569"/>
+            <point y="-8.65273449006563" x="-0.2534407322898331"/>
+            <point y="-0.1006131917449488" x="-0.2534407322898331"/>
         </linkage_region>
     </moving_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
-            <pose x="-10.60716560802787" y="-8.63020942275921" theta="1.57040050094145"/>
+        <shape type="rectangle">
+            <pose y="-8.63020942275921" x="-10.60716560802787" theta="1.57040050094145"/>
             <params width="20.41747978812375" height="-5.000000000000001"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="-11.08338733020197" y="5.518751613900431" theta="1.443508480504439"/>
+        <shape type="rectangle">
+            <pose y="5.518751613900431" x="-11.08338733020197" theta="1.443508480504439"/>
             <params width="20.41747978812375" height="-5.000000000000001"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="-4.902773905770812" y="10.5548128342246" theta="0"/>
+        <shape type="rectangle">
+            <pose y="10.5548128342246" x="-4.902773905770812" theta="0"/>
             <params width="20.41747978812375" height="-5.000000000000001"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose x="-11.26959286280274" y="8.90160629053662" theta="0"/>
-            <point x="1.014813233446432e-016" y="0"/>
-            <point x="16.4865141951564" y="0"/>
-            <point x="16.4865141951564" y="-10.52812691258162"/>
-            <point x="8.629659774027175" y="-17.12050544662807"/>
-            <point x="-1.030407137197276" y="-17.12050544662807"/>
-            <point x="-1.030407137197276" y="0.09839370946337933"/>
+        <linkage_region type="polygon">
+            <pose y="8.90160629053662" x="-11.26959286280274" theta="0"/>
+            <point y="0" x="1.014813233446432e-016"/>
+            <point y="0" x="16.4865141951564"/>
+            <point y="-10.52812691258162" x="16.4865141951564"/>
+            <point y="-17.12050544662807" x="8.629659774027175"/>
+            <point y="-17.12050544662807" x="-1.030407137197276"/>
+            <point y="0.09839370946337933" x="-1.030407137197276"/>
         </linkage_region>
     </moving_body>
 </design>

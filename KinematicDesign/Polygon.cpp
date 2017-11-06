@@ -11,12 +11,12 @@
 
 namespace canvas {
 
-	Polygon::Polygon(int subtype) : Shape(subtype) {
+	Polygon::Polygon() {
 		type = TYPE_POLYGON;
 		theta = 0;
 	}
 
-	Polygon::Polygon(int subtype, const glm::dvec2& point) : Shape(subtype) {
+	Polygon::Polygon(const glm::dvec2& point) {
 		type = TYPE_POLYGON;
 		points.push_back(glm::dvec2());
 		pos = point;
@@ -28,7 +28,7 @@ namespace canvas {
 	/**
 	* Construct a polygon from the xml dom node.
 	*/
-	Polygon::Polygon(int subtype, QDomNode& node) : Shape(subtype) {
+	Polygon::Polygon(QDomNode& node) {
 		type = TYPE_POLYGON;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
@@ -113,7 +113,6 @@ namespace canvas {
 	QDomElement Polygon::toXml(QDomDocument& doc, const QString& node_name) const {
 		QDomElement shape_node = doc.createElement(node_name);
 		shape_node.setAttribute("type", "polygon");
-		shape_node.setAttribute("subtype", subtype);
 
 		QDomElement pose_node = doc.createElement("pose");
 		pose_node.setAttribute("x", pos.x);

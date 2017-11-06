@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	groupMode->addAction(ui.actionMovingCircle);
 	groupMode->addAction(ui.actionMovingPolygon);
 	groupMode->addAction(ui.actionLinkageRegion);
+	groupMode->addAction(ui.actionLinkageAvoidanceRegion);
 	groupMode->addAction(ui.actionKinematics);
 	ui.actionSelect->setChecked(true);
 
@@ -56,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionMovingCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionMovingPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionLinkageRegion, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionLinkageAvoidanceRegion, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionKinematics, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionAddLayer, SIGNAL(triggered()), this, SLOT(onAddLayer()));
 	connect(ui.actionInsertLayer, SIGNAL(triggered()), this, SLOT(onInsertLayer()));
@@ -186,6 +188,9 @@ void MainWindow::onModeChanged() {
 	}
 	else if (ui.actionLinkageRegion->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_LINKAGE_REGION);
+	}
+	else if (ui.actionLinkageAvoidanceRegion->isChecked()) {
+		glWidget->setMode(GLWidget3D::MODE_LINKAGE_AVOIDANCE);
 	}
 	else if (ui.actionKinematics->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_KINEMATICS);

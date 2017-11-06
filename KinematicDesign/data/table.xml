@@ -1,6 +1,6 @@
-<design date="11/03/2017" author="Gen Nishida" version="1.0">
-    <fixed_body type="polygon" subtype="0">
-        <pose x="12.16346153846154" y="18.50961538461538" theta="0"/>
+<design author="Gen Nishida" date="11/06/2017" version="1.0">
+    <fixed_body type="polygon">
+        <pose x="12.16346153846154" theta="0" y="18.50961538461538"/>
         <point x="0" y="0"/>
         <point x="1.442307692307692" y="0"/>
         <point x="1.442307692307692" y="-14.47115384615384"/>
@@ -24,24 +24,31 @@
         <point x="-2" y="0"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
-            <pose x="14.51923076923077" y="18.46153846153846" theta="0"/>
-            <params width="2.451923076923077" height="-15"/>
+        <shape type="rectangle">
+            <pose x="14.51923076923077" theta="0" y="18.46153846153846"/>
+            <params height="-15" width="2.451923076923077"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="9.427857265587093" y="24.0395072754238" theta="0.7236462180205083"/>
-            <params width="2.451923076923077" height="-15"/>
+        <shape type="rectangle">
+            <pose x="9.427857265587093" theta="0.7236462180205083" y="24.0395072754238"/>
+            <params height="-15" width="2.451923076923077"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose x="5.315882844002872" y="18.6573659453404" theta="-10.99283784946934"/>
-            <params width="2.451923076923077" height="-15"/>
+        <shape type="rectangle">
+            <pose x="5.315882844002872" theta="-10.99283784946934" y="18.6573659453404"/>
+            <params height="-15" width="2.451923076923077"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose x="10.44026264050556" y="20.67479775629347" theta="0"/>
+        <linkage_region type="polygon">
+            <pose x="10.44026264050556" theta="0" y="20.67479775629347"/>
             <point x="1.665334536937735e-016" y="-1.27675647831893e-015"/>
             <point x="6.272164405034513" y="-1.27675647831893e-015"/>
             <point x="6.272164405034513" y="-17.45517370334097"/>
             <point x="-0.05501898600907215" y="-17.50172083321654"/>
         </linkage_region>
+        <linkage_avoidance type="polygon">
+            <pose x="-1.123400115205756" theta="0" y="20.75273613667336"/>
+            <point x="0" y="0"/>
+            <point x="0" y="6.56032145215449"/>
+            <point x="27.21957935850064" y="6.56032145215449"/>
+            <point x="27.21957935850064" y="0.05754667940486513"/>
+        </linkage_avoidance>
     </moving_body>
 </design>

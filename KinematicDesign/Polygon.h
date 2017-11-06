@@ -11,9 +11,9 @@ namespace canvas {
 		glm::dvec2 current_point;
 
 	public:
-		Polygon(int subtype);
-		Polygon(int subtype, const glm::dvec2& point);
-		Polygon(int subtype, QDomNode& node);
+		Polygon();
+		Polygon(const glm::dvec2& point);
+		Polygon(QDomNode& node);
 		~Polygon();
 
 		boost::shared_ptr<Shape> clone() const;

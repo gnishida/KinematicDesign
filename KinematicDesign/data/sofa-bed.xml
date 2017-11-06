@@ -1,6 +1,6 @@
-<design author="Gen Nishida" version="1.0" date="07/19/2017">
-    <fixed_body type="polygon" subtype="0">
-        <pose x="0" y="26.2" theta="0"/>
+<design author="Gen Nishida" version="1.0" date="11/06/2017">
+    <fixed_body type="polygon">
+        <pose x="0" theta="0" y="26.2"/>
         <point x="0" y="0"/>
         <point x="6.9" y="0"/>
         <point x="6.9" y="-10"/>
@@ -24,8 +24,8 @@
         <point x="0" y="-26.2"/>
     </fixed_body>
     <moving_body>
-        <shape type="polygon" subtype="0">
-            <pose x="2.6" y="8.100000000000001" theta="0"/>
+        <shape type="polygon">
+            <pose x="2.6" theta="0" y="8.100000000000001"/>
             <point x="0" y="0"/>
             <point x="0.1999999999999997" y="1"/>
             <point x="0.6999999999999997" y="1.6"/>
@@ -35,8 +35,8 @@
             <point x="1.5" y="-2.500000000000001"/>
             <point x="0.7999999999999998" y="-2.200000000000001"/>
         </shape>
-        <shape type="polygon" subtype="0">
-            <pose x="3.94841629367865" y="9.037550319364494" theta="0.4380209940180548"/>
+        <shape type="polygon">
+            <pose x="3.94841629367865" theta="0.4380209940180548" y="9.037550319364494"/>
             <point x="0" y="0"/>
             <point x="0.1999999999999997" y="1"/>
             <point x="0.6999999999999997" y="1.6"/>
@@ -46,8 +46,8 @@
             <point x="1.5" y="-2.500000000000001"/>
             <point x="0.7999999999999998" y="-2.200000000000001"/>
         </shape>
-        <shape type="polygon" subtype="0">
-            <pose x="7.299999999999999" y="13.7" theta="0"/>
+        <shape type="polygon">
+            <pose x="7.299999999999999" theta="0" y="13.7"/>
             <point x="0" y="0"/>
             <point x="0.1999999999999997" y="1"/>
             <point x="0.6999999999999997" y="1.6"/>
@@ -57,12 +57,19 @@
             <point x="1.5" y="-2.500000000000001"/>
             <point x="0.7999999999999998" y="-2.200000000000001"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose x="1.75" y="13.6875" theta="0"/>
+        <linkage_region type="polygon">
+            <pose x="1.75" theta="0" y="13.6875"/>
             <point x="0" y="0"/>
             <point x="21.1875" y="0"/>
             <point x="21.1875" y="-11.125"/>
             <point x="-0.3125000000000002" y="-11.1875"/>
         </linkage_region>
+        <linkage_avoidance type="polygon">
+            <pose x="-3.814930343912754" theta="0" y="-0.009619133346817833"/>
+            <point x="0" y="0"/>
+            <point x="30.75882924972397" y="0"/>
+            <point x="30.75882924972397" y="-4.113099260137508"/>
+            <point x="-0.08941520130733727" y="-4.113099260137508"/>
+        </linkage_avoidance>
     </moving_body>
 </design>

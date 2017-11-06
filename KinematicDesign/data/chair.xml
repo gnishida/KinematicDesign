@@ -1,5 +1,5 @@
-<design version="1.0" author="Gen Nishida" date="07/19/2017">
-    <fixed_body type="polygon" subtype="0">
+<design author="Gen Nishida" version="1.0" date="11/06/2017">
+    <fixed_body type="polygon">
         <pose y="-0" x="-0.9183673469387758" theta="0"/>
         <point y="0" x="0"/>
         <point y="1.683673469387756" x="0.2040816326530612"/>
@@ -15,19 +15,19 @@
         <point y="0" x="23.36734693877552"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
+        <shape type="rectangle">
             <pose y="7" x="0.09999999999999965" theta="0"/>
             <params width="17.8" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
+        <shape type="rectangle">
             <pose y="20.51145170321291" x="23.66088895488845" theta="-1.720505722459161"/>
             <params width="17.8" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
+        <shape type="rectangle">
             <pose y="5.669055378397331" x="36.8748269856025" theta="-2.838604348202121"/>
             <params width="17.8" height="-3.4"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
+        <linkage_region type="polygon">
             <pose y="4.217623738371239" x="14.45455674363661" theta="0"/>
             <point y="-2.636779683484747e-016" x="0"/>
             <point y="-2.636779683484747e-016" x="6.706259105706176"/>

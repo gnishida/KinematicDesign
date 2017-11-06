@@ -17,7 +17,7 @@ namespace kinematics {
 	* @param solutions1	the output solutions for the driving crank, each of which contains a pair of the center point and the circle point
 	* @param solutions2	the output solutions for the follower, each of which contains a pair of the fixed point and the slider point
 	*/
-	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, int num_samples, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions) {
+	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions) {
 		solutions.clear();
 
 		srand(0);
@@ -139,7 +139,7 @@ namespace kinematics {
 
 				// collision check
 				glm::dvec2 slider_end_pos1, slider_end_pos2;
-				if (checkCollision(perturbed_poses, { A0, B0, A1, B1, B0 }, fixed_body_pts, body_pts, slider_end_pos1, slider_end_pos2, 2)) continue;
+				if (checkCollision(perturbed_poses, { A0, B0, A1, B1, B0 }, fixed_body_pts, body_pts, linkage_avoidance_pts, slider_end_pos1, slider_end_pos2, 2)) continue;
 
 				// locate the two endpoints of the bar
 				glm::dvec2 B2;
@@ -559,7 +559,7 @@ namespace kinematics {
 		return false;
 	}
 
-	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, int collision_check_type) {
+	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, int collision_check_type) {
 		kinematics::Kinematics kinematics = constructKinematics(points, {}, body_pts, (collision_check_type == 1 || collision_check_type == 3), fixed_body_pts);
 		kinematics.diagram.initialize();
 
@@ -651,6 +651,11 @@ namespace kinematics {
 				// if only some of the poses are reached before collision, the collision is detected.
 				kinematics.clear();
 				return true;
+			}
+
+			// check if the joints are within the linkage avoidance region
+			for (int i = 0; i < kinematics.diagram.joints.size(); i++) {
+				if (withinPolygon(linkage_avoidance_pts, kinematics.diagram.joints[i]->pos)) return true;
 			}
 
 			// calculate the angle of the driving crank

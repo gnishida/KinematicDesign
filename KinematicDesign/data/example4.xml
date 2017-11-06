@@ -1,27 +1,27 @@
-<design version="1.0" author="Gen Nishida" date="11/05/2017">
-    <fixed_body type="rectangle" subtype="0">
-        <pose y="1.658820241700458" x="-8.064544271692629" theta="0"/>
+<design version="1.0" date="11/06/2017" author="Gen Nishida">
+    <fixed_body type="rectangle">
+        <pose theta="0" y="1.658820241700458" x="-8.064544271692629"/>
         <params width="52.88214263308964" height="-2.648378710219352"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
-            <pose y="10.4" x="8.399999999999999" theta="0"/>
+        <shape type="rectangle">
+            <pose theta="0" y="10.4" x="8.399999999999999"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="6.635448633158675" x="15.75307999925125" theta="0.02900167323461722"/>
+        <shape type="rectangle">
+            <pose theta="0.02900167323461722" y="6.635448633158675" x="15.75307999925125"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="14.34686035802784" x="22.17995730186216" theta="0.7586626903080851"/>
+        <shape type="rectangle">
+            <pose theta="0.7586626903080851" y="14.34686035802784" x="22.17995730186216"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="15.25966971714668" x="12.61818756779844" theta="-4.718024306759709"/>
+        <shape type="rectangle">
+            <pose theta="-4.718024306759709" y="15.25966971714668" x="12.61818756779844"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose y="19.33558780837083" x="0.7977559821868985" theta="0"/>
+        <linkage_region type="polygon">
+            <pose theta="0" y="19.33558780837083" x="0.7977559821868985"/>
             <point y="0" x="0"/>
             <point y="0.1166321274308172" x="23.31130323370765"/>
             <point y="-16.79502635003796" x="23.31130323370765"/>

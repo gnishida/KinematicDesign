@@ -10,9 +10,9 @@ namespace canvas {
 		double height;
 
 	public:
-		Rectangle(int subtype);
-		Rectangle(int subtype, const glm::dvec2& point);
-		Rectangle(int subtype, QDomNode& node);
+		Rectangle();
+		Rectangle(const glm::dvec2& point);
+		Rectangle(QDomNode& node);
 		~Rectangle();
 
 		boost::shared_ptr<Shape> clone() const;

@@ -11,9 +11,9 @@ namespace canvas {
 
 
 	public:
-		Circle(int subtype);
-		Circle(int subtype, const glm::dvec2& point);
-		Circle(int subtype, QDomNode& node);
+		Circle();
+		Circle(const glm::dvec2& point);
+		Circle(QDomNode& node);
 		~Circle();
 
 		boost::shared_ptr<Shape> clone() const;

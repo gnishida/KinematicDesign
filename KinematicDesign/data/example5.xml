@@ -1,31 +1,31 @@
-<design version="1.0" author="Gen Nishida" date="11/05/2017">
-    <fixed_body type="rectangle" subtype="0">
-        <pose y="2.179182954489273" x="-10.37894375472525" theta="0"/>
+<design version="1.0" date="11/06/2017" author="Gen Nishida">
+    <fixed_body type="rectangle">
+        <pose theta="0" y="2.179182954489273" x="-10.37894375472525"/>
         <params width="59.7632208975935" height="-1.397970079475871"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle" subtype="0">
-            <pose y="10.4" x="8.399999999999999" theta="0"/>
+        <shape type="rectangle">
+            <pose theta="0" y="10.4" x="8.399999999999999"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="6.635448633158675" x="15.75307999925125" theta="0.02900167323461722"/>
+        <shape type="rectangle">
+            <pose theta="0.02900167323461722" y="6.635448633158675" x="15.75307999925125"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="11.00346784592804" x="23.90048564278323" theta="0.361161995504272"/>
+        <shape type="rectangle">
+            <pose theta="0.361161995504272" y="11.00346784592804" x="23.90048564278323"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="14.34686035802784" x="22.17995730186216" theta="0.7586626903080851"/>
+        <shape type="rectangle">
+            <pose theta="0.7586626903080851" y="14.34686035802784" x="22.17995730186216"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <shape type="rectangle" subtype="0">
-            <pose y="15.25966971714668" x="12.61818756779844" theta="-4.718024306759709"/>
+        <shape type="rectangle">
+            <pose theta="-4.718024306759709" y="15.25966971714668" x="12.61818756779844"/>
             <params width="11.3" height="-3.4"/>
         </shape>
-        <linkage_region type="polygon" subtype="1">
-            <pose y="26.34796203524134" x="1.267335264216809" theta="0"/>
+        <linkage_region type="polygon">
+            <pose theta="0" y="26.34796203524134" x="1.267335264216809"/>
             <point y="0" x="-1.755372142848067e-014"/>
             <point y="0.1538718150303504" x="29.70074730212881"/>
             <point y="-22.15754136437317" x="29.70074730212881"/>

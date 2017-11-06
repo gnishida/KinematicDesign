@@ -7,8 +7,7 @@ namespace canvas {
 	QImage Shape::rotation_marker = QImage("resources/rotation_marker.png").scaled(16, 16);
 	std::vector<QBrush> Shape::brushes = { QBrush(QColor(0, 255, 0, 60)), QBrush(QColor(0, 0, 255, 30)) };
 
-	Shape::Shape(int subtype) {
-		this->subtype = subtype;
+	Shape::Shape() {
 		selected = false;
 		currently_drawing = false;
 	}

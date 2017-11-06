@@ -51,9 +51,7 @@ public:
 	boost::shared_ptr<canvas::Operation> operation;
 	boost::shared_ptr<canvas::Shape> selected_shape;
 	std::vector<boost::shared_ptr<canvas::Shape>> copied_shapes;
-	//std::vector<canvas::Layer> layers;
 	canvas::Design design;
-	//int layer_id;
 	canvas::History history;
 
 	std::vector<kinematics::Kinematics> kinematics;
@@ -63,6 +61,7 @@ public:
 	std::vector<kinematics::Object25D> fixed_body_pts;
 	std::vector<kinematics::Object25D> body_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
+	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	std::vector<std::vector<glm::dmat3x3>> poses;
 	int linkage_type;
 	QTimer* animation_timer;

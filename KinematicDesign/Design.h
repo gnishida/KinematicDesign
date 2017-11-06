@@ -10,6 +10,7 @@ namespace canvas {
 	class MovingBody {
 	public:
 		boost::shared_ptr<Shape> linkage_region;
+		boost::shared_ptr<Shape> linkage_avoidance;
 		std::vector<boost::shared_ptr<Shape>> poses;
 	};
 
