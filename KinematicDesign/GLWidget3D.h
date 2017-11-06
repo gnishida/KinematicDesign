@@ -60,9 +60,6 @@ public:
 	std::pair<int, int> selectedJoint;
 	std::vector<kinematics::Object25D> fixed_body_pts;
 	std::vector<kinematics::Object25D> body_pts;
-	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
-	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
-	std::vector<std::vector<glm::dmat3x3>> poses;
 	int linkage_type;
 	QTimer* animation_timer;
 	bool collision_check;

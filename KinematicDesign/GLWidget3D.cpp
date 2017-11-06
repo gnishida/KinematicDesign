@@ -778,9 +778,9 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	// get the geometry of fixed rigid bodies, moving bodies, linkage regions
 	fixed_body_pts.clear();
 	body_pts.clear();
-	linkage_region_pts.clear();
-	linkage_avoidance_pts.clear();
-	poses.clear();
+	std::vector<std::vector<glm::dmat3x3>> poses;
+	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
+	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
 	}
@@ -879,6 +879,8 @@ void GLWidget3D::constructKinematics() {
 	// get the geometry of fixed rigid bodies, moving bodies
 	fixed_body_pts.clear();
 	body_pts.clear();
+	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
+	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
 	}
