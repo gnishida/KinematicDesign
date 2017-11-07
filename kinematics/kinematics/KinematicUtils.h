@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
 #include <vector>
 #include <boost/geometry.hpp>
 #include <boost/geometry/core/point_type.hpp>
@@ -83,6 +84,7 @@ namespace kinematics {
 	glm::dvec2 reflect(const glm::dvec2& p, const glm::dvec2& a, const glm::dvec2& v);
 	glm::dmat3x3 affineTransform(const glm::dvec2& p1, const glm::dvec2& p2, const glm::dvec2& q1, const glm::dvec2& q2);
 	double crossProduct(const glm::dvec2& v1, const glm::dvec2& v2);
+	glm::dmat3x3 calculateTransMatrix(const glm::dvec2& O, const glm::dvec2& X);
 
 	double area(const std::vector<glm::dvec2>& points);
 	bool withinPolygon(const std::vector<glm::dvec2>& points, const glm::dvec2& pt);

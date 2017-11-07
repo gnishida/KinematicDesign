@@ -2,6 +2,9 @@
 
 namespace kinematics {
 
+	BBox::BBox() {
+	}
+
 	BBox::BBox(const glm::dvec2& minPt, const glm::dvec2& maxPt) {
 		this->minPt = minPt;
 		this->maxPt = maxPt;

@@ -757,6 +757,9 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - kinematics::options->slider_depth)), vertices);
 			}
 		}
+		else if (linkage_type == LINKAGE_WATT_I) {
+			// TODO
+		}
 	}
 	renderManager.addObject("kinematics", "", vertices, true);
 
@@ -828,9 +831,12 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		else if (linkage_type == LINKAGE_RRRP) {
 			synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
 		}
+		else if (linkage_type == LINKAGE_WATT_I) {
+			synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
+		}
 
 		// calculate the circle point curve and center point curve
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
+		synthesis->calculateSolution({ poses[i] }, linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, { body_pts[i] }, sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
 
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
@@ -847,8 +853,8 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
+		selected_solutions[i] = synthesis->findBestSolution({ poses[i] }, solutions[i], fixed_body_pts, { body_pts[i] }, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
 
 		kinematics.push_back(kin);
 
@@ -914,10 +920,13 @@ void GLWidget3D::constructKinematics() {
 	else if (linkage_type == LINKAGE_RRRP) {
 		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
 	}
+	else if (linkage_type == LINKAGE_WATT_I) {
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
+	}
 
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
 		kinematics.push_back(kin);
 	}
 	

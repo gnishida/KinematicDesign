@@ -99,6 +99,7 @@
     </property>
     <addaction name="actionCalculateSolution4RLinkage"/>
     <addaction name="actionCalculateSolutionSliderCrank"/>
+    <addaction name="actionCalculateSolutionWattI"/>
     <addaction name="separator"/>
     <addaction name="actionRun"/>
     <addaction name="actionRunBackward"/>
@@ -426,6 +427,11 @@
    </property>
    <property name="text">
     <string>Linkage Avoidance Region</string>
+   </property>
+  </action>
+  <action name="actionCalculateSolutionWattI">
+   <property name="text">
+    <string>Calculate Solution for Watt I</string>
    </property>
   </action>
  </widget>

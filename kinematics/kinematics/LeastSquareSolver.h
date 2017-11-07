@@ -25,5 +25,14 @@ namespace kinematics {
 		std::vector<glm::dmat3x3> poses;
 	};
 
+	class SolverForWattI {
+	public:
+		SolverForWattI(const std::vector<std::vector<glm::dmat3x3>>& poses);
+		double operator() (const column_vector& arg) const;
+
+	private:
+		std::vector<std::vector<glm::dmat3x3>> poses;
+	};
+
 }
 

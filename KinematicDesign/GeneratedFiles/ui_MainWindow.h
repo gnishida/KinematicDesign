@@ -68,6 +68,7 @@ public:
     QAction *actionFixedRectangle_2;
     QAction *actionAho;
     QAction *actionLinkageAvoidanceRegion;
+    QAction *actionCalculateSolutionWattI;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -187,6 +188,8 @@ public:
         actionLinkageAvoidanceRegion = new QAction(MainWindowClass);
         actionLinkageAvoidanceRegion->setObjectName(QStringLiteral("actionLinkageAvoidanceRegion"));
         actionLinkageAvoidanceRegion->setCheckable(true);
+        actionCalculateSolutionWattI = new QAction(MainWindowClass);
+        actionCalculateSolutionWattI->setObjectName(QStringLiteral("actionCalculateSolutionWattI"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -262,6 +265,7 @@ public:
         menuLayer->addSeparator();
         menuKinematics->addAction(actionCalculateSolution4RLinkage);
         menuKinematics->addAction(actionCalculateSolutionSliderCrank);
+        menuKinematics->addAction(actionCalculateSolutionWattI);
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionRun);
         menuKinematics->addAction(actionRunBackward);
@@ -340,6 +344,7 @@ public:
         actionFixedRectangle_2->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
         actionAho->setText(QApplication::translate("MainWindowClass", "Aho", 0));
         actionLinkageAvoidanceRegion->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", 0));
+        actionCalculateSolutionWattI->setText(QApplication::translate("MainWindowClass", "Calculate Solution for Watt I", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

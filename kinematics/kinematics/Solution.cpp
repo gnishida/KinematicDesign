@@ -9,7 +9,7 @@ namespace kinematics {
 		this->dist = dist;
 	}
 
-	Solution::Solution(const std::vector<glm::dvec2>& points, double position_error, double orientation_error, double dist, const std::vector<glm::dmat3x3>& poses) {
+	Solution::Solution(const std::vector<glm::dvec2>& points, double position_error, double orientation_error, double dist, const std::vector<std::vector<glm::dmat3x3>>& poses) {
 		this->points = points;
 		this->position_error = position_error;
 		this->orientation_error = orientation_error;
@@ -17,7 +17,7 @@ namespace kinematics {
 		this->poses = poses;
 	}
 
-	Solution::Solution(const std::vector<glm::dvec2>& points, double pose_error, double orientation_error, double dist, const std::vector<glm::dmat3x3>& poses, const std::vector<std::vector<int>>& zorder) {
+	Solution::Solution(const std::vector<glm::dvec2>& points, double pose_error, double orientation_error, double dist, const std::vector<std::vector<glm::dmat3x3>>& poses, const std::vector<std::vector<int>>& zorder) {
 		this->points = points;
 		this->position_error = position_error;
 		this->orientation_error = orientation_error;

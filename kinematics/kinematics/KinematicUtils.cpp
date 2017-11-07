@@ -505,6 +505,24 @@ namespace kinematics {
 	}
 
 	/**
+	* Create a transformation matrix that transforms the origin to O, and (1, 0) to X.
+	*/
+	glm::dmat3x3 calculateTransMatrix(const glm::dvec2& O, const glm::dvec2& X) {
+		double angle = atan2(X.y - O.y, X.x - O.x);
+		glm::dmat3x3 T;
+		T[0][0] = cos(angle);
+		T[0][1] = sin(angle);
+		T[0][2] = 0;
+		T[1][0] = -sin(angle);
+		T[1][1] = cos(angle);
+		T[1][2] = 0;
+		T[2][0] = O.x;
+		T[2][1] = O.y;
+		T[2][2] = 1;
+		return T;
+	}
+
+	/**
 	* Given that point p1 goes to p2, and the point q1 goes to q2,
 	* return the matrix for this transformation.
 	*/

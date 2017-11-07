@@ -10,6 +10,7 @@ namespace kinematics {
 		glm::dvec2 maxPt;
 
 	public:
+		BBox();
 		BBox(const glm::dvec2& minPt, const glm::dvec2& maxPt);
 		~BBox();
 
