@@ -24,18 +24,20 @@
         <point x="-2" y="0"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle">
-            <pose x="14.51923076923077" theta="0" y="18.46153846153846"/>
-            <params height="-15" width="2.451923076923077"/>
-        </shape>
-        <shape type="rectangle">
-            <pose x="9.427857265587093" theta="0.7236462180205083" y="24.0395072754238"/>
-            <params height="-15" width="2.451923076923077"/>
-        </shape>
-        <shape type="rectangle">
-            <pose x="5.315882844002872" theta="-10.99283784946934" y="18.6573659453404"/>
-            <params height="-15" width="2.451923076923077"/>
-        </shape>
+    	<part>
+	        <shape type="rectangle">
+	            <pose x="14.51923076923077" theta="0" y="18.46153846153846"/>
+	            <params height="-15" width="2.451923076923077"/>
+	        </shape>
+	        <shape type="rectangle">
+	            <pose x="9.427857265587093" theta="0.7236462180205083" y="24.0395072754238"/>
+	            <params height="-15" width="2.451923076923077"/>
+	        </shape>
+	        <shape type="rectangle">
+	            <pose x="5.315882844002872" theta="-10.99283784946934" y="18.6573659453404"/>
+	            <params height="-15" width="2.451923076923077"/>
+	        </shape>
+	    </part>
         <linkage_region type="polygon">
             <pose x="10.44026264050556" theta="0" y="20.67479775629347"/>
             <point x="1.665334536937735e-016" y="-1.27675647831893e-015"/>

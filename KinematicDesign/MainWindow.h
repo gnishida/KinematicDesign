@@ -44,6 +44,7 @@ public slots:
 	void onLayerChanged();
 	void onCalculateSolution4RLinkage();
 	void onCalculateSolutionSliderCrank();
+	void onCalculateSolutionWattI();
 	void onRun();
 	void onRunBackward();
 	void onStop();

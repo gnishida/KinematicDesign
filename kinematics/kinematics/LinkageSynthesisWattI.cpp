@@ -600,12 +600,7 @@ namespace kinematics {
 		kin.diagram.addLink(false, kin.diagram.joints[5], kin.diagram.joints[6], 1);
 
 		// update the geometry
-		//updateBodies(kin, body_pts);
-
-		// update the geometry
-		kin.diagram.bodies.clear();
-		kin.diagram.addBody(kin.diagram.joints[1], kin.diagram.joints[3], body_pts[0]);
-		kin.diagram.addBody(kin.diagram.joints[5], kin.diagram.joints[6], body_pts[1]);
+		updateBodies(kin, body_pts);
 		if (connect_joints) {
 			kin.diagram.connectJointsToBodies(fixed_body_pts, zorder);
 		}
@@ -619,15 +614,13 @@ namespace kinematics {
 	}
 
 	/**
-	* Construct a linkage.
+	* update bodies.
 	*/
-	/*
-	void LinkageSynthesisWattI::updateBodies(Kinematics& kin, const std::vector<std::vector<glm::dvec2>>& body_pts) {
+	void LinkageSynthesisWattI::updateBodies(Kinematics& kin, const std::vector<Object25D>& body_pts) {
 		kin.diagram.bodies.clear();
 		kin.diagram.addBody(kin.diagram.joints[1], kin.diagram.joints[3], body_pts[0]);
 		kin.diagram.addBody(kin.diagram.joints[5], kin.diagram.joints[6], body_pts[1]);
 	}
-	*/
 
 	bool LinkageSynthesisWattI::checkCollision(const std::vector<std::vector<glm::dmat3x3>>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const std::vector<Object25D>& body_pts, int collision_check_type) {
 		kinematics::Kinematics kinematics = constructKinematics(points, {}, body_pts, (collision_check_type == 1 || collision_check_type == 3), fixed_body_pts);

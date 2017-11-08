@@ -21,6 +21,7 @@ namespace kinematics {
 		virtual bool checkBranchDefect(const std::vector<std::vector<glm::dmat3x3>>& poses, const std::vector<glm::dvec2>& points) = 0;
 		virtual bool checkCircuitDefect(const std::vector<std::vector<glm::dmat3x3>>& poses, const std::vector<glm::dvec2>& points) = 0;
 		virtual Kinematics constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const std::vector<Object25D>& body_pts, bool connect_joints, std::vector<Object25D>& fixed_body_pts = std::vector<Object25D>()) = 0;
+		virtual void updateBodies(Kinematics& kinematics, const std::vector<Object25D>& body_pts) = 0;
 	};
 
 }

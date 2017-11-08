@@ -59,7 +59,7 @@ public:
 	std::vector<std::vector<kinematics::Solution>> solutions; // all the candidates
 	std::pair<int, int> selectedJoint;
 	std::vector<kinematics::Object25D> fixed_body_pts;
-	std::vector<kinematics::Object25D> body_pts;
+	std::vector<std::vector<kinematics::Object25D>> body_pts;	// body_pts[i][j] are the points of j-th part of i-th body
 	int linkage_type;
 	QTimer* animation_timer;
 	bool collision_check;

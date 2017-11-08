@@ -780,20 +780,25 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 	// get the geometry of fixed rigid bodies, moving bodies, linkage regions
 	fixed_body_pts.clear();
-	body_pts.clear();
-	std::vector<std::vector<glm::dmat3x3>> poses;
+	body_pts.resize(design.moving_bodies.size());
+	std::vector<std::vector<std::vector<glm::dmat3x3>>> poses(design.moving_bodies.size());
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
-		body_pts.push_back(kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0));
+		body_pts[i].resize(design.moving_bodies[i].parts.size());
+		poses[i].resize(design.moving_bodies[i].parts.size());
 
-		// set pose matrices
-		poses.resize(poses.size() + 1);
-		for (int j = 0; j < design.moving_bodies[i].poses.size(); j++) {
-			poses.back().push_back(design.moving_bodies[i].poses[j]->getModelMatrix());
+		for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+			body_pts[i][j] = kinematics::Object25D(design.moving_bodies[i].parts[j].poses[0]->getPoints(), -10, 0);
+
+			// set pose matrices
+			poses[i][j].resize(design.moving_bodies[i].parts[j].poses.size());
+			for (int k = 0; k < design.moving_bodies[i].parts[j].poses.size(); k++) {
+				poses[i][j][k] = design.moving_bodies[i].parts[j].poses[k]->getModelMatrix();
+			}
 		}
 
 		if (design.moving_bodies[i].linkage_region) {
@@ -805,7 +810,9 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 			for (int j = 0; j < design.fixed_bodies.size(); j++) {
 				bbox.addPoints(design.fixed_bodies[j]->getPoints());
 			}
-			bbox.addPoints(design.moving_bodies[i].poses[0]->getPoints());
+			for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+				bbox.addPoints(design.moving_bodies[i].parts[j].poses[0]->getPoints());
+			}
 			linkage_region_pts.push_back({ bbox.minPt, glm::dvec2(bbox.minPt.x, bbox.maxPt.y), bbox.maxPt, glm::dvec2(bbox.maxPt.x, bbox.minPt.y) });
 		}
 
@@ -836,7 +843,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 
 		// calculate the circle point curve and center point curve
-		synthesis->calculateSolution({ poses[i] }, linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, { body_pts[i] }, sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
+		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i]);
 
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
@@ -853,7 +860,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution({ poses[i] }, solutions[i], fixed_body_pts, { body_pts[i] }, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], fixed_body_pts, body_pts[i], position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
 
 		kinematics.push_back(kin);
@@ -884,14 +891,18 @@ void GLWidget3D::constructKinematics() {
 
 	// get the geometry of fixed rigid bodies, moving bodies
 	fixed_body_pts.clear();
-	body_pts.clear();
+	body_pts.resize(design.moving_bodies.size());
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
 		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
-		body_pts.push_back(kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0));	
+		body_pts[i].resize(design.moving_bodies[i].parts.size());
+		for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+			body_pts[i][j] = kinematics::Object25D(design.moving_bodies[i].parts[j].poses[0]->getPoints(), -10, 0);
+		}
+
 		if (design.moving_bodies[i].linkage_region) {
 			linkage_region_pts.push_back(design.moving_bodies[i].linkage_region->getPoints());
 		}
@@ -901,7 +912,9 @@ void GLWidget3D::constructKinematics() {
 			for (int j = 0; j < design.fixed_bodies.size(); j++) {
 				bbox.addPoints(design.fixed_bodies[j]->getPoints());
 			}
-			bbox.addPoints(design.moving_bodies[i].poses[0]->getPoints());
+			for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+				bbox.addPoints(design.moving_bodies[i].parts[j].poses[0]->getPoints());
+			}
 			linkage_region_pts.push_back({ bbox.minPt, glm::dvec2(bbox.minPt.x, bbox.maxPt.y), bbox.maxPt, glm::dvec2(bbox.maxPt.x, bbox.minPt.y) });
 		}
 		
@@ -1197,9 +1210,11 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 		if (mode != MODE_KINEMATICS) {
 			// render unselected layers as background
 			for (int i = 0; i < design.moving_bodies.size(); i++) {
-				for (int j = 0; j < design.moving_bodies[i].poses.size(); j++) {
-					if (j == design.layer_id) continue;
-					design.moving_bodies[i].poses[j]->draw(painter, QColor(0, 255, 0, 60), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
+				for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+					for (int k = 0; k < design.moving_bodies[i].parts[j].poses.size(); k++) {
+						if (k == design.layer_id) continue;
+						design.moving_bodies[i].parts[j].poses[k]->draw(painter, QColor(0, 255, 0, 60), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
+					}
 				}
 			}
 
@@ -1213,7 +1228,9 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 				design.fixed_bodies[i]->draw(painter, QColor(150, 255, 0, 60), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
 			}
 			for (int i = 0; i < design.moving_bodies.size(); i++) {
-				design.moving_bodies[i].poses[design.layer_id]->draw(painter, QColor(0, 255, 0, 60), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
+				for (int j = 0; j < design.moving_bodies[i].parts.size(); j++) {
+					design.moving_bodies[i].parts[j].poses[design.layer_id]->draw(painter, QColor(0, 255, 0, 60), QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
+				}
 			}
 			for (int i = 0; i < design.moving_bodies.size(); i++) {
 				if (design.moving_bodies[i].linkage_region) {
@@ -1477,10 +1494,20 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 				}
 			}
 
+			boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
+			if (linkage_type == LINKAGE_4R) {
+				synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
+			}
+			else if (linkage_type == LINKAGE_RRRP) {
+				synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
+			}
+			else if (linkage_type == LINKAGE_WATT_I) {
+				synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
+			}
+
 			// update the geometry
 			for (int i = 0; i < body_pts.size(); i++) {
-				kinematics[i].diagram.bodies.clear();
-				kinematics[i].diagram.addBody(kinematics[i].diagram.joints[2], kinematics[i].diagram.joints[3], body_pts[i]);
+				synthesis->updateBodies(kinematics[i], body_pts[i]);
 			}
 			for (int i = 0; i < fixed_body_pts.size(); i++) {
 				for (int j = 0; j < kinematics.size(); j++) {
@@ -1584,6 +1611,6 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent* e) {
 }
 
 void GLWidget3D::wheelEvent(QWheelEvent* e) {
-	camera.zoom(e->delta() * 0.1);
+	camera.zoom(e->delta() * 0.2);
 	update();
 }

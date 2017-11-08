@@ -7,11 +7,26 @@
 
 namespace canvas {
 
+	class MovingPart {
+	public:
+		std::vector<boost::shared_ptr<Shape>> poses;
+
+	public:
+		MovingPart clone() const;
+		void load(QDomNode& node);
+		QDomElement toXml(QDomDocument& doc);
+	};
+
 	class MovingBody {
 	public:
 		boost::shared_ptr<Shape> linkage_region;
 		boost::shared_ptr<Shape> linkage_avoidance;
-		std::vector<boost::shared_ptr<Shape>> poses;
+		std::vector<MovingPart> parts;
+
+	public:
+		MovingBody clone() const;
+		void load(QDomNode& node);
+		QDomElement toXml(QDomDocument& doc);
 	};
 
 	class Design {

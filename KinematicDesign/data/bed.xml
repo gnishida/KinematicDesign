@@ -4,18 +4,20 @@
         <params width="30" height="5"/>
     </fixed_body>
     <moving_body>
-        <shape type="rectangle">
-            <pose y="5" x="30.50000000000001" theta="0"/>
-            <params width="5" height="-14"/>
-        </shape>
-        <shape type="rectangle">
-            <pose y="18.71162803965818" x="29.60562227385768" theta="0.1011965966177499"/>
-            <params width="5" height="-14"/>
-        </shape>
-        <shape type="rectangle">
-            <pose y="5.471651968704812" x="16.01018911324163" theta="-4.708336317668167"/>
-            <params width="5" height="-14"/>
-        </shape>
+    	<part>
+	        <shape type="rectangle">
+	            <pose y="5" x="30.50000000000001" theta="0"/>
+	            <params width="5" height="-14"/>
+	        </shape>
+	        <shape type="rectangle">
+	            <pose y="18.71162803965818" x="29.60562227385768" theta="0.1011965966177499"/>
+	            <params width="5" height="-14"/>
+	        </shape>
+	        <shape type="rectangle">
+	            <pose y="5.471651968704812" x="16.01018911324163" theta="-4.708336317668167"/>
+	            <params width="5" height="-14"/>
+	        </shape>
+	    </part>
         <linkage_region type="polygon">
             <pose y="7.324498693774068" x="17.87175878989915" theta="0"/>
             <point y="-6.38378239159465e-016" x="1.318389841742373e-015"/>

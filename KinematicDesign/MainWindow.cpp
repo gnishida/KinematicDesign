@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionDeleteLayer, SIGNAL(triggered()), this, SLOT(onDeleteLayer()));
 	connect(ui.actionCalculateSolution4RLinkage, SIGNAL(triggered()), this, SLOT(onCalculateSolution4RLinkage()));
 	connect(ui.actionCalculateSolutionSliderCrank, SIGNAL(triggered()), this, SLOT(onCalculateSolutionSliderCrank()));
+	connect(ui.actionCalculateSolutionWattI, SIGNAL(triggered()), this, SLOT(onCalculateSolutionWattI()));
 	connect(ui.actionRun, SIGNAL(triggered()), this, SLOT(onRun()));
 	connect(ui.actionRunBackward, SIGNAL(triggered()), this, SLOT(onRunBackward()));
 	connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(onStop()));
@@ -268,6 +269,28 @@ void MainWindow::onCalculateSolutionSliderCrank() {
 		};
 
 		glWidget->calculateSolutions(GLWidget3D::LINKAGE_RRRP,
+			dlg.ui.lineEditNumSamples->text().toInt(),
+			sigmas,
+			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
+			dlg.ui.checkBoxRotatableCrank->isChecked(),
+			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
+			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
+			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
+			dlg.ui.lineEditSizeWeight->text().toDouble());
+	}
+}
+
+void MainWindow::onCalculateSolutionWattI() {
+	LinkageSynthesisOptionDialog dlg;
+	if (dlg.exec()) {
+		std::vector<std::pair<double, double>> sigmas = {
+			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
+			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_WATT_I,
 			dlg.ui.lineEditNumSamples->text().toInt(),
 			sigmas,
 			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),

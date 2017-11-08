@@ -331,8 +331,7 @@ namespace kinematics {
 		kin.diagram.addLink(false, kin.diagram.joints[2], kin.diagram.joints[3], false);
 
 		// update the geometry
-		kin.diagram.bodies.clear();
-		kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], body_pts[0]);
+		updateBodies(kin, body_pts);
 		if (connect_joints) {
 			kin.diagram.connectJointsToBodies(fixed_body_pts, zorder);
 		}
@@ -343,6 +342,14 @@ namespace kinematics {
 		}
 
 		return kin;
+	}
+
+	/**
+	* update bodies.
+	*/
+	void LinkageSynthesis4R::updateBodies(Kinematics& kin, const std::vector<Object25D>& body_pts) {
+		kin.diagram.bodies.clear();
+		kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], body_pts[0]);
 	}
 
 	/**
