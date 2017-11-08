@@ -8,16 +8,24 @@
 
 namespace canvas {
 
-	MovingPart MovingPart::clone() const {
-		MovingPart ret;
+	MovingBody MovingBody::clone() const {
+		MovingBody ret;
+		if (linkage_region) {
+			ret.linkage_region = linkage_region->clone();
+		}
+		if (linkage_avoidance) {
+			ret.linkage_avoidance = linkage_avoidance->clone();
+		}
+
 		ret.poses.resize(poses.size());
 		for (int i = 0; i < poses.size(); i++) {
 			ret.poses[i] = poses[i]->clone();
 		}
+
 		return ret;
 	}
 
-	void MovingPart::load(QDomNode& node) {
+	void MovingBody::load(QDomNode& node) {
 		QDomNode child_node = node.firstChild();
 		while (!child_node.isNull()) {
 			if (child_node.toElement().tagName() == "shape") {
@@ -30,47 +38,6 @@ namespace canvas {
 				else if (child_node.toElement().attribute("type") == "polygon") {
 					poses.push_back(boost::shared_ptr<Shape>(new Polygon(child_node)));
 				}
-			}
-
-			child_node = child_node.nextSibling();
-		}
-	}
-
-	QDomElement MovingPart::toXml(QDomDocument& doc) {
-		QDomElement part_node = doc.createElement("part");
-
-		for (int i = 0; i < poses.size(); i++) {
-			QDomElement shape_node = poses[i]->toXml(doc, "shape");
-			part_node.appendChild(shape_node);
-		}
-
-		return part_node;
-	}
-
-	MovingBody MovingBody::clone() const {
-		MovingBody ret;
-		if (linkage_region) {
-			ret.linkage_region = linkage_region->clone();
-		}
-		if (linkage_avoidance) {
-			ret.linkage_avoidance = linkage_avoidance->clone();
-		}
-
-		ret.parts.resize(parts.size());
-		for (int i = 0; i < parts.size(); i++) {
-			ret.parts[i] = parts[i].clone();
-		}
-
-		return ret;
-	}
-
-	void MovingBody::load(QDomNode& node) {
-		QDomNode child_node = node.firstChild();
-		while (!child_node.isNull()) {
-			if (child_node.toElement().tagName() == "part") {
-				MovingPart moving_part;
-				moving_part.load(child_node);
-				parts.push_back(moving_part);
 			}
 			else if (child_node.toElement().tagName() == "linkage_region") {
 				if (child_node.toElement().attribute("type") == "rectangle") {
@@ -103,8 +70,8 @@ namespace canvas {
 	QDomElement MovingBody::toXml(QDomDocument& doc) {
 		QDomElement moving_body_node = doc.createElement("moving_body");
 		
-		for (int i = 0; i < parts.size(); i++) {
-			QDomElement shape_node = parts[i].toXml(doc);
+		for (int i = 0; i < poses.size(); i++) {
+			QDomElement shape_node = poses[i]->toXml(doc, "shape");
 			moving_body_node.appendChild(shape_node);
 		}
 
@@ -145,17 +112,14 @@ namespace canvas {
 
 	/**
 	 * Add a moving body.
-	 * Note: the current implementation supports only one part for the moving body.
-	 *       this has to be updated.
 	 */
 	void Design::addMovingBody(boost::shared_ptr<Shape> shape) {
 		moving_bodies.resize(moving_bodies.size() + 1);
-		moving_bodies.back().parts.resize(1);
-		moving_bodies.back().parts[0].poses.resize(num_layers);
+		moving_bodies.back().poses.resize(num_layers);
 		for (int i = 0; i < num_layers; i++) {
-			moving_bodies.back().parts[0].poses[i] = shape->clone();
+			moving_bodies.back().poses[i] = shape->clone();
 		}
-		moving_bodies.back().parts[0].poses[layer_id]->select();
+		moving_bodies.back().poses[layer_id]->select();
 	}
 
 	void Design::load(const QString& filename) {
@@ -197,8 +161,8 @@ namespace canvas {
 		layer_id = 0;
 
 		num_layers = 2;
-		if (moving_bodies.size() > 0 && moving_bodies[0].parts.size() > 0) {
-			num_layers = moving_bodies[0].parts[0].poses.size();
+		if (moving_bodies.size() > 0) {
+			num_layers = moving_bodies[0].poses.size();
 		}
 	}
 
@@ -247,9 +211,7 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				moving_bodies[i].parts[j].poses[layer_id]->select();
-			}
+			moving_bodies[i].poses[layer_id]->select();
 			if (moving_bodies[i].linkage_region) {
 				moving_bodies[i].linkage_region->select();
 			}
@@ -271,10 +233,8 @@ namespace canvas {
 			if (moving_bodies[i].linkage_avoidance) {
 				moving_bodies[i].linkage_avoidance->unselect();
 			}
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				for (int k = 0; k < moving_bodies[i].parts[j].poses.size(); k++) {
-					moving_bodies[i].parts[j].poses[k]->unselect();
-				}
+			for (int k = 0; k < moving_bodies[i].poses.size(); k++) {
+				moving_bodies[i].poses[k]->unselect();
 			}
 		}
 	}
@@ -287,13 +247,8 @@ namespace canvas {
 		for (int i = moving_bodies.size() - 1; i >= 0; i--) {
 			if (moving_bodies[i].linkage_region && moving_bodies[i].linkage_region->isSelected()) moving_bodies[i].linkage_region.reset();
 			if (moving_bodies[i].linkage_avoidance && moving_bodies[i].linkage_avoidance->isSelected()) moving_bodies[i].linkage_avoidance.reset();
-			for (int j = moving_bodies[i].parts.size() - 1; j >= 0; j--) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->isSelected()) {
-					moving_bodies[i].parts.erase(moving_bodies[i].parts.begin() + j);
-					if (moving_bodies[i].parts.size() == 0) {
-						moving_bodies.erase(moving_bodies.begin() + i);
-					}
-				}
+			if (moving_bodies[i].poses[layer_id]->isSelected()) {
+				moving_bodies.erase(moving_bodies.begin() + i);
 			}
 		}
 	}
@@ -323,9 +278,7 @@ namespace canvas {
 	void Design::addLayer() {
 		num_layers++;
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				moving_bodies[i].parts[j].poses.push_back(moving_bodies[i].parts[j].poses.back()->clone());
-			}
+			moving_bodies[i].poses.push_back(moving_bodies[i].poses.back()->clone());
 		}
 	}
 
@@ -336,9 +289,7 @@ namespace canvas {
 	void Design::insertLayer() {
 		num_layers++;
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				moving_bodies[i].parts[j].poses.insert(moving_bodies[i].parts[j].poses.begin() + layer_id, moving_bodies[i].parts[j].poses[layer_id]->clone());
-			}
+			moving_bodies[i].poses.insert(moving_bodies[i].poses.begin() + layer_id, moving_bodies[i].poses[layer_id]->clone());
 		}
 	}
 
@@ -350,9 +301,7 @@ namespace canvas {
 		if (num_layers <= 2) return false;
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				moving_bodies[i].parts[j].poses.erase(moving_bodies[i].parts[j].poses.begin() + layer_id);
-			}
+			moving_bodies[i].poses.erase(moving_bodies[i].poses.begin() + layer_id);
 		}
 		num_layers--;
 		if (layer_id >= num_layers) {
@@ -369,10 +318,8 @@ namespace canvas {
 			renderManager.addObject(obj_name, "", fixed_bodies[i]->getVertices(), true);
 		}
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				QString obj_name = QString("moving_body_%1_%2").arg(i).arg(j);
-				renderManager.addObject(obj_name, "", moving_bodies[i].parts[j].poses[layer_id]->getVertices(), true);
-			}
+			QString obj_name = QString("moving_body_%1").arg(i);
+			renderManager.addObject(obj_name, "", moving_bodies[i].poses[layer_id]->getVertices(), true);
 		}
 	}
 
@@ -387,11 +334,9 @@ namespace canvas {
 
 		// hit test for the selected moving bodies
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->isSelected() && moving_bodies[i].parts[j].poses[layer_id]->hit(pt)) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					return true;
-				}
+			if (moving_bodies[i].poses[layer_id]->isSelected() && moving_bodies[i].poses[layer_id]->hit(pt)) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				return true;
 			}
 		}
 
@@ -425,15 +370,13 @@ namespace canvas {
 
 		// hit test for the non-selected moving bodies
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->hit(pt)) {
-					if (!moving_bodies[i].parts[j].poses[layer_id]->isSelected()) {
-						if (!multiple_selection) unselectAll();
-						moving_bodies[i].parts[j].poses[layer_id]->select();
-					}
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					return true;
+			if (moving_bodies[i].poses[layer_id]->hit(pt)) {
+				if (!moving_bodies[i].poses[layer_id]->isSelected()) {
+					if (!multiple_selection) unselectAll();
+					moving_bodies[i].poses[layer_id]->select();
 				}
+				selected_shape = moving_bodies[i].poses[layer_id];
+				return true;
 			}
 		}
 
@@ -478,16 +421,14 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (glm::length(moving_bodies[i].parts[j].poses[layer_id]->getRotationMarkerPosition(scale) - moving_bodies[i].parts[j].poses[layer_id]->localCoordinate(pt)) < threshold) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					rotate_pivot = selected_shape->worldCoordinate(selected_shape->getCenter());
-					if (!selected_shape->isSelected()) {
-						unselectAll();
-						selected_shape->select();
-					}
-					return true;
+			if (glm::length(moving_bodies[i].poses[layer_id]->getRotationMarkerPosition(scale) - moving_bodies[i].poses[layer_id]->localCoordinate(pt)) < threshold) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				rotate_pivot = selected_shape->worldCoordinate(selected_shape->getCenter());
+				if (!selected_shape->isSelected()) {
+					unselectAll();
+					selected_shape->select();
 				}
+				return true;
 			}
 		}
 
@@ -559,45 +500,43 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				canvas::BoundingBox bbox = moving_bodies[i].parts[j].poses[layer_id]->boundingBox();
+			canvas::BoundingBox bbox = moving_bodies[i].poses[layer_id]->boundingBox();
 
-				if (glm::length(bbox.minPt - moving_bodies[i].parts[j].poses[layer_id]->localCoordinate(pt)) < threshold) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					resize_pivot = selected_shape->worldCoordinate(bbox.maxPt);
-					if (!selected_shape->isSelected()) {
-						unselectAll();
-						selected_shape->select();
-					}
-					return true;
+			if (glm::length(bbox.minPt - moving_bodies[i].poses[layer_id]->localCoordinate(pt)) < threshold) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				resize_pivot = selected_shape->worldCoordinate(bbox.maxPt);
+				if (!selected_shape->isSelected()) {
+					unselectAll();
+					selected_shape->select();
 				}
-				if (glm::length(glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - moving_bodies[i].parts[j].poses[layer_id]->localCoordinate(pt)) < threshold) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					resize_pivot = selected_shape->worldCoordinate(bbox.minPt.x, bbox.maxPt.y);
-					if (!selected_shape->isSelected()) {
-						unselectAll();
-						selected_shape->select();
-					}
-					return true;
+				return true;
+			}
+			if (glm::length(glm::dvec2(bbox.maxPt.x, bbox.minPt.y) - moving_bodies[i].poses[layer_id]->localCoordinate(pt)) < threshold) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				resize_pivot = selected_shape->worldCoordinate(bbox.minPt.x, bbox.maxPt.y);
+				if (!selected_shape->isSelected()) {
+					unselectAll();
+					selected_shape->select();
 				}
-				if (glm::length(glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - moving_bodies[i].parts[j].poses[layer_id]->localCoordinate(pt)) < threshold) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					resize_pivot = selected_shape->worldCoordinate(bbox.maxPt.x, bbox.minPt.y);
-					if (!selected_shape->isSelected()) {
-						unselectAll();
-						selected_shape->select();
-					}
-					return true;
+				return true;
+			}
+			if (glm::length(glm::dvec2(bbox.minPt.x, bbox.maxPt.y) - moving_bodies[i].poses[layer_id]->localCoordinate(pt)) < threshold) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				resize_pivot = selected_shape->worldCoordinate(bbox.maxPt.x, bbox.minPt.y);
+				if (!selected_shape->isSelected()) {
+					unselectAll();
+					selected_shape->select();
 				}
-				if (glm::length(bbox.maxPt - moving_bodies[i].parts[j].poses[layer_id]->localCoordinate(pt)) < threshold) {
-					selected_shape = moving_bodies[i].parts[j].poses[layer_id];
-					resize_pivot = selected_shape->worldCoordinate(bbox.minPt);
-					if (!selected_shape->isSelected()) {
-						unselectAll();
-						selected_shape->select();
-					}
-					return true;
+				return true;
+			}
+			if (glm::length(bbox.maxPt - moving_bodies[i].poses[layer_id]->localCoordinate(pt)) < threshold) {
+				selected_shape = moving_bodies[i].poses[layer_id];
+				resize_pivot = selected_shape->worldCoordinate(bbox.minPt);
+				if (!selected_shape->isSelected()) {
+					unselectAll();
+					selected_shape->select();
 				}
+				return true;
 			}
 		}
 
@@ -703,15 +642,13 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->isSelected()) {
-					moving_bodies[i].parts[j].poses[layer_id]->translate(dir);
+			if (moving_bodies[i].poses[layer_id]->isSelected()) {
+				moving_bodies[i].poses[layer_id]->translate(dir);
 
-					// update 3D geometry
-					QString obj_name = QString("moving_body_%1_%2").arg(i).arg(j);
-					renderManager.removeObject(obj_name);
-					renderManager.addObject(obj_name, "", moving_bodies[i].parts[j].poses[layer_id]->getVertices(), true);
-				}
+				// update 3D geometry
+				QString obj_name = QString("moving_body_%1").arg(i);
+				renderManager.removeObject(obj_name);
+				renderManager.addObject(obj_name, "", moving_bodies[i].poses[layer_id]->getVertices(), true);
 			}
 		}
 
@@ -739,15 +676,13 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->isSelected()) {
-					moving_bodies[i].parts[j].poses[layer_id]->rotate(theta);
+			if (moving_bodies[i].poses[layer_id]->isSelected()) {
+				moving_bodies[i].poses[layer_id]->rotate(theta);
 
-					// update 3D geometry
-					QString obj_name = QString("moving_body_%1_%2").arg(i).arg(j);
-					renderManager.removeObject(obj_name);
-					renderManager.addObject(obj_name, "", moving_bodies[i].parts[j].poses[layer_id]->getVertices(), true);
-				}
+				// update 3D geometry
+				QString obj_name = QString("moving_body_%1").arg(i);
+				renderManager.removeObject(obj_name);
+				renderManager.addObject(obj_name, "", moving_bodies[i].poses[layer_id]->getVertices(), true);
 			}
 		}
 
@@ -775,18 +710,16 @@ namespace canvas {
 		}
 
 		for (int i = 0; i < moving_bodies.size(); i++) {
-			for (int j = 0; j < moving_bodies[i].parts.size(); j++) {
-				if (moving_bodies[i].parts[j].poses[layer_id]->isSelected()) {
-					// resize the shape for all the layers in order to make the size of the shape the same across the layers
-					for (int k = 0; k < moving_bodies[i].parts[j].poses.size(); k++) {
-						moving_bodies[i].parts[j].poses[k]->resize(resize_scale, resize_center);
-					}
-
-					// update 3D geometry
-					QString obj_name = QString("moving_body_%1_%2").arg(i).arg(j);
-					renderManager.removeObject(obj_name);
-					renderManager.addObject(obj_name, "", moving_bodies[i].parts[j].poses[layer_id]->getVertices(), true);
+			if (moving_bodies[i].poses[layer_id]->isSelected()) {
+				// resize the shape for all the layers in order to make the size of the shape the same across the layers
+				for (int k = 0; k < moving_bodies[i].poses.size(); k++) {
+					moving_bodies[i].poses[k]->resize(resize_scale, resize_center);
 				}
+
+				// update 3D geometry
+				QString obj_name = QString("moving_body_%1").arg(i);
+				renderManager.removeObject(obj_name);
+				renderManager.addObject(obj_name, "", moving_bodies[i].poses[layer_id]->getVertices(), true);
 			}
 		}
 

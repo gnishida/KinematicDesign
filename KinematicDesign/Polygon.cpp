@@ -40,7 +40,6 @@ namespace canvas {
 			else if (params_node.toElement().tagName() == "point") {
 				double x = params_node.toElement().attribute("x").toDouble();
 				double y = params_node.toElement().attribute("y").toDouble();
-
 				if (points.size() == 0 || points.back() != glm::dvec2(x, y)) {
 					points.push_back(glm::dvec2(x, y));
 				}

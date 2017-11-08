@@ -4,32 +4,30 @@
         <params width="67.52376193700022" height="-2.281689949296734"/>
     </fixed_body>
     <moving_body>
-    	<part>
-	        <shape type="rectangle">
-	            <pose x="8.399999999999999" y="10.4" theta="0"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose x="15.75307999925125" y="6.635448633158675" theta="0.02900167323461722"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose x="23.90048564278323" y="11.00346784592804" theta="0.361161995504272"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose x="22.17995730186216" y="14.34686035802784" theta="0.7586626903080851"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose x="17.91199322846784" y="15.94203451414259" theta="-4.961009056011712"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose x="12.61818756779844" y="15.25966971714668" theta="-4.718024306759709"/>
-	            <params width="11.3" height="-3.4"/>
-	        </shape>
-	    </part>
+        <shape type="rectangle">
+            <pose x="8.399999999999999" y="10.4" theta="0"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
+        <shape type="rectangle">
+            <pose x="15.75307999925125" y="6.635448633158675" theta="0.02900167323461722"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
+        <shape type="rectangle">
+            <pose x="23.90048564278323" y="11.00346784592804" theta="0.361161995504272"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
+        <shape type="rectangle">
+            <pose x="22.17995730186216" y="14.34686035802784" theta="0.7586626903080851"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
+        <shape type="rectangle">
+            <pose x="17.91199322846784" y="15.94203451414259" theta="-4.961009056011712"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
+        <shape type="rectangle">
+            <pose x="12.61818756779844" y="15.25966971714668" theta="-4.718024306759709"/>
+            <params width="11.3" height="-3.4"/>
+        </shape>
         <linkage_region type="polygon">
             <pose x="0.9456304462133782" y="27.49186543749306" theta="0"/>
             <point x="-1.509872111543489e-014" y="6.675215935558754e-015"/>

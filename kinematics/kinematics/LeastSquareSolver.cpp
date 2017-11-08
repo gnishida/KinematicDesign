@@ -5,13 +5,15 @@ namespace kinematics {
 
 	SolverForLink::SolverForLink(const std::vector<glm::dmat3x3>& poses) {
 		this->poses = poses;
+		inv_pose0 = glm::inverse(poses[0]);
 	}
 
 	double SolverForLink::operator() (const column_vector& arg) const {
 		glm::dvec2 A0(arg(0, 0), arg(1, 0));
-		glm::dvec2 a(arg(2, 0), arg(3, 0));
+		glm::dvec2 A1(arg(2, 0), arg(3, 0));
 
-		glm::dvec2 A1(poses[0] * glm::dvec3(a, 1));
+		//glm::dvec2 A1(poses[0] * glm::dvec3(a, 1));
+		glm::dvec2 a(inv_pose0 * glm::dvec3(A1, 1));
 		double l1_squared = glm::length(A1 - A0);
 		l1_squared = l1_squared * l1_squared;
 
@@ -28,6 +30,7 @@ namespace kinematics {
 
 	SolverForSlider::SolverForSlider(const std::vector<glm::dmat3x3>& poses) {
 		this->poses = poses;
+		inv_pose0 = glm::inverse(poses[0]);
 	}
 
 	double SolverForSlider::operator() (const column_vector& arg) const {
@@ -51,8 +54,9 @@ namespace kinematics {
 		return ans;
 	}
 
-	SolverForWattI::SolverForWattI(const std::vector<std::vector<glm::dmat3x3>>& poses) {
+	SolverForWattI::SolverForWattI(const std::vector<glm::dmat3x3>& poses) {
 		this->poses = poses;
+		inv_pose0 = glm::inverse(poses[0]);
 	}
 
 	double SolverForWattI::operator() (const column_vector& arg) const {

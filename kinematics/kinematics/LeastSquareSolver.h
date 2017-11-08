@@ -14,6 +14,7 @@ namespace kinematics {
 
 	private:
 		std::vector<glm::dmat3x3> poses;
+		glm::dmat3x3 inv_pose0;
 	};
 
 	class SolverForSlider {
@@ -23,15 +24,17 @@ namespace kinematics {
 
 	private:
 		std::vector<glm::dmat3x3> poses;
+		glm::dmat3x3 inv_pose0;
 	};
 
 	class SolverForWattI {
 	public:
-		SolverForWattI(const std::vector<std::vector<glm::dmat3x3>>& poses);
+		SolverForWattI(const std::vector<glm::dmat3x3>& poses);
 		double operator() (const column_vector& arg) const;
 
 	private:
-		std::vector<std::vector<glm::dmat3x3>> poses;
+		std::vector<glm::dmat3x3> poses;
+		glm::dmat3x3 inv_pose0;
 	};
 
 }

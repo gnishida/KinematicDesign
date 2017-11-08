@@ -149,9 +149,9 @@
     <ClCompile Include="..\kinematics\kinematics\KinematicUtils.cpp" />
     <ClCompile Include="..\kinematics\kinematics\LeastSquareSolver.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Link.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis.cpp" />
     <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis4R.cpp" />
     <ClCompile Include="..\kinematics\kinematics\LinkageSynthesisRRRP.cpp" />
-    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesisWattI.cpp" />
     <ClCompile Include="..\kinematics\kinematics\PinJoint.cpp" />
     <ClCompile Include="..\kinematics\kinematics\SliderHinge.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Solution.cpp" />
@@ -277,7 +277,6 @@
     <ClInclude Include="..\kinematics\kinematics\LinkageSynthesis.h" />
     <ClInclude Include="..\kinematics\kinematics\LinkageSynthesis4R.h" />
     <ClInclude Include="..\kinematics\kinematics\LinkageSynthesisRRRP.h" />
-    <ClInclude Include="..\kinematics\kinematics\LinkageSynthesisWattI.h" />
     <ClInclude Include="..\kinematics\kinematics\PinJoint.h" />
     <ClInclude Include="..\kinematics\kinematics\SliderHinge.h" />
     <ClInclude Include="..\kinematics\kinematics\Solution.h" />

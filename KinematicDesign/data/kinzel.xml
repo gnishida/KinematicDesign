@@ -9,28 +9,26 @@
         <point y="0" x="-3.767997063328611"/>
     </fixed_body>
     <moving_body>
-    	<part>
-	        <shape type="rectangle">
-	            <pose theta="0.087266" y="9" x="10"/>
-	            <params width="2.224650053129642" height="3.911408597380799"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose theta="0.6108652" y="30" x="9"/>
-	            <params width="2.224650053129642" height="3.911408597380799"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose theta="0.08726646" y="32" x="18"/>
-	            <params width="2.224650053129642" height="3.911408597380799"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose theta="-0.78539816339" y="25" x="22"/>
-	            <params width="2.224650053129642" height="3.911408597380799"/>
-	        </shape>
-	        <shape type="rectangle">
-	            <pose theta="-1.22173" y="22" x="13"/>
-	            <params width="2.224650053129642" height="3.911408597380799"/>
-	        </shape>
-	    </part>
+        <shape type="rectangle">
+            <pose theta="0.087266" y="9" x="10"/>
+            <params width="2.224650053129642" height="3.911408597380799"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0.6108652" y="30" x="9"/>
+            <params width="2.224650053129642" height="3.911408597380799"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0.08726646" y="32" x="18"/>
+            <params width="2.224650053129642" height="3.911408597380799"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="-0.78539816339" y="25" x="22"/>
+            <params width="2.224650053129642" height="3.911408597380799"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="-1.22173" y="22" x="13"/>
+            <params width="2.224650053129642" height="3.911408597380799"/>
+        </shape>
         <linkage_region type="polygon">
             <pose theta="0" y="41.671187249297" x="-3.998845779926546"/>
             <point y="1.61259894326804e-014" x="8.604228440844963e-016"/>

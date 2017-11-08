@@ -179,7 +179,7 @@
     <ClCompile Include="..\kinematics\kinematics\clipper.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesisWattI.cpp">
+    <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -325,9 +325,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\clipper.hpp">
-      <Filter>Source Files\kinematics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kinematics\kinematics\LinkageSynthesisWattI.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>

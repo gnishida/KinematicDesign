@@ -30,32 +30,30 @@
         <params height="-0.7" width="63.4"/>
     </fixed_body>
     <moving_body>
-    	<part>
-	        <shape type="polygon">
-	            <pose x="44.1" theta="0" y="7.6"/>
-	            <point x="0" y="0"/>
-	            <point x="3" y="-7.4"/>
-	            <point x="10.6" y="-7.4"/>
-	            <point x="10.6" y="0.3000000000000007"/>
-	            <point x="0" y="0.3000000000000007"/>
-	        </shape>
-	        <shape type="polygon">
-	            <pose x="40.86870155416621" theta="0.03807682558980408" y="21.69566842234605"/>
-	            <point x="0" y="0"/>
-	            <point x="3" y="-7.4"/>
-	            <point x="10.6" y="-7.4"/>
-	            <point x="10.6" y="0.3000000000000007"/>
-	            <point x="0" y="0.3000000000000007"/>
-	        </shape>
-	        <shape type="polygon">
-	            <pose x="31.83161642310222" theta="1.362699173493227" y="19.79776780767996"/>
-	            <point x="0" y="0"/>
-	            <point x="3" y="-7.4"/>
-	            <point x="10.6" y="-7.4"/>
-	            <point x="10.6" y="0.3000000000000007"/>
-	            <point x="0" y="0.3000000000000007"/>
-	        </shape>
-	    </part>
+        <shape type="polygon">
+            <pose x="44.1" theta="0" y="7.6"/>
+            <point x="0" y="0"/>
+            <point x="3" y="-7.4"/>
+            <point x="10.6" y="-7.4"/>
+            <point x="10.6" y="0.3000000000000007"/>
+            <point x="0" y="0.3000000000000007"/>
+        </shape>
+        <shape type="polygon">
+            <pose x="40.86870155416621" theta="0.03807682558980408" y="21.69566842234605"/>
+            <point x="0" y="0"/>
+            <point x="3" y="-7.4"/>
+            <point x="10.6" y="-7.4"/>
+            <point x="10.6" y="0.3000000000000007"/>
+            <point x="0" y="0.3000000000000007"/>
+        </shape>
+        <shape type="polygon">
+            <pose x="31.83161642310222" theta="1.362699173493227" y="19.79776780767996"/>
+            <point x="0" y="0"/>
+            <point x="3" y="-7.4"/>
+            <point x="10.6" y="-7.4"/>
+            <point x="10.6" y="0.3000000000000007"/>
+            <point x="0" y="0.3000000000000007"/>
+        </shape>
         <linkage_region type="polygon">
             <pose x="29" theta="0" y="4.5"/>
             <point x="0" y="0"/>
