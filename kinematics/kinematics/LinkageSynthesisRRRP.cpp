@@ -23,8 +23,8 @@ namespace kinematics {
 		srand(0);
 
 		// calculate the center of the valid regions
-		BBox bbox_world = boundingBox(linkage_region_pts);
-		glm::dvec2 bbox_world_center = bbox_world.center();
+		BBox bbox = boundingBox(linkage_region_pts);
+		glm::dvec2 bbox_center = bbox.center();
 
 		int cnt = 0;
 		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
@@ -32,26 +32,15 @@ namespace kinematics {
 			// calculate the enlarged linkage region for the sampling region
 			std::vector<glm::dvec2> enlarged_linkage_region_pts;
 			for (int i = 0; i < linkage_region_pts.size(); i++) {
-				enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - bbox_world_center) * (double)scale + bbox_world_center);
+				enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - bbox_center) * (double)scale + bbox_center);
 			}
 
 			// calculate the bounding boxe of the valid regions
-			BBox enlarged_bbox_world = boundingBox(enlarged_linkage_region_pts);
+			BBox enlarged_bbox = boundingBox(enlarged_linkage_region_pts);
 
 			// calculate the distace transform of the linkage region
-			cv::Mat img(enlarged_bbox_world.height() + 1, enlarged_bbox_world.width() + 1, CV_8U, cv::Scalar(255));
-			std::vector<std::vector<cv::Point>> pts(1);
-			for (int i = 0; i < linkage_region_pts.size(); i++) {
-				double x = linkage_region_pts[i].x - enlarged_bbox_world.minPt.x;
-				double y = linkage_region_pts[i].y - enlarged_bbox_world.minPt.y;
-				pts[0].push_back(cv::Point(x, y));
-			}
-			cv::fillPoly(img, pts, cv::Scalar(0), 4);
 			cv::Mat distMap;
-			cv::distanceTransform(img, distMap, CV_DIST_L2, 3);
-			//cv::imwrite("test2.png", img);
-			//cv::imwrite("test.png", distMap);
-			distMap.convertTo(distMap, CV_64F);
+			createDistanceMapForLinkageRegion(linkage_region_pts, enlarged_bbox, distMap);
 
 			for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
 				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples * 100 + iter + 1);
@@ -65,12 +54,12 @@ namespace kinematics {
 				std::vector<glm::dvec2> points(5);
 				for (int i = 0; i < points.size(); i++) {
 					while (true) {
-						points[i] = glm::dvec2(genRand(enlarged_bbox_world.minPt.x, enlarged_bbox_world.maxPt.x), genRand(enlarged_bbox_world.minPt.y, enlarged_bbox_world.maxPt.y));
+						points[i] = glm::dvec2(genRand(enlarged_bbox.minPt.x, enlarged_bbox.maxPt.x), genRand(enlarged_bbox.minPt.y, enlarged_bbox.maxPt.y));
 						if (withinPolygon(enlarged_linkage_region_pts, points[i])) break;
 					}
 				}
 
-				if (!optimizeCandidate(perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox_world, points)) continue;
+				if (!optimizeCandidate(perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, points)) continue;
 
 				// check hard constraints
 				std::vector<std::vector<int>> zorder;
@@ -83,11 +72,10 @@ namespace kinematics {
 				// calculate the distance of the joints from the user-specified linkage region
 				double dist = 0.0;
 				for (int i = 0; i < points.size(); i++) {
-					dist += distMap.at<double>(points[i].y - enlarged_bbox_world.minPt.y, points[i].x - enlarged_bbox_world.minPt.x);
+					dist += distMap.at<double>(points[i].y - enlarged_bbox.minPt.y, points[i].x - enlarged_bbox.minPt.x);
 				}
-				//dist /= points.size();
 
-				solutions.push_back(Solution(points, position_error, orientation_error, dist, perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox_world, zorder));
+				solutions.push_back(Solution(points, position_error, orientation_error, dist, perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, zorder));
 				cnt++;
 			}
 		}

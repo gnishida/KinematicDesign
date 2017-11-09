@@ -49,4 +49,24 @@ namespace kinematics {
 
 		return perturbed_poses;
 	}
+
+	/**
+	 * Create a distance map for the linkage region.
+	 */
+	void LinkageSynthesis::createDistanceMapForLinkageRegion(const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, cv::Mat& distMap) {
+		cv::Mat img(bbox.height() + 1, bbox.width() + 1, CV_8U, cv::Scalar(255));
+
+		std::vector<std::vector<cv::Point>> pts(1);
+		for (int i = 0; i < linkage_region_pts.size(); i++) {
+			double x = linkage_region_pts[i].x - bbox.minPt.x;
+			double y = linkage_region_pts[i].y - bbox.minPt.y;
+			pts[0].push_back(cv::Point(x, y));
+		}
+		cv::fillPoly(img, pts, cv::Scalar(0), 4);
+		
+		cv::distanceTransform(img, distMap, CV_DIST_L2, 3);
+		//cv::imwrite("test2.png", img);
+		//cv::imwrite("test.png", distMap);
+		distMap.convertTo(distMap, CV_64F);
+	}
 }
