@@ -59,6 +59,22 @@ namespace kinematics {
 					}
 				}
 
+				// HACK: this indicates that the positions of the joint are random
+				//       for the particle filter, the initial joints are used to optimize, so we want to differentiate these two cases.
+				//points[1] = points[3];
+
+
+				//////////////////////////////////////////////////////////////////////////////////////////////
+				// DEBUG
+				/*
+				points[0] = glm::dvec2(26.5742, 14.5953);
+				points[1] = glm::dvec2(20.9969, 14.4981);
+				points[2] = glm::dvec2(31.4632, 11.8095);
+				points[3] = glm::dvec2(18.7982, 11.8076);
+				points[4] = glm::dvec2(11.6889, 3.10791);
+				*/
+				//////////////////////////////////////////////////////////////////////////////////////////////
+
 				if (!optimizeCandidate(perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, points)) continue;
 
 				// check hard constraints
@@ -186,31 +202,34 @@ namespace kinematics {
 		return true;
 	}
 
-	bool LinkageSynthesisRRRP::optimizeSlider(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox_world, glm::dvec2& A0, glm::dvec2& A1) {
-		// calculate the local coordinate of A1
-		glm::dvec2 a = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(A1, 1));
-		
+	bool LinkageSynthesisRRRP::optimizeSlider(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox_world, glm::dvec2& A0, glm::dvec2& A1) {		
 		// setup the initial parameters for optimization
-		column_vector starting_point(2);
-		column_vector lower_bound(2);
-		column_vector upper_bound(2);
-		starting_point(0, 0) = A1.x;
-		starting_point(1, 0) = A1.y;
+		column_vector starting_point(4);
+		column_vector lower_bound(4);
+		column_vector upper_bound(4);
+		starting_point(0, 0) = A0.x;
+		starting_point(1, 0) = A0.y;
+		starting_point(2, 0) = A1.x;
+		starting_point(3, 0) = A1.y;
 		lower_bound(0, 0) = bbox_world.minPt.x;
 		lower_bound(1, 0) = bbox_world.minPt.y;
+		lower_bound(2, 0) = bbox_world.minPt.x;
+		lower_bound(3, 0) = bbox_world.minPt.y;
 		upper_bound(0, 0) = bbox_world.maxPt.x;
 		upper_bound(1, 0) = bbox_world.maxPt.y;
+		upper_bound(2, 0) = bbox_world.maxPt.x;
+		upper_bound(3, 0) = bbox_world.maxPt.y;
 
 		double min_range = std::numeric_limits<double>::max();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 4; i++) {
 			min_range = std::min(min_range, upper_bound(i, 0) - lower_bound(i, 0));
 		}
 
 		try {
-			find_min_bobyqa(SolverForSlider(poses), starting_point, 5, lower_bound, upper_bound, min_range * 0.19, min_range * 0.0001, 1000);
+			find_min_bobyqa(SolverForSlider(poses), starting_point, 14, lower_bound, upper_bound, min_range * 0.19, min_range * 0.0001, 1000);
 
-			A1.x = starting_point(0, 0);
-			A1.y = starting_point(1, 0);
+			A1.x = starting_point(2, 0);
+			A1.y = starting_point(3, 0);
 
 			// if the moving point is outside the valid region, discard it.
 			if (!withinPolygon(linkage_region_pts, A1)) return false;
@@ -218,6 +237,9 @@ namespace kinematics {
 		catch (std::exception& e) {
 			//std::cout << e.what() << std::endl;
 		}
+
+		// calculate the local coordinate of A1
+		glm::dvec2 a = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(A1, 1));
 
 		glm::dvec2 v1 = glm::dvec2(poses[1] * glm::dvec3(a, 1)) - A1;
 		double l1 = glm::length(v1);
@@ -240,7 +262,7 @@ namespace kinematics {
 		A0 = A1 - v1;
 
 		// if the sampled point is outside the valid region, discard it.
-		//if (!withinPolygon(linkage_region_pts, A0)) return false;
+		if (!withinPolygon(linkage_region_pts, A0)) return false;
 
 		return true;
 	}
