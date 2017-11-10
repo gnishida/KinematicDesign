@@ -61,9 +61,6 @@ namespace kinematics {
 				std::vector<std::vector<int>> zorder;
 				if (!checkHardConstraints(points, perturbed_poses, enlarged_linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, zorder)) continue;
 
-				// collision check for the main body
-				//if (checkCollision(perturbed_poses, { A0, B0, A1, B1 }, fixed_body_pts, body_pts[0], 1)) continue;
-
 				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, zorder));
 				cnt++;
 			}
@@ -246,6 +243,7 @@ namespace kinematics {
 		if (checkOrderDefect(poses, points)) return false;
 
 		// collision check for the main body
+		// body_pts[0] means the main body without the joint connectors
 		if (checkCollision(poses, points, fixed_body_pts, body_pts[0], linkage_avoidance_pts, 2)) return false;
 
 		// record collision between connectors

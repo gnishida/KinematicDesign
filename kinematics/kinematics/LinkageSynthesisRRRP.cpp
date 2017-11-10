@@ -77,10 +77,6 @@ namespace kinematics {
 				std::vector<std::vector<int>> zorder;
 				if (!checkHardConstraints(points, perturbed_poses, enlarged_linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, zorder)) continue;
 				
-				// collision check again
-				// beucase B2 (the other end of the bar) is added to the linkage.
-				//if (checkCollision(perturbed_poses, { A0, B0, A1, B1, B2 }, fixed_body_pts, body_pts[0], slider_end_pos1, slider_end_pos2, 1)) continue;
-
 				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, zorder));
 				cnt++;
 			}
@@ -328,6 +324,7 @@ namespace kinematics {
 		if (checkCircuitDefect(poses, points)) return false;
 
 		// collision check
+		// body_pts[0] means the main body without the joint connectors
 		glm::dvec2 slider_end_pos1, slider_end_pos2;
 		if (checkCollision(poses, points, fixed_body_pts, body_pts[0], linkage_avoidance_pts, slider_end_pos1, slider_end_pos2, 2)) return false;
 
@@ -338,7 +335,7 @@ namespace kinematics {
 		if (!withinPolygon(linkage_region_pts, points[4])) return false;
 
 		// record collision between connectors
-		Kinematics kin = recordCollisionForConnectors(poses, points, fixed_body_pts, body_pts[0]);
+		Kinematics kin = recordCollisionForConnectors(poses, points, fixed_body_pts, body_pts);
 
 		// determine the z-order of links and connectors
 		try {
