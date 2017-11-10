@@ -86,6 +86,8 @@ namespace kinematics {
 	}
 
 	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+		BBox linkage_region_bbox = boundingBox(linkage_region_pts);
+
 		std::vector<std::pair<double, Solution>> particles(solutions.size());
 
 		// sort the solutions by the cost
@@ -121,7 +123,7 @@ namespace kinematics {
 					new_particles[i].second.points[j].y += genRand(-1, 1);
 				}
 
-				optimizeCandidate(new_particles[i].second.poses, new_particles[i].second.linkage_region, new_particles[i].second.linkage_region_bbox, new_particles[i].second.points);
+				optimizeCandidate(new_particles[i].second.poses, linkage_region_pts, linkage_region_bbox, new_particles[i].second.points);
 
 				// check the hard constraints
 				if (checkHardConstraints(new_particles[i].second.points, new_particles[i].second.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].second.zorder)) {

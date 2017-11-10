@@ -17,7 +17,7 @@ namespace kinematics {
 	* @param solutions1	the output solutions for the world coordinates of the driving crank at the first pose, each of which contains a pair of the center point and the circle point
 	* @param solutions2	the output solutions for the world coordinates of the follower at the first pose, each of which contains a pair of the center point and the circle point
 	*/
-	void LinkageSynthesis4R::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions) {
+	void LinkageSynthesis4R::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions, std::vector<glm::dvec2>& enlarged_linkage_region_pts) {
 		solutions.clear();
 
 		srand(0);
@@ -30,17 +30,13 @@ namespace kinematics {
 		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
 		//for (int scale = 1; scale <= 3 && cnt < num_samples; scale++) {
 			// calculate the enlarged linkage region for the sampling region
-			std::vector<glm::dvec2> enlarged_linkage_region_pts;
+			enlarged_linkage_region_pts.clear();
 			for (int i = 0; i < linkage_region_pts.size(); i++) {
 				enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - bbox_center) * (double)scale + bbox_center);
 			}
 
 			// calculate the bounding boxe of the valid regions
 			BBox enlarged_bbox = boundingBox(enlarged_linkage_region_pts);
-
-			// calculate the distace transform of the linkage region
-			//cv::Mat distMap;
-			//createDistanceMapForLinkageRegion(linkage_region_pts, enlarged_bbox, distMap);
 
 			for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
 				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples * 100 + iter + 1);
@@ -68,15 +64,7 @@ namespace kinematics {
 				// collision check for the main body
 				//if (checkCollision(perturbed_poses, { A0, B0, A1, B1 }, fixed_body_pts, body_pts[0], 1)) continue;
 
-				// calculate the distance of the joints from the user-specified linkage region
-				/*
-				double dist = 0.0;
-				for (int i = 0; i < points.size(); i++) {
-					dist += dist_map.at<double>(points[i].y - dist_map_bbox.minPt.y, points[i].x - dist_map_bbox.minPt.x);
-				}
-				*/
-
-				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, zorder));
+				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, zorder));
 				cnt++;
 			}
 		}
