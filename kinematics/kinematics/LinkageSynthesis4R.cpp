@@ -39,8 +39,8 @@ namespace kinematics {
 			BBox enlarged_bbox = boundingBox(enlarged_linkage_region_pts);
 
 			// calculate the distace transform of the linkage region
-			cv::Mat distMap;
-			createDistanceMapForLinkageRegion(linkage_region_pts, enlarged_bbox, distMap);
+			//cv::Mat distMap;
+			//createDistanceMapForLinkageRegion(linkage_region_pts, enlarged_bbox, distMap);
 
 			for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
 				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples * 100 + iter + 1);
@@ -69,12 +69,14 @@ namespace kinematics {
 				//if (checkCollision(perturbed_poses, { A0, B0, A1, B1 }, fixed_body_pts, body_pts[0], 1)) continue;
 
 				// calculate the distance of the joints from the user-specified linkage region
+				/*
 				double dist = 0.0;
 				for (int i = 0; i < points.size(); i++) {
-					dist += distMap.at<double>(points[i].y - enlarged_bbox.minPt.y, points[i].x - enlarged_bbox.minPt.x);
+					dist += dist_map.at<double>(points[i].y - dist_map_bbox.minPt.y, points[i].x - dist_map_bbox.minPt.x);
 				}
+				*/
 
-				solutions.push_back(Solution(points, position_error, orientation_error, dist, perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, zorder));
+				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, zorder));
 				cnt++;
 			}
 		}
@@ -85,7 +87,7 @@ namespace kinematics {
 	 * Optimize the linkage parameters based on the rigidity constraints.
 	 * If it fails to optimize, return false.
 	 */
-	bool LinkageSynthesis4R::optimizeCandidate(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox_world, std::vector<glm::dvec2>& points) {
+	bool LinkageSynthesis4R::optimizeCandidate(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, std::vector<glm::dvec2>& points) {
 		if (poses.size() == 2) {
 			if (!optimizeLinkForTwoPoses(poses, linkage_region_pts, points[0], points[2])) return false;
 			if (!optimizeLinkForTwoPoses(poses, linkage_region_pts, points[1], points[3])) return false;
@@ -95,36 +97,36 @@ namespace kinematics {
 			if (!optimizeLinkForThreePoses(poses, linkage_region_pts, points[1], points[3])) return false;
 		}
 		else {
-			if (!optimizeLink(poses, linkage_region_pts, bbox_world, points[0], points[2])) return false;
-			if (!optimizeLink(poses, linkage_region_pts, bbox_world, points[1], points[3])) return false;
+			if (!optimizeLink(poses, linkage_region_pts, bbox, points[0], points[2])) return false;
+			if (!optimizeLink(poses, linkage_region_pts, bbox, points[1], points[3])) return false;
 		}
 
 		return true;
 	}
 
-	bool LinkageSynthesis4R::optimizeLink(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox_world, glm::dvec2& A0, glm::dvec2& A1) {
+	bool LinkageSynthesis4R::optimizeLink(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, glm::dvec2& A0, glm::dvec2& A1) {
 		// setup the initial parameters for optimization
 		column_vector starting_point(4);
-		column_vector lower_bound(4);
-		column_vector upper_bound(4);
 		starting_point(0, 0) = A0.x;
 		starting_point(1, 0) = A0.y;
 		starting_point(2, 0) = A1.x;
 		starting_point(3, 0) = A1.y;
-		lower_bound(0, 0) = bbox_world.minPt.x;
-		lower_bound(1, 0) = bbox_world.minPt.y;
-		lower_bound(2, 0) = bbox_world.minPt.x;
-		lower_bound(3, 0) = bbox_world.minPt.y;
-		upper_bound(0, 0) = bbox_world.maxPt.x;
-		upper_bound(1, 0) = bbox_world.maxPt.y;
-		upper_bound(2, 0) = bbox_world.maxPt.x;
-		upper_bound(3, 0) = bbox_world.maxPt.y;
 
+		column_vector lower_bound(4);
+		column_vector upper_bound(4);
 		double min_range = std::numeric_limits<double>::max();
 		for (int i = 0; i < 4; i++) {
+			// set the lower bound
+			lower_bound(i, 0) = i % 2 == 0 ? bbox.minPt.x : bbox.minPt.y;
+			lower_bound(i, 0) = std::min(lower_bound(i, 0), starting_point(i, 0));
+
+			// set the upper bound
+			upper_bound(i, 0) = i % 2 == 0 ? bbox.maxPt.x : bbox.maxPt.y;
+			upper_bound(i, 0) = std::max(upper_bound(i, 0), starting_point(i, 0));
+
 			min_range = std::min(min_range, upper_bound(i, 0) - lower_bound(i, 0));
 		}
-
+		
 		try {
 			find_min_bobyqa(SolverForLink(poses), starting_point, 14, lower_bound, upper_bound, min_range * 0.19, min_range * 0.0001, 1000);
 
@@ -186,77 +188,26 @@ namespace kinematics {
 		return true;
 	}
 
-	Solution LinkageSynthesis4R::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+	Solution LinkageSynthesis4R::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
 		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
-			std::vector<std::pair<double, Solution>> particles(solutions.size());
-
-			// sort the solutions by the cost
-			for (int i = 0; i < solutions.size(); i++) {
-				double cost = calculateCost(solutions[i], body_pts, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
-				particles[i] = std::make_pair(cost, solutions[i]);
-			}
-			std::sort(particles.begin(), particles.end(), compare);
-
-			// select top 100 solutions as the initial points
-			if (particles.size() > 100) {
-				particles.resize(100);
-			}
-			else {
-				// if the number of solutions is less than 100, augment the solutions to make 100 initial points
-				int N = particles.size();
-				particles.resize(100);
-				int cnt = 0;
-				while (N + cnt < 100) {
-					particles[N + cnt] = particles[cnt % N];
-					cnt++;
-				}
-			}
-
-			// particle filter
-			for (int iter = 0; iter < 10; iter++) {
-				// perturb the particles and calculate its score
-				std::vector<std::pair<double, Solution>> new_particles = particles;
-				for (int i = 0; i < new_particles.size(); i++) {
-					// pertube the joints
-					for (int j = 0; j < new_particles[i].second.points.size(); j++) {
-						new_particles[i].second.points[j].x += genNormal(0, 1);
-						new_particles[i].second.points[j].y += genNormal(0, 1);
-					}
-
-					optimizeCandidate(new_particles[i].second.poses, new_particles[i].second.linkage_region, new_particles[i].second.linkage_region_bbox, new_particles[i].second.points);
-
-					// check the hard constraints
-					if (checkHardConstraints(new_particles[i].second.points, new_particles[i].second.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].second.zorder)) {
-						// calculate the score
-						double cost = calculateCost(new_particles[i].second, body_pts, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
-						new_particles[i] = std::make_pair(cost, new_particles[i].second);
-					}
-					else {
-						// for the invalid point, make the cost infinity so that it will be discarded.
-						new_particles[i] = std::make_pair(std::numeric_limits<double>::max(), new_particles[i].second);
-					}
-				}
-
-				// merge the particles
-				particles.insert(particles.end(), new_particles.begin(), new_particles.end());
-
-				// take the top 100 partciles
-				std::sort(particles.begin(), particles.end(), compare);
-				particles.resize(100);
-			}
-
-			// update solutions
-			solutions.resize(particles.size());
-			for (int i = 0; i < particles.size(); i++) {
-				solutions[i] = particles[i].second;
-			}
-			
+			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
 			return solutions[0];
 		}
 		else {
-			return Solution({ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, 0, poses, {}, BBox());
+			return Solution({ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, poses);
 		}
+	}
+
+	double LinkageSynthesis4R::calculateCost(Solution& solution, const Object25D& body_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+		double dist = 0;
+		for (int i = 0; i < solution.points.size(); i++) {
+			dist += dist_map.at<double>(solution.points[i].y - dist_map_bbox.minPt.y, solution.points[i].x - dist_map_bbox.minPt.x);
+		}
+		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, body_pts);
+		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]);
+
+		return solution.position_error * position_error_weight + solution.orientation_error * orientation_error_weight + dist * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 	}
 
 	/**
@@ -893,16 +844,6 @@ namespace kinematics {
 		}
 
 		return kinematics;
-	}
-
-	double LinkageSynthesis4R::calculateCost(const Solution& solution, const Object25D& body_pts, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
-		double position_error = solution.position_error;
-		double orientation_error = solution.orientation_error;
-		double linkage_location = solution.dist;
-		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, body_pts);
-		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]);
-		
-		return position_error * position_error_weight + orientation_error * orientation_error_weight + linkage_location * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
 	}
 
 	double LinkageSynthesis4R::tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const Object25D& body_pts) {

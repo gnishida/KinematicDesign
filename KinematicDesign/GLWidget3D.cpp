@@ -836,6 +836,11 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 			//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
 		}
 
+		// calculate a distance mapt for the linkage region
+		cv::Mat dist_map;
+		kinematics::BBox dist_map_bbox;
+		synthesis->createDistanceMapForLinkageRegion(linkage_region_pts[i], 5, dist_map_bbox, dist_map);
+
 		// calculate the circle point curve and center point curve
 		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 0.5, solutions[i]);
 
@@ -854,7 +859,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], linkage_region_pts[i], linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], linkage_region_pts[i], dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight);
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
 
 		kinematics.push_back(kin);

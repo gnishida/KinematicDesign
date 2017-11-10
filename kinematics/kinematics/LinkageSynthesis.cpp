@@ -53,20 +53,101 @@ namespace kinematics {
 	/**
 	 * Create a distance map for the linkage region.
 	 */
-	void LinkageSynthesis::createDistanceMapForLinkageRegion(const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, cv::Mat& distMap) {
-		cv::Mat img(bbox.height() + 1, bbox.width() + 1, CV_8U, cv::Scalar(255));
+	void LinkageSynthesis::createDistanceMapForLinkageRegion(const std::vector<glm::dvec2>& linkage_region_pts, double scale, BBox& dist_map_bbox, cv::Mat& dist_map) {
+		// calculate the center of the linkage region
+		BBox bbox = boundingBox(linkage_region_pts);
+		glm::dvec2 center = bbox.center();
+
+		// calculate the enlarged linkage region for the sampling region
+		std::vector<glm::dvec2> enlarged_linkage_region_pts;
+		for (int i = 0; i < linkage_region_pts.size(); i++) {
+			enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - center) * (double)scale + center);
+		}
+
+		// calculate the bounding box for the distance map
+		dist_map_bbox = boundingBox(enlarged_linkage_region_pts);
+
+		cv::Mat img(dist_map_bbox.height() + 1, dist_map_bbox.width() + 1, CV_8U, cv::Scalar(255));
 
 		std::vector<std::vector<cv::Point>> pts(1);
 		for (int i = 0; i < linkage_region_pts.size(); i++) {
-			double x = linkage_region_pts[i].x - bbox.minPt.x;
-			double y = linkage_region_pts[i].y - bbox.minPt.y;
+			double x = linkage_region_pts[i].x - dist_map_bbox.minPt.x;
+			double y = linkage_region_pts[i].y - dist_map_bbox.minPt.y;
 			pts[0].push_back(cv::Point(x, y));
 		}
 		cv::fillPoly(img, pts, cv::Scalar(0), 4);
 		
-		cv::distanceTransform(img, distMap, CV_DIST_L2, 3);
+		cv::distanceTransform(img, dist_map, CV_DIST_L2, 3);
 		//cv::imwrite("test2.png", img);
-		//cv::imwrite("test.png", distMap);
-		distMap.convertTo(distMap, CV_64F);
+		//cv::imwrite("test.png", dist_map);
+
+		// convert float type to double type
+		dist_map.convertTo(dist_map, CV_64F);
 	}
+
+	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+		std::vector<std::pair<double, Solution>> particles(solutions.size());
+
+		// sort the solutions by the cost
+		for (int i = 0; i < solutions.size(); i++) {
+			double cost = calculateCost(solutions[i], body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
+			particles[i] = std::make_pair(cost, solutions[i]);
+		}
+		std::sort(particles.begin(), particles.end(), compare);
+
+		// select top 100 solutions as the initial points
+		if (particles.size() > 100) {
+			particles.resize(100);
+		}
+		else {
+			// if the number of solutions is less than 100, augment the solutions to make 100 initial points
+			int N = particles.size();
+			particles.resize(100);
+			int cnt = 0;
+			while (N + cnt < 100) {
+				particles[N + cnt] = particles[cnt % N];
+				cnt++;
+			}
+		}
+
+		// particle filter
+		for (int iter = 0; iter < 10; iter++) {
+			// perturb the particles and calculate its score
+			std::vector<std::pair<double, Solution>> new_particles = particles;
+			for (int i = 0; i < new_particles.size(); i++) {
+				// pertube the joints
+				for (int j = 0; j < new_particles[i].second.points.size(); j++) {
+					new_particles[i].second.points[j].x += genRand(-1, 1);
+					new_particles[i].second.points[j].y += genRand(-1, 1);
+				}
+
+				optimizeCandidate(new_particles[i].second.poses, new_particles[i].second.linkage_region, new_particles[i].second.linkage_region_bbox, new_particles[i].second.points);
+
+				// check the hard constraints
+				if (checkHardConstraints(new_particles[i].second.points, new_particles[i].second.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].second.zorder)) {
+					// calculate the score
+					double cost = calculateCost(new_particles[i].second, body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
+					new_particles[i] = std::make_pair(cost, new_particles[i].second);
+				}
+				else {
+					// for the invalid point, make the cost infinity so that it will be discarded.
+					new_particles[i] = std::make_pair(std::numeric_limits<double>::max(), new_particles[i].second);
+				}
+			}
+
+			// merge the particles
+			particles.insert(particles.end(), new_particles.begin(), new_particles.end());
+
+			// take the top 100 partciles
+			std::sort(particles.begin(), particles.end(), compare);
+			particles.resize(100);
+		}
+
+		// update solutions
+		solutions.resize(particles.size());
+		for (int i = 0; i < particles.size(); i++) {
+			solutions[i] = particles[i].second;
+		}
+	}
+
 }
