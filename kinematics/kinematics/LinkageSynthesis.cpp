@@ -1,4 +1,6 @@
 #include "LinkageSynthesis.h"
+#include <QFile>
+#include <QTextStream>
 
 namespace kinematics {
 
@@ -85,7 +87,7 @@ namespace kinematics {
 		dist_map.convertTo(dist_map, CV_64F);
 	}
 
-	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight, int num_particles, int num_iterations) {
 		BBox linkage_region_bbox = boundingBox(linkage_region_pts);
 
 		std::vector<std::pair<double, Solution>> particles(solutions.size());
@@ -97,23 +99,39 @@ namespace kinematics {
 		}
 		std::sort(particles.begin(), particles.end(), compare);
 
-		// select top 100 solutions as the initial points
-		if (particles.size() > 100) {
-			particles.resize(100);
+		// select top num_particles solutions as the initial points
+		if (particles.size() > num_particles) {
+			particles.resize(num_particles);
 		}
 		else {
 			// if the number of solutions is less than 100, augment the solutions to make 100 initial points
 			int N = particles.size();
-			particles.resize(100);
+			particles.resize(num_particles);
 			int cnt = 0;
-			while (N + cnt < 100) {
+			while (N + cnt < num_particles) {
 				particles[N + cnt] = particles[cnt % N];
 				cnt++;
 			}
 		}
 
+		/*
+		QFile file("particle_filter.txt");
+		file.open(QIODevice::WriteOnly);
+		QTextStream out(&file);
+		double min_val = std::numeric_limits<double>::max();
+		double max_val = 0;
+		for (int i = 0; i < particles.size(); i++) {
+			if (particles[i].first == std::numeric_limits<double>::max()) continue;
+
+			min_val = std::min(min_val, particles[i].first);
+			max_val = std::max(max_val, particles[i].first);
+		}
+		double avg_val = (min_val + max_val) * 0.5;
+		out << min_val << "," << avg_val << "," << max_val << "\n";
+		*/
+
 		// particle filter
-		for (int iter = 0; iter < 10; iter++) {
+		for (int iter = 0; iter < num_iterations; iter++) {
 			// perturb the particles and calculate its score
 			std::vector<std::pair<double, Solution>> new_particles = particles;
 			for (int i = 0; i < new_particles.size(); i++) {
@@ -140,10 +158,24 @@ namespace kinematics {
 			// merge the particles
 			particles.insert(particles.end(), new_particles.begin(), new_particles.end());
 
-			// take the top 100 partciles
+			// take the top num_particles partciles
 			std::sort(particles.begin(), particles.end(), compare);
-			particles.resize(100);
+			particles.resize(num_particles);
+
+			/*
+			min_val = std::numeric_limits<double>::max();
+			max_val = 0;
+			for (int i = 0; i < particles.size(); i++) {
+				if (particles[i].first == std::numeric_limits<double>::max()) continue;
+
+				min_val = std::min(min_val, particles[i].first);
+				max_val = std::max(max_val, particles[i].first);
+			}
+			avg_val = (min_val + max_val) * 0.5;
+			out << min_val << "," << avg_val << "," << max_val << "\n";
+			*/
 		}
+		//file.close();
 
 		// update solutions
 		solutions.resize(particles.size());
