@@ -54,6 +54,8 @@ public:
 	canvas::Design design;
 	canvas::History history;
 
+	boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
+
 	std::vector<kinematics::Kinematics> kinematics;
 	std::vector<kinematics::Solution> selected_solutions; // currently selected solution
 	std::vector<std::vector<kinematics::Solution>> solutions; // all the candidates

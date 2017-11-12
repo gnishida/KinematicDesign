@@ -820,21 +820,21 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 	kinematics.clear();
 
+	if (linkage_type == LINKAGE_4R) {
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
+	}
+	else if (linkage_type == LINKAGE_RRRP) {
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
+	}
+	else if (linkage_type == LINKAGE_WATT_I) {
+		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
+	}
+
 	solutions.resize(body_pts.size());
 	selected_solutions.resize(body_pts.size());
 	for (int i = 0; i < body_pts.size(); i++) {
 		time_t start = clock();
 
-		boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
-		if (linkage_type == LINKAGE_4R) {
-			synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
-		}
-		else if (linkage_type == LINKAGE_RRRP) {
-			synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
-		}
-		else if (linkage_type == LINKAGE_WATT_I) {
-			//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
-		}
 
 		// calculate a distance mapt for the linkage region
 		cv::Mat dist_map;
@@ -860,7 +860,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight, 100, 500);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight, 100, 10);
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
 
 		kinematics.push_back(kin);
@@ -919,17 +919,6 @@ void GLWidget3D::constructKinematics() {
 		else {
 			linkage_avoidance_pts.push_back({});
 		}
-	}
-
-	boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
-	if (linkage_type == LINKAGE_4R) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
-	}
-	else if (linkage_type == LINKAGE_RRRP) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
-	}
-	else if (linkage_type == LINKAGE_WATT_I) {
-		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
 	}
 
 	// construct kinamtics
@@ -1483,17 +1472,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 
 					//updateDefectFlag(solutions[linkage_id][selectedSolution].poses, kinematics[linkage_id]);
 				}
-			}
-
-			boost::shared_ptr<kinematics::LinkageSynthesis> synthesis;
-			if (linkage_type == LINKAGE_4R) {
-				synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
-			}
-			else if (linkage_type == LINKAGE_RRRP) {
-				synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
-			}
-			else if (linkage_type == LINKAGE_WATT_I) {
-				//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
 			}
 
 			// update the geometry
