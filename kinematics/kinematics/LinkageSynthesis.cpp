@@ -4,6 +4,20 @@
 
 namespace kinematics {
 
+	void LinkageSynthesis::calculateStatistics(const std::vector<double>& values, double& mean, double& sd) {
+		double total = 0.0;
+		for (int i = 0; i < values.size(); i++) {
+			total += values[i];
+		}
+		mean = total / values.size();
+
+		double var = 0.0;
+		for (int i = 0; i < values.size(); i++) {
+			var += (values[i] - mean) * (values[i] - mean);
+		}
+		sd = std::sqrt(var / values.size());
+	}
+
 	bool LinkageSynthesis::compare(const std::pair<double, Solution>& s1, const std::pair<double, Solution>& s2) {
 		return s1.first < s2.first;
 	}
@@ -118,16 +132,16 @@ namespace kinematics {
 		QFile file("particle_filter.txt");
 		file.open(QIODevice::WriteOnly);
 		QTextStream out(&file);
-		double min_val = std::numeric_limits<double>::max();
-		double max_val = 0;
+		std::vector<double> values;
 		for (int i = 0; i < particles.size(); i++) {
 			if (particles[i].first == std::numeric_limits<double>::max()) continue;
 
-			min_val = std::min(min_val, particles[i].first);
-			max_val = std::max(max_val, particles[i].first);
+			values.push_back(particles[i].first);
 		}
-		double avg_val = (min_val + max_val) * 0.5;
-		out << min_val << "," << avg_val << "," << max_val << "\n";
+		double mean_val;
+		double sd_val;
+		calculateStatistics(values, mean_val, sd_val);
+		out << mean_val << "," << sd_val << "\n";
 		*/
 
 		// particle filter
@@ -163,16 +177,16 @@ namespace kinematics {
 			particles.resize(num_particles);
 
 			/*
-			min_val = std::numeric_limits<double>::max();
-			max_val = 0;
+			std::vector<double> values;
 			for (int i = 0; i < particles.size(); i++) {
 				if (particles[i].first == std::numeric_limits<double>::max()) continue;
 
-				min_val = std::min(min_val, particles[i].first);
-				max_val = std::max(max_val, particles[i].first);
+				values.push_back(particles[i].first);
 			}
-			avg_val = (min_val + max_val) * 0.5;
-			out << min_val << "," << avg_val << "," << max_val << "\n";
+			double mean_val;
+			double sd_val;
+			calculateStatistics(values, mean_val, sd_val);
+			out << mean_val << "," << sd_val << "\n";
 			*/
 		}
 		//file.close();

@@ -15,6 +15,7 @@ namespace kinematics {
 		LinkageSynthesis() {}
 
 	public:
+		static void calculateStatistics(const std::vector<double>& values, double& mean, double& sd);
 		static bool compare(const std::pair<double, Solution>& s1, const std::pair<double, Solution>& s2);
 		std::vector<glm::dmat3x3> perturbPoses(const std::vector<glm::dmat3x3>& poses, std::vector<std::pair<double, double>>& sigmas, double& position_error, double& orientation_error);
 		void createDistanceMapForLinkageRegion(const std::vector<glm::dvec2>& linkage_region_pts, double scale, BBox& dist_map_bbox, cv::Mat& dist_map);
