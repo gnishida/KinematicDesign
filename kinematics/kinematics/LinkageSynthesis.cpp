@@ -170,11 +170,37 @@ namespace kinematics {
 			}
 
 			// merge the particles
-			particles.insert(particles.end(), new_particles.begin(), new_particles.end());
+			new_particles.insert(new_particles.end(), particles.begin(), particles.end());
 
-			// take the top num_particles partciles
-			std::sort(particles.begin(), particles.end(), compare);
-			particles.resize(num_particles);
+			// calculate the weights of particles
+			std::vector<double> weights(new_particles.size());
+			double weight_total = 0.0;
+			for (int i = 0; i < new_particles.size(); i++) {
+				double w;
+				if (new_particles[i].first == std::numeric_limits<double>::max()) {
+					w = 0;
+				}
+				else {
+					w = std::exp(-new_particles[i].first * 10);
+				}
+				if (i == 0) {
+					weights[i] = w;
+				}
+				else {
+					weights[i] = weights[i - 1] + w;
+				}
+				weight_total += w;
+			}
+			for (int i = 0; i < new_particles.size(); i++) {
+				weights[i] /= weight_total;
+			}
+			
+			// resample the particles based on their weights
+			for (int i = 0; i < particles.size(); i++) {
+				double r = genRand();
+				auto it = std::lower_bound(weights.begin(), weights.end(), r);
+				particles[i] = new_particles[it - weights.begin()];
+			}
 
 			/*
 			std::vector<double> values;
@@ -190,6 +216,9 @@ namespace kinematics {
 			*/
 		}
 		//file.close();
+
+		// sort the particles based on the costs
+		sort(particles.begin(), particles.end(), compare);
 
 		// update solutions
 		solutions.resize(particles.size());
