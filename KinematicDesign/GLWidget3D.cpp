@@ -703,7 +703,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// In the future, this part of code should be moved to the class of each type of mechanism.
 				float z = kinematics[i].diagram.links[j]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
+				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z - kinematics::options->link_depth)), vertices);
 			}
 		}
 		else if (linkage_type == LINKAGE_RRRP) {
@@ -722,7 +722,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// In the future, this part of code should be moved to the class of each type of mechanism.
 				float z = kinematics[i].diagram.links[0]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->link_depth)), vertices);
+				glutils::drawPrism(pts, kinematics::options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z - kinematics::options->link_depth)), vertices);
 			}
 
 			// link 1
@@ -738,15 +738,15 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				// In the future, this part of code should be moved to the class of each type of mechanism.
 				float z = kinematics[i].diagram.links[1]->z * (kinematics::options->link_depth + kinematics::options->gap * 2 + kinematics::options->joint_cap_depth) - kinematics::options->link_depth;
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z - kinematics::options->slider_bar_depth)), vertices);
 
 				// end of bar
 				pts = kinematics::generateCirclePolygon(p1, kinematics::options->slider_width / 2);
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z - kinematics::options->slider_bar_depth)), vertices);
 				pts = kinematics::generateCirclePolygon(p2, kinematics::options->slider_width / 2);
 				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - kinematics::options->slider_bar_depth)), vertices);
+				glutils::drawPrism(pts, kinematics::options->slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z - kinematics::options->slider_bar_depth)), vertices);
 				
 				// slider
 				glm::dvec2& p3 = kinematics[i].diagram.links[1]->joints[1]->pos;
@@ -754,7 +754,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 				vec *= kinematics::options->slider_depth * 2;
 				std::vector<glm::dvec2> pts2 = kinematics::generateBarPolygon(glm::vec2(p3.x - vec.x, p3.y - vec.y), glm::vec2(p3.x + vec.x, p3.y + vec.y), kinematics::options->slider_width);
 				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z - (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5)), vertices);
-				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - kinematics::options->slider_depth)), vertices);
+				glutils::drawPrism(pts2, kinematics::options->slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -kinematics::options->body_depth - z + (kinematics::options->slider_depth - kinematics::options->slider_bar_depth) * 0.5 - kinematics::options->slider_depth)), vertices);
 			}
 		}
 		else if (linkage_type == LINKAGE_WATT_I) {
@@ -785,12 +785,12 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
-		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
+		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
 		poses[i].resize(design.moving_bodies[i].poses.size());
 
-		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0);
+		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
 
 		// set pose matrices
 		for (int j = 0; j < design.moving_bodies[i].poses.size(); j++) {
@@ -895,10 +895,10 @@ void GLWidget3D::constructKinematics() {
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
-		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -10, 0));
+		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
-		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -10, 0);
+		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
 		
 		if (design.moving_bodies[i].linkage_region) {
 			linkage_region_pts.push_back(design.moving_bodies[i].linkage_region->getPoints());

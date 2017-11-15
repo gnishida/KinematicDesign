@@ -28,6 +28,7 @@ namespace kinematics {
 		float slider_bar_depth;
 		float slider_width;
 		float slider_depth;
+		float body_depth;
 
 	protected:
 		Options() {
@@ -44,6 +45,7 @@ namespace kinematics {
 			slider_bar_depth = 0.3f;
 			slider_width = 1.0f;
 			slider_depth = 0.5f;
+			body_depth = 10.0f;
 		}
 
 	public:

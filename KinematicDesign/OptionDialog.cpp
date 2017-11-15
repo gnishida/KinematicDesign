@@ -121,6 +121,14 @@ float OptionDialog::getSliderDepth() {
 	return ui.lineEditSliderDepth->text().toFloat();
 }
 
+void OptionDialog::setBodyDepth(float body_depth) {
+	ui.lineEditBodyDepth->setText(QString::number(body_depth));
+}
+
+float OptionDialog::getBodyDepth() {
+	return ui.lineEditBodyDepth->text().toFloat();
+}
+
 void OptionDialog::onSmall() {
 	ui.lineEditBodyMargin->setText("0.3");
 	ui.lineEditGap->setText("0.04");

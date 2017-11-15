@@ -40,6 +40,8 @@ public:
 	float getSliderWidth();
 	void setSliderDepth(float slider_depth);
 	float getSliderDepth();
+	void setBodyDepth(float body_depth);
+	float getBodyDepth();
 
 public slots:
 	void onSmall();

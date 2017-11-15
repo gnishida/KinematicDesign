@@ -58,12 +58,15 @@ public:
     QLineEdit *lineEditBodyMargin;
     QPushButton *pushButtonOK;
     QPushButton *pushButtonCancel;
+    QGroupBox *groupBox_2;
+    QLabel *label_14;
+    QLineEdit *lineEditBodyDepth;
 
     void setupUi(QDialog *OptionDialog)
     {
         if (OptionDialog->objectName().isEmpty())
             OptionDialog->setObjectName(QStringLiteral("OptionDialog"));
-        OptionDialog->resize(291, 438);
+        OptionDialog->resize(291, 491);
         groupBox = new QGroupBox(OptionDialog);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setGeometry(QRect(20, 10, 251, 361));
@@ -159,10 +162,19 @@ public:
         lineEditBodyMargin->setGeometry(QRect(120, 90, 113, 20));
         pushButtonOK = new QPushButton(OptionDialog);
         pushButtonOK->setObjectName(QStringLiteral("pushButtonOK"));
-        pushButtonOK->setGeometry(QRect(30, 390, 101, 31));
+        pushButtonOK->setGeometry(QRect(20, 440, 101, 31));
         pushButtonCancel = new QPushButton(OptionDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
-        pushButtonCancel->setGeometry(QRect(160, 390, 101, 31));
+        pushButtonCancel->setGeometry(QRect(170, 440, 101, 31));
+        groupBox_2 = new QGroupBox(OptionDialog);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setGeometry(QRect(20, 380, 251, 51));
+        label_14 = new QLabel(groupBox_2);
+        label_14->setObjectName(QStringLiteral("label_14"));
+        label_14->setGeometry(QRect(10, 20, 71, 21));
+        lineEditBodyDepth = new QLineEdit(groupBox_2);
+        lineEditBodyDepth->setObjectName(QStringLiteral("lineEditBodyDepth"));
+        lineEditBodyDepth->setGeometry(QRect(120, 20, 113, 20));
         QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
         QWidget::setTabOrder(pushButtonCancel, pushButtonSmall);
         QWidget::setTabOrder(pushButtonSmall, pushButtonLarge);
@@ -207,6 +219,8 @@ public:
         label_13->setText(QApplication::translate("OptionDialog", "Body margin:", 0));
         pushButtonOK->setText(QApplication::translate("OptionDialog", "OK", 0));
         pushButtonCancel->setText(QApplication::translate("OptionDialog", "Cancel", 0));
+        groupBox_2->setTitle(QApplication::translate("OptionDialog", "Parameters for body", 0));
+        label_14->setText(QApplication::translate("OptionDialog", "Body depth:", 0));
     } // retranslateUi
 
 };

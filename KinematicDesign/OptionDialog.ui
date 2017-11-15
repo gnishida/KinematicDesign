@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>291</width>
-    <height>438</height>
+    <height>491</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -380,8 +380,8 @@
   <widget class="QPushButton" name="pushButtonOK">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>390</y>
+     <x>20</x>
+     <y>440</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -393,8 +393,8 @@
   <widget class="QPushButton" name="pushButtonCancel">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>390</y>
+     <x>170</x>
+     <y>440</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -402,6 +402,42 @@
    <property name="text">
     <string>Cancel</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>251</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Parameters for body</string>
+   </property>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Body depth:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditBodyDepth">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
