@@ -55,7 +55,7 @@
     </widget>
     <widget class="QMenu" name="menuMovingBody">
      <property name="title">
-      <string>MovingBody</string>
+      <string>Moving Body</string>
      </property>
      <addaction name="actionMovingRectangle"/>
      <addaction name="actionMovingCircle"/>

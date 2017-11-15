@@ -834,8 +834,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	selected_solutions.resize(body_pts.size());
 	for (int i = 0; i < body_pts.size(); i++) {
 		time_t start = clock();
-
-
+		
 		// calculate a distance mapt for the linkage region
 		cv::Mat dist_map;
 		kinematics::BBox dist_map_bbox;
@@ -861,7 +860,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		start = clock();
 
 		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight, 100, 10);
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
 
 		kinematics.push_back(kin);
 
@@ -1315,7 +1314,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 				setMouseTracking(true);
 			}
 		}
-		else if (mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_POLYGON) {
+		else if (mode == MODE_FIXED_POLYGON || mode == MODE_MOVING_POLYGON || mode == MODE_LINKAGE_REGION || mode == MODE_LINKAGE_AVOIDANCE) {
 			if (current_shape) {
 				current_shape->addPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())));
 			}
@@ -1327,34 +1326,9 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 				setMouseTracking(true);
 			}
 		}
-		else if (mode == MODE_LINKAGE_REGION) {
-			if (current_shape) {
-				current_shape->addPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())));
-			}
-			else {
-				// start drawing a polygon
-				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(screenToWorldCoordinates(e->x(), e->y())));
-				current_shape->startDrawing();
-				setMouseTracking(true);
-			}
-		}
-		else if (mode == MODE_LINKAGE_AVOIDANCE) {
-			if (current_shape) {
-				current_shape->addPoint(current_shape->localCoordinate(screenToWorldCoordinates(e->x(), e->y())));
-			}
-			else {
-				// start drawing a polygon
-				unselectAll();
-				current_shape = boost::shared_ptr<canvas::Shape>(new canvas::Polygon(screenToWorldCoordinates(e->x(), e->y())));
-				current_shape->startDrawing();
-				setMouseTracking(true);
-			}
-		}
 		else if (mode == MODE_KINEMATICS) {
 			// convert the mouse position to the world coordinate system
 			glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
-			//glm::dvec2 pt((e->x() - origin.x()) / scale, -(e->y() - origin.y()) / scale);
 
 			// select a joint to move
 			selectedJoint = std::make_pair(-1, -1);

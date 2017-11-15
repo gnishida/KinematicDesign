@@ -349,7 +349,7 @@ public:
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
         menuFixed_Body->setTitle(QApplication::translate("MainWindowClass", "Fixed Body", 0));
-        menuMovingBody->setTitle(QApplication::translate("MainWindowClass", "MovingBody", 0));
+        menuMovingBody->setTitle(QApplication::translate("MainWindowClass", "Moving Body", 0));
         menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
         menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", 0));
         menuKinematics->setTitle(QApplication::translate("MainWindowClass", "Kinematics", 0));
