@@ -106,27 +106,11 @@ namespace kinematics {
 
 		std::vector<std::pair<double, Solution>> particles(solutions.size());
 
-		// sort the solutions by the cost
 		for (int i = 0; i < solutions.size(); i++) {
 			double cost = calculateCost(solutions[i], body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
 			particles[i] = std::make_pair(cost, solutions[i]);
 		}
-		std::sort(particles.begin(), particles.end(), compare);
-
-		// select top num_particles solutions as the initial points
-		if (particles.size() > num_particles) {
-			particles.resize(num_particles);
-		}
-		else {
-			// if the number of solutions is less than 100, augment the solutions to make 100 initial points
-			int N = particles.size();
-			particles.resize(num_particles);
-			int cnt = 0;
-			while (N + cnt < num_particles) {
-				particles[N + cnt] = particles[cnt % N];
-				cnt++;
-			}
-		}
+		resample(particles, num_particles, particles);
 
 		/*
 		QFile file("particle_filter.txt");
@@ -155,13 +139,17 @@ namespace kinematics {
 					new_particles[i].second.points[j].y += genRand(-1, 1);
 				}
 
-				optimizeCandidate(new_particles[i].second.poses, linkage_region_pts, linkage_region_bbox, new_particles[i].second.points);
-
-				// check the hard constraints
-				if (checkHardConstraints(new_particles[i].second.points, new_particles[i].second.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].second.zorder)) {
-					// calculate the score
-					double cost = calculateCost(new_particles[i].second, body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
-					new_particles[i] = std::make_pair(cost, new_particles[i].second);
+				if (optimizeCandidate(new_particles[i].second.poses, linkage_region_pts, linkage_region_bbox, new_particles[i].second.points)) {
+					// check the hard constraints
+					if (checkHardConstraints(new_particles[i].second.points, new_particles[i].second.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].second.zorder)) {
+						// calculate the score
+						double cost = calculateCost(new_particles[i].second, body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
+						new_particles[i] = std::make_pair(cost, new_particles[i].second);
+					}
+					else {
+						// for the invalid point, make the cost infinity so that it will be discarded.
+						new_particles[i] = std::make_pair(std::numeric_limits<double>::max(), new_particles[i].second);
+					}
 				}
 				else {
 					// for the invalid point, make the cost infinity so that it will be discarded.
@@ -173,34 +161,7 @@ namespace kinematics {
 			new_particles.insert(new_particles.end(), particles.begin(), particles.end());
 
 			// calculate the weights of particles
-			std::vector<double> weights(new_particles.size());
-			double weight_total = 0.0;
-			for (int i = 0; i < new_particles.size(); i++) {
-				double w;
-				if (new_particles[i].first == std::numeric_limits<double>::max()) {
-					w = 0;
-				}
-				else {
-					w = std::exp(-new_particles[i].first * 10);
-				}
-				if (i == 0) {
-					weights[i] = w;
-				}
-				else {
-					weights[i] = weights[i - 1] + w;
-				}
-				weight_total += w;
-			}
-			for (int i = 0; i < new_particles.size(); i++) {
-				weights[i] /= weight_total;
-			}
-			
-			// resample the particles based on their weights
-			for (int i = 0; i < particles.size(); i++) {
-				double r = genRand();
-				auto it = std::lower_bound(weights.begin(), weights.end(), r);
-				particles[i] = new_particles[it - weights.begin()];
-			}
+			resample(new_particles, num_particles, particles);
 
 			/*
 			std::vector<double> values;
@@ -224,6 +185,40 @@ namespace kinematics {
 		solutions.resize(particles.size());
 		for (int i = 0; i < particles.size(); i++) {
 			solutions[i] = particles[i].second;
+		}
+	}
+
+	void LinkageSynthesis::resample(std::vector<std::pair<double, Solution>> particles, int N, std::vector<std::pair<double, Solution>>& resampled_particles) {
+		// calculate the weights of particles
+		std::vector<double> weights(particles.size());
+		double weight_total = 0.0;
+		for (int i = 0; i < particles.size(); i++) {
+			double w;
+			if (particles[i].first == std::numeric_limits<double>::max()) {
+				w = 0;
+			}
+			else {
+				w = std::exp(-particles[i].first * 10);
+			}
+			if (i == 0) {
+				weights[i] = w;
+			}
+			else {
+				weights[i] = weights[i - 1] + w;
+			}
+			weight_total += w;
+		}
+		for (int i = 0; i < particles.size(); i++) {
+			weights[i] /= weight_total;
+		}
+
+		// resample the particles based on their weights
+		resampled_particles.resize(N);
+		for (int i = 0; i < N; i++) {
+			double r = genRand();
+			auto it = std::lower_bound(weights.begin(), weights.end(), r);
+			int index = it - weights.begin();
+			resampled_particles[i] = particles[index];
 		}
 	}
 
