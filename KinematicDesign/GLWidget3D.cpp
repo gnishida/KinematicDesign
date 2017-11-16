@@ -767,7 +767,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 	renderManager.updateShadowMap(this, light_dir, light_mvpMatrix);
 }
 
-void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight) {
+void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, bool rotatable_crank, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double trajectory_weight, double size_weight, int num_particles, int num_iterations) {
 	mainWin->ui.statusBar->showMessage("Please wait for a moment...");
 
 	// change the mode to kinematics
@@ -842,7 +842,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		// calculate the circle point curve and center point curve
 		std::vector<glm::dvec2> enlarged_linkage_region_pts;
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 0.5, solutions[i], enlarged_linkage_region_pts);
+		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1, solutions[i], enlarged_linkage_region_pts);
 
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
@@ -859,7 +859,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 0.5, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight, 100, 10);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 1, position_error_weight, orientation_error_weight, linkage_location_weight, trajectory_weight, size_weight, num_particles, num_iterations);
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
 
 		kinematics.push_back(kin);

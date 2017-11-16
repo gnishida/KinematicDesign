@@ -255,7 +255,9 @@ void MainWindow::onCalculateSolution4RLinkage() {
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
-			dlg.ui.lineEditSizeWeight->text().toDouble());
+			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditNumParticles->text().toInt(),
+			dlg.ui.lineEditNumIterations->text().toInt());
 	}
 }
 
@@ -277,7 +279,9 @@ void MainWindow::onCalculateSolutionSliderCrank() {
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
-			dlg.ui.lineEditSizeWeight->text().toDouble());
+			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditNumParticles->text().toInt(),
+			dlg.ui.lineEditNumIterations->text().toInt());
 	}
 }
 
@@ -299,7 +303,9 @@ void MainWindow::onCalculateSolutionWattI() {
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
-			dlg.ui.lineEditSizeWeight->text().toDouble());
+			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditNumParticles->text().toInt(),
+			dlg.ui.lineEditNumIterations->text().toInt());
 	}
 }
 

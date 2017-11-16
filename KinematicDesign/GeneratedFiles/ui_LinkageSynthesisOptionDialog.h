@@ -59,12 +59,17 @@ public:
     QLineEdit *lineEditOrientationErrorWeight;
     QLabel *label_15;
     QLineEdit *lineEditLinkageLocationWeight;
+    QGroupBox *groupBox_3;
+    QLabel *label_16;
+    QLabel *label_17;
+    QLineEdit *lineEditNumParticles;
+    QLineEdit *lineEditNumIterations;
 
     void setupUi(QDialog *LinkageSynthesisOptionDialog)
     {
         if (LinkageSynthesisOptionDialog->objectName().isEmpty())
             LinkageSynthesisOptionDialog->setObjectName(QStringLiteral("LinkageSynthesisOptionDialog"));
-        LinkageSynthesisOptionDialog->resize(352, 505);
+        LinkageSynthesisOptionDialog->resize(352, 581);
         label = new QLabel(LinkageSynthesisOptionDialog);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(30, 10, 61, 21));
@@ -79,10 +84,10 @@ public:
         checkBoxRotatableCrank->setGeometry(QRect(30, 280, 131, 17));
         pushButtonOK = new QPushButton(LinkageSynthesisOptionDialog);
         pushButtonOK->setObjectName(QStringLiteral("pushButtonOK"));
-        pushButtonOK->setGeometry(QRect(60, 460, 91, 31));
+        pushButtonOK->setGeometry(QRect(60, 540, 91, 31));
         pushButtonCancel = new QPushButton(LinkageSynthesisOptionDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
-        pushButtonCancel->setGeometry(QRect(200, 460, 91, 31));
+        pushButtonCancel->setGeometry(QRect(200, 540, 91, 31));
         groupBox = new QGroupBox(LinkageSynthesisOptionDialog);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setGeometry(QRect(20, 40, 311, 211));
@@ -164,6 +169,21 @@ public:
         lineEditLinkageLocationWeight = new QLineEdit(groupBox_2);
         lineEditLinkageLocationWeight->setObjectName(QStringLiteral("lineEditLinkageLocationWeight"));
         lineEditLinkageLocationWeight->setGeometry(QRect(200, 60, 101, 20));
+        groupBox_3 = new QGroupBox(LinkageSynthesisOptionDialog);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setGeometry(QRect(20, 450, 311, 71));
+        label_16 = new QLabel(groupBox_3);
+        label_16->setObjectName(QStringLiteral("label_16"));
+        label_16->setGeometry(QRect(20, 20, 111, 21));
+        label_17 = new QLabel(groupBox_3);
+        label_17->setObjectName(QStringLiteral("label_17"));
+        label_17->setGeometry(QRect(20, 40, 111, 21));
+        lineEditNumParticles = new QLineEdit(groupBox_3);
+        lineEditNumParticles->setObjectName(QStringLiteral("lineEditNumParticles"));
+        lineEditNumParticles->setGeometry(QRect(200, 20, 101, 20));
+        lineEditNumIterations = new QLineEdit(groupBox_3);
+        lineEditNumIterations->setObjectName(QStringLiteral("lineEditNumIterations"));
+        lineEditNumIterations->setGeometry(QRect(200, 40, 101, 20));
 
         retranslateUi(LinkageSynthesisOptionDialog);
 
@@ -194,6 +214,9 @@ public:
         label_5->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage size:", 0));
         label_14->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Orientation error:", 0));
         label_15->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage location:", 0));
+        groupBox_3->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Partile filter", 0));
+        label_16->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#particles:", 0));
+        label_17->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#iterations:", 0));
     } // retranslateUi
 
 };

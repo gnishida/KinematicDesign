@@ -28,7 +28,6 @@ namespace kinematics {
 
 		int cnt = 0;
 		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
-		//for (int scale = 1; scale <= 3 && cnt < num_samples; scale++) {
 			// calculate the enlarged linkage region for the sampling region
 			enlarged_linkage_region_pts.clear();
 			for (int i = 0; i < linkage_region_pts.size(); i++) {
@@ -38,8 +37,8 @@ namespace kinematics {
 			// calculate the bounding boxe of the valid regions
 			BBox enlarged_bbox = boundingBox(enlarged_linkage_region_pts);
 
-			for (int iter = 0; iter < num_samples * 100 && cnt < num_samples; iter++) {
-				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples * 100 + iter + 1);
+			for (int iter = 0; iter < num_samples && cnt < num_samples; iter++) {
+				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples + iter + 1);
 
 				// perturbe the poses a little
 				double position_error = 0.0;

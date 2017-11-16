@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>505</height>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>460</y>
+     <y>540</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -79,7 +79,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>460</y>
+     <y>540</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -400,6 +400,65 @@
      <rect>
       <x>200</x>
       <y>60</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>450</y>
+     <width>311</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Partile filter</string>
+   </property>
+   <widget class="QLabel" name="label_16">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>#particles:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_17">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>#iterations:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditNumParticles">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditNumIterations">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
       <width>101</width>
       <height>20</height>
      </rect>

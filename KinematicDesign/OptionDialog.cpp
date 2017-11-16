@@ -143,6 +143,7 @@ void OptionDialog::onSmall() {
 	ui.lineEditSliderBarDepth->setText("0.3");
 	ui.lineEditSliderWidth->setText("1.0");
 	ui.lineEditSliderDepth->setText("0.5");
+	ui.lineEditBodyDepth->setText("10");
 }
 
 void OptionDialog::onLarge() {
@@ -159,6 +160,7 @@ void OptionDialog::onLarge() {
 	ui.lineEditSliderBarDepth->setText("0.6");
 	ui.lineEditSliderWidth->setText("2.0");
 	ui.lineEditSliderDepth->setText("1.0");
+	ui.lineEditBodyDepth->setText("10");
 }
 
 void OptionDialog::onHalf() {
