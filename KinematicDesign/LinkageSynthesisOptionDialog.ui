@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>607</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>560</y>
+     <y>580</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -79,7 +79,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>560</y>
+     <y>580</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -284,7 +284,7 @@
      <x>20</x>
      <y>310</y>
      <width>311</width>
-     <height>131</height>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
@@ -405,12 +405,35 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLineEdit" name="lineEditLinkageDepthWeight">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>120</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_18">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Linkage depth:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>450</y>
+     <y>470</y>
      <width>311</width>
      <height>91</height>
     </rect>

@@ -246,16 +246,21 @@ void MainWindow::onCalculateSolution4RLinkage() {
 			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
 		};
 
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_4R,
-			dlg.ui.lineEditNumSamples->text().toInt(),
-			sigmas,
-			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
+		std::vector<double> weights = {
 			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_4R,
+			dlg.ui.lineEditNumSamples->text().toInt(),
+			sigmas,
+			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
+			dlg.ui.checkBoxRotatableCrank->isChecked(),
+			weights,
 			dlg.ui.lineEditNumParticles->text().toInt(),
 			dlg.ui.lineEditNumIterations->text().toInt(),
 			dlg.ui.checkBoxRecordFile->isChecked());
@@ -271,16 +276,21 @@ void MainWindow::onCalculateSolutionSliderCrank() {
 			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
 		};
 
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_RRRP,
-			dlg.ui.lineEditNumSamples->text().toInt(),
-			sigmas,
-			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
+		std::vector<double> weights = {
 			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_RRRP,
+			dlg.ui.lineEditNumSamples->text().toInt(),
+			sigmas,
+			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
+			dlg.ui.checkBoxRotatableCrank->isChecked(),
+			weights,
 			dlg.ui.lineEditNumParticles->text().toInt(),
 			dlg.ui.lineEditNumIterations->text().toInt(),
 			dlg.ui.checkBoxRecordFile->isChecked());
@@ -296,16 +306,21 @@ void MainWindow::onCalculateSolutionWattI() {
 			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
 		};
 
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_WATT_I,
-			dlg.ui.lineEditNumSamples->text().toInt(),
-			sigmas,
-			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
+		std::vector<double> weights = {
 			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
 			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
 			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
+			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
+		};
+
+		glWidget->calculateSolutions(GLWidget3D::LINKAGE_WATT_I,
+			dlg.ui.lineEditNumSamples->text().toInt(),
+			sigmas,
+			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
+			dlg.ui.checkBoxRotatableCrank->isChecked(),
+			weights,
 			dlg.ui.lineEditNumParticles->text().toInt(),
 			dlg.ui.lineEditNumIterations->text().toInt(),
 			dlg.ui.checkBoxRecordFile->isChecked());
@@ -353,6 +368,7 @@ void MainWindow::onOptions() {
 	dlg.setSliderBarDepth(kinematics::options->slider_bar_depth);
 	dlg.setSliderWidth(kinematics::options->slider_width);
 	dlg.setSliderDepth(kinematics::options->slider_depth);
+	dlg.setBodyDepth(kinematics::options->body_depth);
 
 	if (dlg.exec()) {
 		kinematics::options->body_margin = dlg.getBodyMargin();
@@ -368,6 +384,7 @@ void MainWindow::onOptions() {
 		kinematics::options->slider_bar_depth = dlg.getSliderBarDepth();
 		kinematics::options->slider_width = dlg.getSliderWidth();
 		kinematics::options->slider_depth = dlg.getSliderDepth();
+		kinematics::options->body_depth = dlg.getBodyDepth();
 	}
 }
 

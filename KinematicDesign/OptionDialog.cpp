@@ -149,17 +149,17 @@ void OptionDialog::onSmall() {
 void OptionDialog::onLarge() {
 	ui.lineEditBodyMargin->setText("0.3");
 	ui.lineEditGap->setText("0.07");
-	ui.lineEditLinkWidth->setText("2.5");
-	ui.lineEditLinkDepth->setText("0.9");
-	ui.lineEditHoleRadius->setText("0.6625");
-	ui.lineEditJointRadius->setText("0.625");
-	ui.lineEditJointCapRadius1->setText("0.6");
-	ui.lineEditJointCapRadius2->setText("0.7");
-	ui.lineEditJointCapDepth->setText("0.4");
-	ui.lineEditSliderBarWidth->setText("1.2");
-	ui.lineEditSliderBarDepth->setText("0.6");
-	ui.lineEditSliderWidth->setText("2.0");
-	ui.lineEditSliderDepth->setText("1.0");
+	ui.lineEditLinkWidth->setText("1.7");
+	ui.lineEditLinkDepth->setText("0.6");
+	ui.lineEditHoleRadius->setText("0.463");
+	ui.lineEditJointRadius->setText("0.437");
+	ui.lineEditJointCapRadius1->setText("0.5");
+	ui.lineEditJointCapRadius2->setText("0.47");
+	ui.lineEditJointCapDepth->setText("0.3");
+	ui.lineEditSliderBarWidth->setText("0.84");
+	ui.lineEditSliderBarDepth->setText("0.42");
+	ui.lineEditSliderWidth->setText("1.4");
+	ui.lineEditSliderDepth->setText("0.7");
 	ui.lineEditBodyDepth->setText("10");
 }
 

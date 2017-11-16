@@ -101,14 +101,14 @@ namespace kinematics {
 		dist_map.convertTo(dist_map, CV_64F);
 	}
 
-	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight, int num_particles, int num_iterations, bool record_file) {
+	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
 		BBox linkage_region_bbox = boundingBox(linkage_region_pts);
 
 		std::vector<Particle> particles(solutions.size());
 
 		double max_cost = 0;
 		for (int i = 0; i < solutions.size(); i++) {
-			double cost = calculateCost(solutions[i], body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
+			double cost = calculateCost(solutions[i], body_pts, dist_map, dist_map_bbox, weights);
 			max_cost = std::max(max_cost, cost);
 			particles[i] = Particle(cost, solutions[i]);
 		}
@@ -146,7 +146,7 @@ namespace kinematics {
 					// check the hard constraints
 					if (checkHardConstraints(new_particles[i].solution.points, new_particles[i].solution.poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].solution.zorder)) {
 						// calculate the score
-						double cost = calculateCost(new_particles[i].solution, body_pts, dist_map, dist_map_bbox, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight);
+						double cost = calculateCost(new_particles[i].solution, body_pts, dist_map, dist_map_bbox, weights);
 						new_particles[i] = Particle(cost, new_particles[i].solution);
 					}
 					else {
@@ -189,12 +189,6 @@ namespace kinematics {
 		for (int i = 0; i < particles.size(); i++) {
 			solutions[i] = particles[i].solution;
 		}
-
-		/////////////////////////////////////////////////////////////
-		// DEBUG
-		checkHardConstraints(solutions[0].points, solutions[0].poses, linkage_region_pts, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, solutions[0].zorder);
-		/////////////////////////////////////////////////////////////
-
 	}
 
 	void LinkageSynthesis::resample(std::vector<Particle> particles, int N, std::vector<Particle>& resampled_particles, double max_cost) {

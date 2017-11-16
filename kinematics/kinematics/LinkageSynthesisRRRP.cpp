@@ -252,10 +252,10 @@ namespace kinematics {
 		return true;
 	}
 
-	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight, int num_particles, int num_iterations, bool record_file) {
+	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_body_pts, const Object25D& body_pts, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
 		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
-			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, position_error_weight, orientation_error_weight, linkage_location_weight, smoothness_weight, size_weight, num_particles, num_iterations, record_file);
+			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, fixed_body_pts, body_pts, rotatable_crank, avoid_branch_defect, min_link_length, weights, num_particles, num_iterations, record_file);
 			return solutions[0];
 		}
 		else {
@@ -263,14 +263,21 @@ namespace kinematics {
 		}
 	}
 
-	double LinkageSynthesisRRRP::calculateCost(Solution& solution, const Object25D& body_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, double position_error_weight, double orientation_error_weight, double linkage_location_weight, double smoothness_weight, double size_weight) {
+	double LinkageSynthesisRRRP::calculateCost(Solution& solution, const Object25D& body_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<double>& weights) {
 		double dist = 0;
 		for (int i = 0; i < solution.points.size(); i++) {
 			dist += dist_map.at<double>(solution.points[i].y - dist_map_bbox.minPt.y, solution.points[i].x - dist_map_bbox.minPt.x);
 		}
 		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, body_pts);
 		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]);
-		return solution.position_error * position_error_weight + solution.orientation_error * orientation_error_weight + dist * linkage_location_weight + tortuosity * smoothness_weight + size * size_weight;
+		int max_zorder = 0;
+		for (int i = 0; i < solution.zorder.size(); i++) {
+			for (int j = 0; j < solution.zorder[i].size(); j++) {
+				max_zorder = std::max(max_zorder, solution.zorder[i][j]);
+			}
+		}
+
+		return solution.position_error * weights[0] + solution.orientation_error * weights[1] + dist * weights[2] + tortuosity * weights[3] + size * weights[4] + max_zorder * weights[5];
 	}
 
 	/**
