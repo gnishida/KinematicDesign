@@ -561,7 +561,7 @@ namespace kinematics {
 	}
 
 	bool LinkageSynthesis4R::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int collision_check_type) {
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, { body_pts }, (collision_check_type == 1 || collision_check_type == 3), fixed_body_pts);
+		kinematics::Kinematics kinematics = constructKinematics(points, {}, body_pts, (collision_check_type == 1 || collision_check_type == 3), fixed_body_pts);
 		kinematics.diagram.initialize();
 
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
@@ -700,7 +700,7 @@ namespace kinematics {
 	}
 
 	Kinematics LinkageSynthesis4R::recordCollisionForConnectors(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D> fixed_body_pts, const Object25D& body_pts) {
-		Kinematics kinematics = constructKinematics(points, {}, { body_pts }, true, fixed_body_pts);
+		Kinematics kinematics = constructKinematics(points, {}, body_pts, true, fixed_body_pts);
 		kinematics.diagram.initialize();
 
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
@@ -854,7 +854,7 @@ namespace kinematics {
 		}
 
 		// create a kinematics
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, { body_pts }, false, {});
+		kinematics::Kinematics kinematics = constructKinematics(points, {}, body_pts, false, {});
 		kinematics.diagram.initialize();
 
 		// initialize the trajectory of the moving body
