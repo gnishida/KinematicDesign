@@ -194,7 +194,7 @@ namespace kinematics {
 			// Thus, we need to convert the coordinates of points2 as well.
 			for (int j = 0; j < polygons[i].points2.size(); ++j) {
 				// convert the coordinates to the local coordinate system
-				body->polygons[i].points2[j] = model * glm::dvec3(polygons[i].points[j], 1);
+				body->polygons[i].points2[j] = model * glm::dvec3(polygons[i].points2[j], 1);
 			}
 		}
 

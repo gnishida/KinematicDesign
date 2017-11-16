@@ -153,7 +153,7 @@ void OptionDialog::onLarge() {
 	ui.lineEditLinkDepth->setText("0.6");
 	ui.lineEditHoleRadius->setText("0.463");
 	ui.lineEditJointRadius->setText("0.437");
-	ui.lineEditJointCapRadius1->setText("0.5");
+	ui.lineEditJointCapRadius1->setText("0.43");
 	ui.lineEditJointCapRadius2->setText("0.47");
 	ui.lineEditJointCapDepth->setText("0.3");
 	ui.lineEditSliderBarWidth->setText("0.84");
