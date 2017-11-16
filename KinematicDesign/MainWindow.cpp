@@ -102,7 +102,7 @@ void MainWindow::initLayerMenu(int num_layers) {
 
 void MainWindow::onNew() {
 	glWidget->clear();
-	setWindowTitle("Canvas 3D");
+	setWindowTitle("Kinematic Design");
 }
 
 void MainWindow::onOpen() {
@@ -110,7 +110,7 @@ void MainWindow::onOpen() {
 	if (filename.isEmpty()) return;
 
 	glWidget->open(filename);
-	setWindowTitle("Canvas 3D - " + QFileInfo(filename).fileName());
+	setWindowTitle("Kinematic Design - " + QFileInfo(filename).fileName());
 }
 
 void MainWindow::onSave() {
@@ -118,7 +118,7 @@ void MainWindow::onSave() {
 	if (filename.isEmpty()) return;
 
 	glWidget->save(filename);
-	setWindowTitle("Canvas 3D - " + QFileInfo(filename).fileName());
+	setWindowTitle("Kinematic Design - " + QFileInfo(filename).fileName());
 }
 
 void MainWindow::onExportSTL() {
@@ -257,7 +257,8 @@ void MainWindow::onCalculateSolution4RLinkage() {
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
 			dlg.ui.lineEditNumParticles->text().toInt(),
-			dlg.ui.lineEditNumIterations->text().toInt());
+			dlg.ui.lineEditNumIterations->text().toInt(),
+			dlg.ui.checkBoxRecordFile->isChecked());
 	}
 }
 
@@ -281,7 +282,8 @@ void MainWindow::onCalculateSolutionSliderCrank() {
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
 			dlg.ui.lineEditNumParticles->text().toInt(),
-			dlg.ui.lineEditNumIterations->text().toInt());
+			dlg.ui.lineEditNumIterations->text().toInt(),
+			dlg.ui.checkBoxRecordFile->isChecked());
 	}
 }
 
@@ -305,7 +307,8 @@ void MainWindow::onCalculateSolutionWattI() {
 			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
 			dlg.ui.lineEditSizeWeight->text().toDouble(),
 			dlg.ui.lineEditNumParticles->text().toInt(),
-			dlg.ui.lineEditNumIterations->text().toInt());
+			dlg.ui.lineEditNumIterations->text().toInt(),
+			dlg.ui.checkBoxRecordFile->isChecked());
 	}
 }
 

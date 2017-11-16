@@ -64,12 +64,13 @@ public:
     QLabel *label_17;
     QLineEdit *lineEditNumParticles;
     QLineEdit *lineEditNumIterations;
+    QCheckBox *checkBoxRecordFile;
 
     void setupUi(QDialog *LinkageSynthesisOptionDialog)
     {
         if (LinkageSynthesisOptionDialog->objectName().isEmpty())
             LinkageSynthesisOptionDialog->setObjectName(QStringLiteral("LinkageSynthesisOptionDialog"));
-        LinkageSynthesisOptionDialog->resize(352, 581);
+        LinkageSynthesisOptionDialog->resize(352, 607);
         label = new QLabel(LinkageSynthesisOptionDialog);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(30, 10, 61, 21));
@@ -84,10 +85,10 @@ public:
         checkBoxRotatableCrank->setGeometry(QRect(30, 280, 131, 17));
         pushButtonOK = new QPushButton(LinkageSynthesisOptionDialog);
         pushButtonOK->setObjectName(QStringLiteral("pushButtonOK"));
-        pushButtonOK->setGeometry(QRect(60, 540, 91, 31));
+        pushButtonOK->setGeometry(QRect(60, 560, 91, 31));
         pushButtonCancel = new QPushButton(LinkageSynthesisOptionDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
-        pushButtonCancel->setGeometry(QRect(200, 540, 91, 31));
+        pushButtonCancel->setGeometry(QRect(200, 560, 91, 31));
         groupBox = new QGroupBox(LinkageSynthesisOptionDialog);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setGeometry(QRect(20, 40, 311, 211));
@@ -171,7 +172,7 @@ public:
         lineEditLinkageLocationWeight->setGeometry(QRect(200, 60, 101, 20));
         groupBox_3 = new QGroupBox(LinkageSynthesisOptionDialog);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(20, 450, 311, 71));
+        groupBox_3->setGeometry(QRect(20, 450, 311, 91));
         label_16 = new QLabel(groupBox_3);
         label_16->setObjectName(QStringLiteral("label_16"));
         label_16->setGeometry(QRect(20, 20, 111, 21));
@@ -184,6 +185,9 @@ public:
         lineEditNumIterations = new QLineEdit(groupBox_3);
         lineEditNumIterations->setObjectName(QStringLiteral("lineEditNumIterations"));
         lineEditNumIterations->setGeometry(QRect(200, 40, 101, 20));
+        checkBoxRecordFile = new QCheckBox(groupBox_3);
+        checkBoxRecordFile->setObjectName(QStringLiteral("checkBoxRecordFile"));
+        checkBoxRecordFile->setGeometry(QRect(20, 60, 171, 21));
 
         retranslateUi(LinkageSynthesisOptionDialog);
 
@@ -217,6 +221,7 @@ public:
         groupBox_3->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Partile filter", 0));
         label_16->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#particles:", 0));
         label_17->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#iterations:", 0));
+        checkBoxRecordFile->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Record cost evolution to a file", 0));
     } // retranslateUi
 
 };

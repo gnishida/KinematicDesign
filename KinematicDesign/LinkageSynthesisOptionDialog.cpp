@@ -16,9 +16,10 @@ LinkageSynthesisOptionDialog::LinkageSynthesisOptionDialog(QWidget *parent) : QD
 	ui.lineEditOrientationErrorWeight->setText("5");
 	ui.lineEditLinkageLocationWeight->setText("10");
 	ui.lineEditTrajectoryWeight->setText("1");
-	ui.lineEditSizeWeight->setText("1");
+	ui.lineEditSizeWeight->setText("0.1");
 	ui.lineEditNumParticles->setText("100");
 	ui.lineEditNumIterations->setText("10");
+	ui.checkBoxRecordFile->setChecked(true);
 
 	connect(ui.pushButtonOK, SIGNAL(clicked()), this, SLOT(onOK()));
 	connect(ui.pushButtonCancel, SIGNAL(clicked()), this, SLOT(onCancel()));

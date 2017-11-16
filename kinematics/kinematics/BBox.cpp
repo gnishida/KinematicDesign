@@ -9,8 +9,7 @@ namespace kinematics {
 		this->minPt = minPt;
 		this->maxPt = maxPt;
 	}
-
-
+	
 	BBox::~BBox() {
 	}
 

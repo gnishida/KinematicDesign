@@ -290,7 +290,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindowClass)
     {
-        MainWindowClass->setWindowTitle(QApplication::translate("MainWindowClass", "Canvas 3D", 0));
+        MainWindowClass->setWindowTitle(QApplication::translate("MainWindowClass", "Kinematic Design", 0));
         actionExit->setText(QApplication::translate("MainWindowClass", "Exit", 0));
         actionSelect->setText(QApplication::translate("MainWindowClass", "Select", 0));
         actionFixedRectangle->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
