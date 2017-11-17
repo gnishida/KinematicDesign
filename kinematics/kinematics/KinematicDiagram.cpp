@@ -11,7 +11,6 @@
 namespace kinematics {
 
 	Options* Options::instance = NULL;
-	//options = Options::getInstance();
 
 	KinematicDiagram::KinematicDiagram() {
 	}
@@ -679,6 +678,10 @@ namespace kinematics {
 		}
 	}
 
+	/**
+	 * Check the collision between bodies.
+	 * If main_body_only is true, check only the main bodies, and the joint connectors are not checked.
+	 */
 	bool KinematicDiagram::isCollided(bool main_body_only) const {
 		// check the collision between rigid bodies
 		for (int i = 0; i < bodies.size(); ++i) {
@@ -687,17 +690,13 @@ namespace kinematics {
 				if (bodies[i]->neighbors.contains(j)) continue;
 
 				for (int k = 0; k < bodies[i]->polygons.size(); k++) {
-					/////// DEBUG //////////
 					if (main_body_only && k > 0) continue;
-					/////// DEBUG //////////
 
 					if (!bodies[i]->polygons[k].check_collision) continue;
 					std::vector<glm::dvec2> pts1 = bodies[i]->getActualPoints(k);
 
 					for (int l = 0; l < bodies[j]->polygons.size(); l++) {
-						/////// DEBUG //////////
 						if (main_body_only && l > 0) continue;
-						/////// DEBUG //////////
 
 						if (!bodies[j]->polygons[l].check_collision) continue;
 						std::vector<glm::dvec2> pts2 = bodies[j]->getActualPoints(l);
@@ -711,38 +710,41 @@ namespace kinematics {
 			}
 		}
 
-#if 0
-		// check the collision between links and joints
-		for (int i = 0; i < links.size(); i++) {
-			// For the coupler, we can use the moving body itself as a coupler, 
-			// so we do not need to create a coupler link.
-			if (!links[i]->actual_link) continue;
+		// This check is needed strictly speaking, but
+		// the collision that this check detects should not happen
+		// because the appropriate z-orders are selected.
+		/*if (!main_body_only) {
+			// check the collision between links and joints
+			for (int i = 0; i < links.size(); i++) {
+				// For the coupler, we can use the moving body itself as a coupler, 
+				// so we do not need to create a coupler link.
+				if (!links[i]->actual_link) continue;
 
-			for (int j = 0; j < joints.size(); j++) {
-				// If the link i is furhter away from the body than joint j,
-				// there will be no collision between them.
-				if (links[i]->z > joints[j]->z) continue;
+				for (int j = 0; j < joints.size(); j++) {
+					// If the link i is furhter away from the body than joint j,
+					// there will be no collision between them.
+					if (links[i]->z > joints[j]->z) continue;
 
-				// If joint j belongs to link i, skip it for collision check.
-				bool excluded = false;
-				for (int k = 0; k < links[i]->joints.size(); k++) {
-					if (joints[j] == links[i]->joints[k]) {
-						excluded = true;
-						break;
+					// If joint j belongs to link i, skip it for collision check.
+					bool excluded = false;
+					for (int k = 0; k < links[i]->joints.size(); k++) {
+						if (joints[j] == links[i]->joints[k]) {
+							excluded = true;
+							break;
+						}
 					}
-				}
-				if (excluded) continue;
+					if (excluded) continue;
 
-				for (int k = 0; k < links[i]->joints.size(); k++) {
-					for (int l = k + 1; l < links[i]->joints.size(); l++) {
-						if (distanceToSegment(links[i]->joints[k]->pos, links[i]->joints[l]->pos, joints[j]->pos) < options->link_width) {
-							return true;
+					for (int k = 0; k < links[i]->joints.size(); k++) {
+						for (int l = k + 1; l < links[i]->joints.size(); l++) {
+							if (distanceToSegment(links[i]->joints[k]->pos, links[i]->joints[l]->pos, joints[j]->pos) < options->link_width) {
+								return true;
+							}
 						}
 					}
 				}
 			}
-		}
-#endif
+		}*/
 
 		return false;
 	}

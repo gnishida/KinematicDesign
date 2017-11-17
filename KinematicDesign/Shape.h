@@ -14,13 +14,10 @@ namespace canvas {
 
 	class Shape {
 	public:
-		static enum { TYPE_RECTANGLE = 0, TYPE_CIRCLE, TYPE_POLYGON };
 		static enum { TYPE_BODY = 0, TYPE_LINKAGE_REGION };
 		static enum { RESIZE_TOP_LEFT = 0, RESIZE_TOP_RIGHT, RESIZE_BOTTOM_LEFT, RESIZE_BOTTOM_RIGHT };
 
 	protected:
-		int type;
-		int subtype;
 		bool selected;
 		bool currently_drawing;
 		glm::dvec2 pos;
@@ -33,7 +30,6 @@ namespace canvas {
 		Shape();
 		~Shape();
 
-		int getType() { return type; }
 		virtual boost::shared_ptr<Shape> clone() const = 0;
 		virtual void draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const = 0;
 		virtual QDomElement toXml(QDomDocument& doc, const QString& node_name) const = 0;

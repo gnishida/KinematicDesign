@@ -1,23 +1,14 @@
 #include "Polygon.h"
 #include <boost/geometry.hpp>
-#include <boost/geometry/core/point_type.hpp>
-#include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
-#include <boost/geometry/algorithms/within.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
 
 namespace canvas {
 
 	Polygon::Polygon() {
-		type = TYPE_POLYGON;
 		theta = 0;
 	}
 
 	Polygon::Polygon(const glm::dvec2& point) {
-		type = TYPE_POLYGON;
 		points.push_back(glm::dvec2());
 		pos = point;
 		theta = 0;
@@ -29,7 +20,6 @@ namespace canvas {
 	* Construct a polygon from the xml dom node.
 	*/
 	Polygon::Polygon(QDomNode& node) {
-		type = TYPE_POLYGON;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "pose") {

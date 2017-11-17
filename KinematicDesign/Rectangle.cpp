@@ -3,14 +3,12 @@
 namespace canvas {
 
 	Rectangle::Rectangle() {
-		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
 		theta = 0;
 	}
 
 	Rectangle::Rectangle(const glm::dvec2& point) {
-		type = TYPE_RECTANGLE;
 		width = 0;
 		height = 0;
 		pos = point;
@@ -21,7 +19,6 @@ namespace canvas {
 	 * Construct a rectangle from the xml dom node.
 	 */
 	Rectangle::Rectangle(QDomNode& node) {
-		type = TYPE_RECTANGLE;
 		QDomNode params_node = node.firstChild();
 		while (!params_node.isNull()) {
 			if (params_node.toElement().tagName() == "pose") {
@@ -44,8 +41,7 @@ namespace canvas {
 	}
 
 	boost::shared_ptr<Shape> Rectangle::clone() const {
-		Rectangle* new_rec = new Rectangle(*this);
-		return boost::shared_ptr<Shape>(new_rec);
+		return boost::shared_ptr<Shape>(new Rectangle(*this));
 	}
 
 	void Rectangle::draw(QPainter& painter, const QColor& brush_color, const QPointF& origin, double scale) const {

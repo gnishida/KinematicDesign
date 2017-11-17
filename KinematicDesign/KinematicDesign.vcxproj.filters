@@ -95,9 +95,6 @@
     <ClCompile Include="..\kinematics\kinematics\BodyGeometry.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
-    <ClCompile Include="..\kinematics\kinematics\Burmester.cpp">
-      <Filter>Source Files\kinematics</Filter>
-    </ClCompile>
     <ClCompile Include="..\kinematics\kinematics\Gear.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
@@ -256,9 +253,6 @@
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\BodyGeometry.h">
-      <Filter>Source Files\kinematics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kinematics\kinematics\Burmester.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\Gear.h">
