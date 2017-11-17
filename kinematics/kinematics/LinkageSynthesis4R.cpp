@@ -598,12 +598,12 @@ namespace kinematics {
 			type = 3;
 			angles[2] += M_PI * 2;
 		}
-		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && angles[1] >= angles[2]) {
+		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && (poses.size() >= 3 && angles[1] >= angles[2] || poses.size() == 2 && angles[1] - angles[0] > M_PI)) {
 			type = 4;
 			angles[1] -= M_PI * 2;
 			angles[2] -= M_PI * 2;
 		}
-		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && angles[1] < angles[2]) {
+		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && (poses.size() >= 3 && angles[1] < angles[2] || poses.size() == 2 && angles[0] - angles[1] > M_PI)) {
 			type = 5;
 			angles[1] += M_PI * 2;
 			angles[2] += M_PI * 2;
@@ -737,12 +737,12 @@ namespace kinematics {
 			type = 3;
 			angles[2] += M_PI * 2;
 		}
-		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && angles[1] >= angles[2]) {
+		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && (poses.size() >= 3 && angles[1] >= angles[2] || poses.size() == 2 && angles[1] - angles[0] > M_PI)) {
 			type = 4;
 			angles[1] -= M_PI * 2;
 			angles[2] -= M_PI * 2;
 		}
-		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && angles[1] < angles[2]) {
+		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && (poses.size() >= 3 && angles[1] < angles[2] || poses.size() == 2 && angles[0] - angles[1] > M_PI)) {
 			type = 5;
 			angles[1] += M_PI * 2;
 			angles[2] += M_PI * 2;
@@ -895,12 +895,12 @@ namespace kinematics {
 			type = 3;
 			angles[2] += M_PI * 2;
 		}
-		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && angles[1] >= angles[2]) {
+		else if (angles[0] < 0 && angles[1] >= 0 && angles[2] >= 0 && (poses.size() >= 3 && angles[1] >= angles[2] || poses.size() == 2 && angles[1] - angles[0] > M_PI)) {
 			type = 4;
 			angles[1] -= M_PI * 2;
 			angles[2] -= M_PI * 2;
 		}
-		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && angles[1] < angles[2]) {
+		else if (angles[0] >= 0 && angles[1] < 0 && angles[2] < 0 && (poses.size() >= 3 && angles[1] < angles[2] || poses.size() == 2 && angles[0] - angles[1] > M_PI)) {
 			type = 5;
 			angles[1] += M_PI * 2;
 			angles[2] += M_PI * 2;
