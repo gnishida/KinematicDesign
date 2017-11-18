@@ -32,14 +32,10 @@ public:
 	float getJointCapRadius2();
 	void setJointCapDepth(float joint_cap_depth);
 	float getJointCapDepth();
-	void setSliderBarWidth(float slider_bar_width);
-	float getSliderBarWidth();
-	void setSliderBarDepth(float slider_bar_depth);
-	float getSliderBarDepth();
-	void setSliderWidth(float slider_width);
-	float getSliderWidth();
-	void setSliderDepth(float slider_depth);
-	float getSliderDepth();
+	void setSliderGuideWidth(float slider_guide_width);
+	float getSliderGuideWidth();
+	void setSliderGuideDepth(float slider_guide_depth);
+	float getSliderGuideDepth();
 	void setBodyDepth(float body_depth);
 	float getBodyDepth();
 

@@ -364,10 +364,8 @@ void MainWindow::onOptions() {
 	dlg.setJointCapRaidus1(kinematics::options->joint_cap_radius1);
 	dlg.setJointCapRaidus2(kinematics::options->joint_cap_radius2);
 	dlg.setJointCapDepth(kinematics::options->joint_cap_depth);
-	dlg.setSliderBarWidth(kinematics::options->slider_bar_width);
-	dlg.setSliderBarDepth(kinematics::options->slider_bar_depth);
-	dlg.setSliderWidth(kinematics::options->slider_width);
-	dlg.setSliderDepth(kinematics::options->slider_depth);
+	dlg.setSliderGuideWidth(kinematics::options->slider_guide_width);
+	dlg.setSliderGuideDepth(kinematics::options->slider_guide_depth);
 	dlg.setBodyDepth(kinematics::options->body_depth);
 
 	if (dlg.exec()) {
@@ -380,10 +378,8 @@ void MainWindow::onOptions() {
 		kinematics::options->joint_cap_radius1 = dlg.getJointCapRadius1();
 		kinematics::options->joint_cap_radius2 = dlg.getJointCapRadius2();
 		kinematics::options->joint_cap_depth = dlg.getJointCapDepth();
-		kinematics::options->slider_bar_width = dlg.getSliderBarWidth();
-		kinematics::options->slider_bar_depth = dlg.getSliderBarDepth();
-		kinematics::options->slider_width = dlg.getSliderWidth();
-		kinematics::options->slider_depth = dlg.getSliderDepth();
+		kinematics::options->slider_guide_width = dlg.getSliderGuideWidth();
+		kinematics::options->slider_guide_depth = dlg.getSliderGuideDepth();
 		kinematics::options->body_depth = dlg.getBodyDepth();
 	}
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>291</width>
-    <height>491</height>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>20</x>
      <y>10</y>
      <width>251</width>
-     <height>361</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="title">
@@ -166,20 +166,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Slider bar width:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>310</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Slider width:</string>
+     <string>Slider guide width:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_10">
@@ -192,20 +179,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Slider bar depth:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_11">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>330</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Slider depth:</string>
+     <string>Slider guide depth:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEditJointCapRadius1">
@@ -238,7 +212,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditSliderBarWidth">
+   <widget class="QLineEdit" name="lineEditSliderGuideWidth">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -248,31 +222,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditSliderBarDepth">
+   <widget class="QLineEdit" name="lineEditSliderGuideDepth">
     <property name="geometry">
      <rect>
       <x>120</x>
       <y>290</y>
-      <width>113</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSliderWidth">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>310</y>
-      <width>113</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditSliderDepth">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>330</y>
       <width>113</width>
       <height>20</height>
      </rect>
@@ -381,7 +335,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>440</y>
+     <y>400</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -394,7 +348,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>440</y>
+     <y>400</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -407,7 +361,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>380</y>
+     <y>340</y>
      <width>251</width>
      <height>51</height>
     </rect>
@@ -454,10 +408,8 @@
   <tabstop>lineEditJointCapRadius1</tabstop>
   <tabstop>lineEditJointCapRadius2</tabstop>
   <tabstop>lineEditJointCapDepth</tabstop>
-  <tabstop>lineEditSliderBarWidth</tabstop>
-  <tabstop>lineEditSliderBarDepth</tabstop>
-  <tabstop>lineEditSliderWidth</tabstop>
-  <tabstop>lineEditSliderDepth</tabstop>
+  <tabstop>lineEditSliderGuideWidth</tabstop>
+  <tabstop>lineEditSliderGuideDepth</tabstop>
  </tabstops>
  <resources/>
  <connections/>

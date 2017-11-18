@@ -1207,7 +1207,7 @@ namespace glutils {
 	/**
 	 * Create a prism with holes
 	 */
-	void drawPrism(std::vector<glm::dvec2> points, std::vector<std::vector<glm::dvec2>> holes, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
+	void drawPrismWithHoles(std::vector<glm::dvec2> points, std::vector<std::vector<glm::dvec2>> holes, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
 		correct(points);
 		for (int i = 0; i < holes.size(); i++) {
 			correct(holes[i]);

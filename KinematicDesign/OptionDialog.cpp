@@ -89,36 +89,20 @@ float OptionDialog::getJointCapDepth() {
 	return ui.lineEditJointCapDepth->text().toFloat();
 }
 
-void OptionDialog::setSliderBarWidth(float slider_bar_width) {
-	ui.lineEditSliderBarWidth->setText(QString::number(slider_bar_width));
+void OptionDialog::setSliderGuideWidth(float slider_guide_width) {
+	ui.lineEditSliderGuideWidth->setText(QString::number(slider_guide_width));
 }
 
-float OptionDialog::getSliderBarWidth() {
-	return ui.lineEditSliderBarWidth->text().toFloat();
+float OptionDialog::getSliderGuideWidth() {
+	return ui.lineEditSliderGuideWidth->text().toFloat();
 }
 
-void OptionDialog::setSliderBarDepth(float slider_bar_depth) {
-	ui.lineEditSliderBarDepth->setText(QString::number(slider_bar_depth));
+void OptionDialog::setSliderGuideDepth(float slider_guide_depth) {
+	ui.lineEditSliderGuideDepth->setText(QString::number(slider_guide_depth));
 }
 
-float OptionDialog::getSliderBarDepth() {
-	return ui.lineEditSliderBarDepth->text().toFloat();
-}
-
-void OptionDialog::setSliderWidth(float slider_width) {
-	ui.lineEditSliderWidth->setText(QString::number(slider_width));
-}
-
-float OptionDialog::getSliderWidth() {
-	return ui.lineEditSliderWidth->text().toFloat();
-}
-
-void OptionDialog::setSliderDepth(float slider_depth) {
-	ui.lineEditSliderDepth->setText(QString::number(slider_depth));
-}
-
-float OptionDialog::getSliderDepth() {
-	return ui.lineEditSliderDepth->text().toFloat();
+float OptionDialog::getSliderGuideDepth() {
+	return ui.lineEditSliderGuideDepth->text().toFloat();
 }
 
 void OptionDialog::setBodyDepth(float body_depth) {
@@ -139,10 +123,8 @@ void OptionDialog::onSmall() {
 	ui.lineEditJointCapRadius1->setText("0.23");
 	ui.lineEditJointCapRadius2->setText("0.28");
 	ui.lineEditJointCapDepth->setText("0.15");
-	ui.lineEditSliderBarWidth->setText("0.6");
-	ui.lineEditSliderBarDepth->setText("0.3");
-	ui.lineEditSliderWidth->setText("1.0");
-	ui.lineEditSliderDepth->setText("0.5");
+	ui.lineEditSliderGuideWidth->setText("1.0");
+	ui.lineEditSliderGuideDepth->setText("0.3");
 	ui.lineEditBodyDepth->setText("10");
 }
 
@@ -156,10 +138,8 @@ void OptionDialog::onLarge() {
 	ui.lineEditJointCapRadius1->setText("0.43");
 	ui.lineEditJointCapRadius2->setText("0.47");
 	ui.lineEditJointCapDepth->setText("0.3");
-	ui.lineEditSliderBarWidth->setText("0.84");
-	ui.lineEditSliderBarDepth->setText("0.42");
-	ui.lineEditSliderWidth->setText("1.4");
-	ui.lineEditSliderDepth->setText("0.7");
+	ui.lineEditSliderGuideWidth->setText("1.7");
+	ui.lineEditSliderGuideDepth->setText("0.6");
 	ui.lineEditBodyDepth->setText("10");
 }
 
@@ -172,10 +152,8 @@ void OptionDialog::onHalf() {
 	ui.lineEditJointCapRadius1->setText(QString::number(ui.lineEditJointCapRadius1->text().toDouble() * 0.5));
 	ui.lineEditJointCapRadius2->setText(QString::number(ui.lineEditJointCapRadius2->text().toDouble() * 0.5));
 	ui.lineEditJointCapDepth->setText(QString::number(ui.lineEditJointCapDepth->text().toDouble() * 0.5));
-	ui.lineEditSliderBarWidth->setText(QString::number(ui.lineEditSliderBarWidth->text().toDouble() * 0.5));
-	ui.lineEditSliderBarDepth->setText(QString::number(ui.lineEditSliderBarDepth->text().toDouble() * 0.5));
-	ui.lineEditSliderWidth->setText(QString::number(ui.lineEditSliderWidth->text().toDouble() * 0.5));
-	ui.lineEditSliderDepth->setText(QString::number(ui.lineEditSliderDepth->text().toDouble() * 0.5));
+	ui.lineEditSliderGuideWidth->setText(QString::number(ui.lineEditSliderGuideWidth->text().toDouble() * 0.5));
+	ui.lineEditSliderGuideDepth->setText(QString::number(ui.lineEditSliderGuideDepth->text().toDouble() * 0.5));
 }
 
 void OptionDialog::onTwice() {
@@ -187,10 +165,8 @@ void OptionDialog::onTwice() {
 	ui.lineEditJointCapRadius1->setText(QString::number(ui.lineEditJointCapRadius1->text().toDouble() * 2));
 	ui.lineEditJointCapRadius2->setText(QString::number(ui.lineEditJointCapRadius2->text().toDouble() * 2));
 	ui.lineEditJointCapDepth->setText(QString::number(ui.lineEditJointCapDepth->text().toDouble() * 2));
-	ui.lineEditSliderBarWidth->setText(QString::number(ui.lineEditSliderBarWidth->text().toDouble() * 2));
-	ui.lineEditSliderBarDepth->setText(QString::number(ui.lineEditSliderBarDepth->text().toDouble() * 2));
-	ui.lineEditSliderWidth->setText(QString::number(ui.lineEditSliderWidth->text().toDouble() * 2));
-	ui.lineEditSliderDepth->setText(QString::number(ui.lineEditSliderDepth->text().toDouble() * 2));
+	ui.lineEditSliderGuideWidth->setText(QString::number(ui.lineEditSliderGuideWidth->text().toDouble() * 2));
+	ui.lineEditSliderGuideDepth->setText(QString::number(ui.lineEditSliderGuideDepth->text().toDouble() * 2));
 }
 
 void OptionDialog::onOK() {

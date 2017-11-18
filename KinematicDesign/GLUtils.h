@@ -125,7 +125,7 @@ namespace glutils {
 	void drawPrism(std::vector<glm::vec2> points, float h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
 	void drawPrism(std::vector<glm::dvec2> points, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
 	void drawPrism(std::vector<glm::dvec2> bottom_points, std::vector<glm::dvec2> top_points, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
-	void drawPrism(std::vector<glm::dvec2> points, std::vector<std::vector<glm::dvec2>> holes, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
+	void drawPrismWithHoles(std::vector<glm::dvec2> points, std::vector<std::vector<glm::dvec2>> holes, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
 	void drawArrow(float radius, float length, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices);
 	void drawAxes(float radius, float length, const glm::mat4& mat, std::vector<Vertex>& vertices);
 	void drawTube(std::vector<glm::vec3>& points, float radius, const glm::vec4& color, std::vector<Vertex>& vertices, int slices = 12);

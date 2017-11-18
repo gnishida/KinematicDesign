@@ -24,10 +24,8 @@ namespace kinematics {
 		float joint_cap_radius1;
 		float joint_cap_radius2;
 		float joint_cap_depth;
-		float slider_bar_width;
-		float slider_bar_depth;
-		float slider_width;
-		float slider_depth;
+		float slider_guide_width;
+		float slider_guide_depth;
 		float body_depth;
 
 	protected:
@@ -41,10 +39,8 @@ namespace kinematics {
 			joint_cap_radius1 = 0.23f;
 			joint_cap_radius2 = 0.28f;
 			joint_cap_depth = 0.15f;
-			slider_bar_width = 0.6f;
-			slider_bar_depth = 0.3f;
-			slider_width = 1.0f;
-			slider_depth = 0.5f;
+			slider_guide_width = 1.0f;
+			slider_guide_depth = 0.3f;
 			body_depth = 10.0f;
 		}
 
