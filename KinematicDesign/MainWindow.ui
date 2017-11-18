@@ -97,9 +97,9 @@
     <property name="title">
      <string>Kinematics</string>
     </property>
-    <addaction name="actionCalculateSolution4RLinkage"/>
-    <addaction name="actionCalculateSolutionSliderCrank"/>
-    <addaction name="actionCalculateSolutionWattI"/>
+    <addaction name="actionGenerate4RLinkage"/>
+    <addaction name="actionGenerateSliderCrank"/>
+    <addaction name="actionGenerateWattI"/>
     <addaction name="separator"/>
     <addaction name="actionRun"/>
     <addaction name="actionRunBackward"/>
@@ -159,6 +159,10 @@
   <action name="actionSelect">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/select.png</normaloff>Resources/select.png</iconset>
    </property>
    <property name="text">
     <string>Select</string>
@@ -319,13 +323,13 @@
     <string>Delete Layer</string>
    </property>
   </action>
-  <action name="actionCalculateSolution4RLinkage">
+  <action name="actionGenerate4RLinkage">
    <property name="icon">
     <iconset>
      <normaloff>Resources/fourbar_linkage.png</normaloff>Resources/fourbar_linkage.png</iconset>
    </property>
    <property name="text">
-    <string>Calculate Solution for 4R Linkage</string>
+    <string>Generate 4R Linkage</string>
    </property>
   </action>
   <action name="actionCollisionCheck">
@@ -387,13 +391,13 @@
     <string>Left</string>
    </property>
   </action>
-  <action name="actionCalculateSolutionSliderCrank">
+  <action name="actionGenerateSliderCrank">
    <property name="icon">
     <iconset>
      <normaloff>Resources/slider_crank.png</normaloff>Resources/slider_crank.png</iconset>
    </property>
    <property name="text">
-    <string>Calculate Solution for Slider Crank</string>
+    <string>Generate Slider Crank</string>
    </property>
   </action>
   <action name="actionShowSolutions">
@@ -514,9 +518,9 @@
     <string>Linkage Avoidance Region</string>
    </property>
   </action>
-  <action name="actionCalculateSolutionWattI">
+  <action name="actionGenerateWattI">
    <property name="text">
-    <string>Calculate Solution for Watt I</string>
+    <string>Generate Watt I</string>
    </property>
   </action>
  </widget>

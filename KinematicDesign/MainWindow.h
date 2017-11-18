@@ -42,9 +42,9 @@ public slots:
 	void onInsertLayer();
 	void onDeleteLayer();
 	void onLayerChanged();
-	void onCalculateSolution4RLinkage();
-	void onCalculateSolutionSliderCrank();
-	void onCalculateSolutionWattI();
+	void onGenerate4RLinkage();
+	void onGenerateSliderCrank();
+	void onGenerateWattI();
 	void onRun();
 	void onRunBackward();
 	void onStop();
