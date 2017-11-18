@@ -378,12 +378,10 @@ void GLWidget3D::redo() {
 
 void GLWidget3D::copySelectedShapes() {
 	design.copySelectedShapes();
-	//layers[layer_id].copySelectedShapes(copied_shapes);
 }
 
 void GLWidget3D::pasteCopiedShapes() {
 	design.pasteCopiedShapes();
-	//layers[layer_id].pasteCopiedShapes(copied_shapes);
 
 	// update 3D geometry
 	update3DGeometry();

@@ -1032,12 +1032,7 @@ namespace kinematics {
 
 				glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
 				glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), options->link_width / 2);
-
-				// HACK
-				// This part is currently very unorganized.
-				// For each type of mechanism, I have to hard code the depth of each link.
-				// In the future, this part of code should be moved to the class of each type of mechanism.
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(p1, p2, options->link_width / 2);
 				float z = kinematics[i].diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth;
 				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->link_depth)), vertices);
@@ -1081,12 +1076,6 @@ namespace kinematics {
 				holes[1] = generateCirclePolygon(p2 - p1, options->hole_radius);
 
 				std::vector<Vertex> vertices;
-
-				// HACK
-				// This part is currently very unorganized.
-				// For each type of mechanism, I have to hard code the depth of each link.
-				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = options->link_depth + options->joint_cap_depth + kinematics[i].diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) + options->gap;
 				glutils::drawPrismWithHoles(pts, holes, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::mat4(), vertices);
 
 				QString name = QString("link_%1_%2").arg(i).arg(j);
@@ -1118,15 +1107,9 @@ namespace kinematics {
 				holes[0] = generateCirclePolygon(glm::vec2(), options->hole_radius);
 				holes[1] = generateCirclePolygon(p2 - p1, options->hole_radius);
 
-				// HACK
-				// This part is currently very unorganized.
-				// For each type of mechanism, I have to hard code the depth of each link.
-				// In the future, this part of code should be moved to the class of each type of mechanism.
-				float z = options->link_depth + options->joint_cap_depth + kinematics[i].diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) + options->gap;
-
 				QString name = QString("link_%1_%2").arg(i).arg(j);
 				QString filename = dirname + "/" + name + ".scad";
-				SCADExporter::save(filename, name, pts, holes, z, options->link_depth);
+				SCADExporter::save(filename, name, pts, holes, options->link_depth);
 			}
 		}
 	}

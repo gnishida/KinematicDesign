@@ -23,7 +23,7 @@ namespace kinematics {
 			out << "  endloop" << endl;
 			out << "endfacet" << endl;
 		}
-		out << "endsolid" << name << endl;
+		out << "endsolid " << name << endl;
 		file.close();
 	}
 

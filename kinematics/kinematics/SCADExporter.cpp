@@ -34,7 +34,7 @@ namespace kinematics {
 		file.close();
 	}
 
-	void SCADExporter::save(const QString& filename, const QString& name, const std::vector<glm::dvec2>& pts, const std::vector<std::vector<glm::dvec2>>& holes, double z, double height) {
+	void SCADExporter::save(const QString& filename, const QString& name, const std::vector<glm::dvec2>& pts, const std::vector<std::vector<glm::dvec2>>& holes, double height) {
 		QFile file(filename);
 		file.open(QIODevice::WriteOnly);
 		QTextStream out(&file);

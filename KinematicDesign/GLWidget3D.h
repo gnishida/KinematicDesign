@@ -15,7 +15,6 @@
 #include "Operation.h"
 #include "Design.h"
 #include "History.h"
-#include <kinematics.h>
 
 class MainWindow;
 
