@@ -10,14 +10,14 @@ GeometryObject::GeometryObject() {
 	vaoOutdated = true;
 }
 
-GeometryObject::GeometryObject(const std::vector<Vertex>& vertices, bool lighting) {
+GeometryObject::GeometryObject(const std::vector<kinematics::Vertex>& vertices, bool lighting) {
 	this->vertices = vertices;
 	this->lighting = lighting;
 	vaoCreated = false;
 	vaoOutdated = true;
 }
 
-void GeometryObject::addVertices(const std::vector<Vertex>& vertices) {
+void GeometryObject::addVertices(const std::vector<kinematics::Vertex>& vertices) {
 	this->vertices.insert(this->vertices.end(), vertices.begin(), vertices.end());
 	vaoOutdated = true;
 }
@@ -44,19 +44,19 @@ void GeometryObject::createVAO() {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	}
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(kinematics::Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
 	// configure the attributes in the vao
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, normal));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, color));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, texCoord));
 	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, drawEdge));
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, drawEdge));
 		
 	// unbind the vao
 	glBindVertexArray(0); 
@@ -121,27 +121,27 @@ void RenderManager::init(const std::string& vertex_file, const std::string& geom
 	//////////////////////////////////////////////
 	// INIT SECOND PASS
 	// Quad
-	std::vector<Vertex> vert(4);
-	vert[0]=Vertex(glm::vec3(-1,-1,0),glm::vec3(0,0,0),glm::vec4(0,0,0,1), glm::vec2(0,0));
-	vert[1]=Vertex(glm::vec3(1,-1,0),glm::vec3(0,0,0),glm::vec4(0,0,0,1), glm::vec2(1,0));
-	vert[2]=Vertex(glm::vec3(1,1,0),glm::vec3(0,0,0),glm::vec4(0,0,0,1), glm::vec2(1,1));
-	vert[3]=Vertex(glm::vec3(-1,1,0),glm::vec3(0,0,0),glm::vec4(0,0,0,1), glm::vec2(0,1));
+	std::vector<kinematics::Vertex> vert(4);
+	vert[0] = kinematics::Vertex(glm::vec3(-1, -1, 0), glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0));
+	vert[1] = kinematics::Vertex(glm::vec3(1, -1, 0), glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0));
+	vert[2] = kinematics::Vertex(glm::vec3(1, 1, 0), glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1));
+	vert[3] = kinematics::Vertex(glm::vec3(-1, 1, 0), glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1));
 
 	glGenVertexArrays(1,&secondPassVAO);
 	glBindVertexArray(secondPassVAO);
 	glGenBuffers(1, &secondPassVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, secondPassVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*vert.size(), vert.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(kinematics::Vertex)*vert.size(), vert.data(), GL_STATIC_DRAW);
 	
 	// Configure the attributes in the VAO.
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, normal));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, color));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(kinematics::Vertex), (void*)offsetof(kinematics::Vertex, texCoord));
 
 	glBindVertexArray(0);
 	// fragm
@@ -327,11 +327,6 @@ void RenderManager::resize(int winWidth, int winHeight){
 	glActiveTexture(GL_TEXTURE0);
 		
 	resizeSsaoKernel();
-}//
-
-template<typename T>
-T lerp(T v0, T v1, T t) {
-	return (1 - t)*v0 + t*v1;
 }
 
 void RenderManager::resizeSsaoKernel() {
@@ -340,26 +335,19 @@ void RenderManager::resizeSsaoKernel() {
 	for (int i = 0; i < uKernelSize; ++i) {
 		glm::vec3 kernel = glm::normalize(glm::vec3((float(qrand()) / RAND_MAX)*2.0f - 1.0f, (float(qrand()) / RAND_MAX)*2.0f - 1.0f, (float(qrand()) / RAND_MAX)));
 		float scale = float(i) / uKernelSize;
-		kernel *= lerp<float>(0.1f, 1.0f, scale*scale);
+		kernel *= glm::mix(0.1f, 1.0f, scale*scale);
 		//printf("[%d] %f %f %f\n",i,kernel.x,kernel.y,kernel.z);
 		uKernelOffsets[i * 3 + 0] = kernel.x;
 		uKernelOffsets[i * 3 + 1] = kernel.y;
 		uKernelOffsets[i * 3 + 2] = kernel.z;
 	}
-}//
-
-
-void RenderManager::addFaces(const std::vector<boost::shared_ptr<glutils::Face> >& faces, bool lighting) {
-	for (int i = 0; i < faces.size(); ++i) {
-		addObject(faces[i]->name.c_str(), faces[i]->texture.c_str(), faces[i]->vertices, lighting);
-	}
 }
 
-void RenderManager::addObject(const QString& object_name, const QString& texture_file, const std::vector<Vertex>& vertices, bool lighting) {
+void RenderManager::addObject(const QString& object_name, const QString& texture_file, const std::vector<kinematics::Vertex>& vertices, bool lighting) {
 	GLuint texId;
 	
 	if (texture_file.length() > 0) {
-		// テクスチャファイルがまだ読み込まれていない場合は、ロードする
+		// load texture if it is not loaded yet
 		if (!textures.contains(texture_file)) {
 			texId = loadTexture(texture_file);
 			textures[texture_file] = texId;
@@ -397,49 +385,8 @@ void RenderManager::removeObject(const QString& object_name) {
 	objects[object_name].clear();
 }
 
-void RenderManager::centerObjects() {
-	glm::vec3 minPt((std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)(), (std::numeric_limits<float>::max)());
-	glm::vec3 maxPt = -minPt;
-
-	// もとのサイズを計算
-	for (auto it = objects.begin(); it != objects.end(); ++it) {
-		for (auto it2 = it.value().begin(); it2 != it.value().end(); ++it2) {
-			for (int k = 0; k < it2->vertices.size(); ++k) {
-				minPt.x = (std::min)(minPt.x, it2->vertices[k].position.x);
-				minPt.y = (std::min)(minPt.y, it2->vertices[k].position.y);
-				minPt.z = (std::min)(minPt.z, it2->vertices[k].position.z);
-				maxPt.x = (std::max)(maxPt.x, it2->vertices[k].position.x);
-				maxPt.y = (std::max)(maxPt.y, it2->vertices[k].position.y);
-				maxPt.z = (std::max)(maxPt.z, it2->vertices[k].position.z);
-			}
-		}
-	}
-
-	glm::vec3 center = (maxPt + minPt) * 0.5f;
-
-	float size = (std::max)(maxPt.x - minPt.x, (std::max)(maxPt.y - minPt.y, maxPt.z - minPt.z));
-	float scale = 1.0f / size;
-
-	// 単位立方体に入るよう、縮尺・移動
-	for (auto it = objects.begin(); it != objects.end(); ++it) {
-		for (auto it2 = it.value().begin(); it2 != it.value().end(); ++it2) {
-			for (int k = 0; k < it2->vertices.size(); ++k) {
-				it2->vertices[k].position = (it2->vertices[k].position - center) * scale;
-			}
-		}
-	}
-}
-
 void RenderManager::renderAll() {
 	for (auto it = objects.begin(); it != objects.end(); ++it) {
-		render(it.key());
-	}
-}
-
-void RenderManager::renderAllExcept(const QString& object_name) {
-	for (auto it = objects.begin(); it != objects.end(); ++it) {
-		if (it.key() == object_name) continue;
-
 		render(it.key());
 	}
 }
@@ -448,11 +395,11 @@ void RenderManager::render(const QString& object_name) {
 	for (auto it = objects[object_name].begin(); it != objects[object_name].end(); ++it) {
 		GLuint texId = it.key();
 		
-		// vaoを作成
+		// create vao
 		it->createVAO();
 
 		if (texId > 0) {
-			// テクスチャなら、バインドする
+			// bind the texture
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texId);
 			glUniform1i(glGetUniformLocation(programs["pass1"], "textureEnabled"), 1);
@@ -480,7 +427,7 @@ void RenderManager::render(const QString& object_name) {
 			glUniform1i(glGetUniformLocation(programs["pass1"], "useShadow"), 0);
 		}
 
-		// 描画
+		// draw
 		glBindVertexArray(it->vao);
 		glDrawArrays(GL_TRIANGLES, 0, it->vertices.size());
 
@@ -533,37 +480,35 @@ GLuint RenderManager::load3DTexture(const std::vector<QString> & pathes) {
 	std::vector<QImage> formatedImages(pathes.size());
 
 	// load and format each image
-	{
-		for (uint i = 0; i < pathes.size(); ++i) {
-			QImage imageToConvert;
-			if (!imageToConvert.load(pathes[i])) {
+	for (uint i = 0; i < pathes.size(); ++i) {
+		QImage imageToConvert;
+		if (!imageToConvert.load(pathes[i])) {
+			std::stringstream ss;
+			ss << "Failed to load 3D texture : " << pathes[i].toUtf8().constData();
+			std::cout << ss.str() << std::endl;
+			throw ss.str();
+		}
+
+		QImage GL_formatted_image = QGLWidget::convertToGLFormat(imageToConvert);
+		if (GL_formatted_image.isNull()) {
+			std::stringstream ss;
+			ss << "Failed to convert to gl format : " << pathes[i].toUtf8().constData();
+			std::cout << ss.str() << std::endl;
+			throw ss.str();
+		}
+
+		formatedImages[i] = GL_formatted_image;
+
+		if (i == 0) {
+			width = formatedImages[i].width();
+			height = formatedImages[i].height();
+		}
+		else {
+			if (width != formatedImages[i].width() || height != formatedImages[i].height())	{
 				std::stringstream ss;
-				ss << "Failed to load 3D texture : " << pathes[i].toUtf8().constData();
+				ss << "Texture3D::load() failed : different dimensions of images. " << pathes[0].toUtf8().constData() << " " << pathes[i].toUtf8().constData();
 				std::cout << ss.str() << std::endl;
 				throw ss.str();
-			}
-
-			QImage GL_formatted_image = QGLWidget::convertToGLFormat(imageToConvert);
-			if (GL_formatted_image.isNull()) {
-				std::stringstream ss;
-				ss << "Failed to convert to gl format : " << pathes[i].toUtf8().constData();
-				std::cout << ss.str() << std::endl;
-				throw ss.str();
-			}
-
-			formatedImages[i] = GL_formatted_image;
-
-			if (i == 0) {
-				width = formatedImages[i].width();
-				height = formatedImages[i].height();
-			}
-			else {
-				if (width != formatedImages[i].width() || height != formatedImages[i].height())	{
-					std::stringstream ss;
-					ss << "Texture3D::load() failed : different dimensions of images. " << pathes[0].toUtf8().constData() << " " << pathes[i].toUtf8().constData();
-					std::cout << ss.str() << std::endl;
-					throw ss.str();
-				}
 			}
 		}
 	}
@@ -585,10 +530,8 @@ GLuint RenderManager::load3DTexture(const std::vector<QString> & pathes) {
 	}
 
 	// copy image data to each layer of 3D texture
-	{
-		for (uint i = 0; i < pathes.size(); ++i) {
-			glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, (GLint)i, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, formatedImages[i].bits());
-		}
+	for (uint i = 0; i < pathes.size(); ++i) {
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, (GLint)i, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, formatedImages[i].bits());
 	}
 
 	glGenerateMipmap(GL_TEXTURE_3D);

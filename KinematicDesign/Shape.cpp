@@ -1,6 +1,6 @@
 #include "Shape.h"
 #include <QImage>
-#include "GLUtils.h"
+#include <kinematics.h>
 
 namespace canvas {
 
@@ -98,6 +98,6 @@ namespace canvas {
 		for (int i = 0; i < pts.size(); i++) {
 			pts[i] = glm::vec2(points[i].x, points[i].y);
 		}
-		glutils::drawPrism(pts, 10, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10)), vertices);
+		kinematics::glutils::drawPrism(pts, 10, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10)), vertices);
 	}
 }

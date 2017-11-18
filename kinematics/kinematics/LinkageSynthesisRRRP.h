@@ -33,6 +33,10 @@ namespace kinematics {
 		bool checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, std::vector<Object25D> fixed_body_pts, const Object25D& body_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, int collision_check_type);
 		Kinematics recordCollisionForConnectors(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D> fixed_body_pts, const Object25D& body_pts);
 		double tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const Object25D& body_pts);
+
+		std::vector<Vertex> generate3DGeometry(const std::vector<Kinematics>& kinematics);
+		void saveSCAD(const QString& dirname, const std::vector<Kinematics>& kinematics);
+		void saveSTL(const QString& dirname, const std::vector<Kinematics>& kinematics);
 	};
 
 }

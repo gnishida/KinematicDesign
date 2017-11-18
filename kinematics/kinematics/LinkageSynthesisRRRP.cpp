@@ -1,4 +1,5 @@
 ﻿#include "LinkageSynthesisRRRP.h"
+#include <opencv2/opencv.hpp>
 #include "KinematicUtils.h"
 #include "Kinematics.h"
 #include "PinJoint.h"
@@ -6,7 +7,10 @@
 #include "BoundingBox.h"
 #include "LeastSquareSolver.h"
 #include "ZOrder.h"
-#include <opencv2/opencv.hpp>
+#include "STLExporter.h"
+#include "SCADExporter.h"
+#include "Vertex.h"
+#include "GLUtils.h"
 
 namespace kinematics {
 	
@@ -957,6 +961,217 @@ namespace kinematics {
 
 		kinematics.clear();
 		return length_of_trajectory / length_of_straight;
+	}
+
+	std::vector<Vertex> LinkageSynthesisRRRP::generate3DGeometry(const std::vector<Kinematics>& kinematics) {
+		std::vector<Vertex> vertices;
+
+		for (int i = 0; i < kinematics.size(); i++) {
+			// generate geometry of rigid bodies
+			for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
+				for (int k = 0; k < kinematics[i].diagram.bodies[j]->size(); k++) {
+					std::vector<glm::dvec2> points = kinematics[i].diagram.bodies[j]->getActualPoints(k);
+					std::vector<glm::dvec2> points2 = kinematics[i].diagram.bodies[j]->getActualPoints2(k);
+					float z = kinematics[i].diagram.bodies[j]->polygons[k].depth1;
+					float depth = kinematics[i].diagram.bodies[j]->polygons[k].depth2 - kinematics[i].diagram.bodies[j]->polygons[k].depth1;
+					glutils::drawPrism(points, points2, depth, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				}
+			}
+
+			// generate geometry of links
+			// link 0
+			{
+				glm::dvec2& p1 = kinematics[i].diagram.links[0]->joints[0]->pos;
+				glm::dvec2& p2 = kinematics[i].diagram.links[0]->joints[1]->pos;
+				if (!kinematics[i].diagram.links[0]->joints[0]->ground) {
+					std::swap(p1, p2);
+				}
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), options->link_width / 2);
+
+				// HACK
+				// This part is currently very unorganized.
+				// For each type of mechanism, I have to hard code the depth of each link.
+				// In the future, this part of code should be moved to the class of each type of mechanism.
+				float z = kinematics[i].diagram.links[0]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth;
+				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->link_depth)), vertices);
+			}
+
+			// link 1
+			{
+				glm::dvec2& p1 = kinematics[i].diagram.links[1]->joints[0]->pos;
+				glm::dvec2& p2 = kinematics[i].diagram.links[1]->joints[2]->pos;
+
+				std::vector<glm::dvec2> pts = generateBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), options->slider_guide_width);
+				glm::dvec2 dir = p2 - p1;
+				dir /= glm::length(dir);
+				glm::dvec2 p1b = p1 + dir * (2.0 - options->joint_radius - options->gap);
+				glm::dvec2 p2b = p2 - dir * (2.0 - options->joint_radius - options->gap);
+				std::vector<glm::dvec2> holes = generateBarPolygon(glm::vec2(p1b.x, p1b.y), glm::vec2(p2b.x, p2b.y), options->joint_radius * 2);
+
+				// HACK
+				// This part is currently very unorganized.
+				// For each type of mechanism, I have to hard code the depth of each link.
+				// In the future, this part of code should be moved to the class of each type of mechanism.
+				float z = kinematics[i].diagram.links[1]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth;
+				glutils::drawPrismWithHoles(pts, { holes }, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrismWithHoles(pts, { holes }, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->slider_guide_depth)), vertices);
+
+				// end of bar
+				pts = generateCirclePolygon(p1, options->slider_guide_width / 2);
+				glutils::drawPrism(pts, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrism(pts, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->slider_guide_depth)), vertices);
+				pts = generateCirclePolygon(p2, options->slider_guide_width / 2);
+				glutils::drawPrism(pts, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				glutils::drawPrism(pts, options->slider_guide_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->slider_guide_depth)), vertices);
+			}
+		}
+
+		return vertices;
+	}
+
+	void LinkageSynthesisRRRP::saveSTL(const QString& dirname, const std::vector<Kinematics>& kinematics) {
+		for (int i = 0; i < kinematics.size(); i++) {
+			// generate geometry of rigid bodies
+			for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
+				std::vector<Vertex> vertices;
+
+				int N = kinematics[i].diagram.bodies[j]->size();
+				for (int k = 0; k < N; k++) {
+					std::vector<glm::dvec2> pts = kinematics[i].diagram.bodies[j]->getActualPoints(k);
+					std::vector<glm::dvec2> pts2 = kinematics[i].diagram.bodies[j]->getActualPoints2(k);
+					float z = kinematics[i].diagram.bodies[j]->polygons[k].depth1;
+					float depth = kinematics[i].diagram.bodies[j]->polygons[k].depth2 - kinematics[i].diagram.bodies[j]->polygons[k].depth1;
+					glutils::drawPrism(pts, pts2, depth, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+				}
+
+				QString name = QString("body_%1_%2").arg(i).arg(j);
+				QString filename = dirname + "/" + name + ".stl";
+				STLExporter::save(filename, name, vertices);
+			}
+
+			// generate geometry of links
+			/*
+			// link 0
+			{
+			glm::dvec2& p1 = kinematics[i].diagram.links[0]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics[i].diagram.links[0]->joints[1]->pos;
+			if (!kinematics[i].diagram.links[0]->joints[0]->ground) {
+			std::swap(p1, p2);
+			}
+			std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), options->link_width / 2);
+
+			// HACK
+			// This part is currently very unorganized.
+			// For each type of mechanism, I have to hard code the depth of each link.
+			// In the future, this part of code should be moved to the class of each type of mechanism.
+			float z = (options->link_depth + options->joint_depth) + slider_depth - (slider_depth - slider_bar_depth) * 0.5 + joint_depth + (link_depth + joint_depth);
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - link_depth)), vertices);
+
+			// joints
+			float height1 = joint_depth + slider_depth - (slider_depth - slider_bar_depth) * 0.5 + joint_depth + (link_depth + joint_depth) * 2;
+			float height2 = link_depth + joint_depth * 2;
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height1, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, link_depth)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height2, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z - joint_depth)), vertices, 36);
+
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height1, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - link_depth - height1)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height2, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z + joint_depth - height2)), vertices, 36);
+			}
+
+			// link 1
+			{
+			glm::dvec2& p1 = kinematics[i].diagram.links[1]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics[i].diagram.links[1]->joints[1]->pos;
+			if (!kinematics[i].diagram.links[0]->joints[0]->ground) {
+			std::swap(p1, p2);
+			}
+			std::vector<glm::dvec2> pts = generateBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), slider_bar_with);
+
+			// HACK
+			// This part is currently very unorganized.
+			// For each type of mechanism, I have to hard code the depth of each link.
+			// In the future, this part of code should be moved to the class of each type of mechanism.
+			float z = link_depth + joint_depth;
+			glutils::drawPrism(pts, slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+			glutils::drawPrism(pts, slider_bar_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - slider_bar_depth)), vertices);
+
+			// slider
+			glm::vec2 vec = glm::normalize(p2 - p1);
+			vec *= slider_depth * 2;
+			std::vector<glm::dvec2> pts2 = generateBarPolygon(glm::vec2(p2.x - vec.x, p2.y - vec.y), glm::vec2(p2.x + vec.x, p2.y + vec.y), slider_with);
+			glutils::drawPrism(pts2, slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z - (slider_depth - slider_bar_depth) * 0.5)), vertices);
+			glutils::drawPrism(pts2, slider_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z + (slider_depth - slider_bar_depth) * 0.5 - slider_depth)), vertices);
+
+			// joints
+			float height = slider_bar_depth + joint_depth * 2;
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z - joint_depth)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z + (slider_depth - slider_bar_depth) * 0.5)), vertices, 36);
+
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - z + joint_depth - height)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z - (slider_depth - slider_bar_depth) * 0.5 - height)), vertices, 36);
+			}
+
+			// link 2
+			{
+			glm::dvec2& p1 = kinematics[i].diagram.links[2]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics[i].diagram.links[2]->joints[1]->pos;
+			std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(p1.x, p1.y), glm::vec2(p2.x, p2.y), link_radius);
+
+			// HACK
+			// This part is currently very unorganized.
+			// For each type of mechanism, I have to hard code the depth of each link.
+			// In the future, this part of code should be moved to the class of each type of mechanism.
+			float z = (link_depth + joint_depth) + slider_depth - (slider_depth - slider_bar_depth) * 0.5 + joint_depth;
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+			glutils::drawPrism(pts, link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -10 - z - link_depth)), vertices);
+
+			// joints
+			float height = link_depth + joint_depth * 2;
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, z - joint_depth)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, z - joint_depth)), vertices, 36);
+
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p1.x, p1.y, -10 - z + joint_depth - height)), vertices, 36);
+			glutils::drawCylinderZ(joint_radius, joint_radius, joint_radius, joint_radius, height, glm::vec4(0.9, 0.9, 0.9, 1), glm::translate(glm::mat4(), glm::vec3(p2.x, p2.y, -10 - z + joint_depth - height)), vertices, 36);
+			}
+			*/
+		}
+	}
+
+	void LinkageSynthesisRRRP::saveSCAD(const QString& dirname, const std::vector<Kinematics>& kinematics) {
+		for (int i = 0; i < kinematics.size(); i++) {
+			// generate geometry of rigid bodies
+			for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
+				QString name = QString("body_%1_%2").arg(i).arg(j);
+				QString filename = dirname + "/" + name + ".scad";
+				SCADExporter::save(filename, name, kinematics[i].diagram.bodies[j]);
+			}
+
+			// generate geometry of links
+			for (int j = 0; j < kinematics[i].diagram.links.size(); j++) {
+				// For the coupler, we can use the moving body itself as a coupler, 
+				// so we do not need to create a coupler link.
+				if (!kinematics[i].diagram.links[j]->actual_link) continue;
+
+				glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
+				glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
+				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(), p2 - p1, options->link_width / 2);
+				std::vector<std::vector<glm::dvec2>> holes(2);
+				holes[0] = generateCirclePolygon(glm::vec2(), options->hole_radius);
+				holes[1] = generateCirclePolygon(p2 - p1, options->hole_radius);
+
+				// HACK
+				// This part is currently very unorganized.
+				// For each type of mechanism, I have to hard code the depth of each link.
+				// In the future, this part of code should be moved to the class of each type of mechanism.
+				float z = options->link_depth + options->joint_cap_depth + kinematics[i].diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) + options->gap;
+
+				QString name = QString("link_%1_%2").arg(i).arg(j);
+				QString filename = dirname + "/" + name + ".scad";
+				SCADExporter::save(filename, name, pts, holes, z, options->link_depth);
+			}
+		}
+
 	}
 
 }

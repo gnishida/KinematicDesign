@@ -2,7 +2,7 @@
 
 #include <glew.h>
 #include "Shader.h"
-#include "Vertex.h"
+#include <kinematics.h>
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QTimer>

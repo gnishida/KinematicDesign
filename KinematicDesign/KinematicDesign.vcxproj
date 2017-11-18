@@ -141,6 +141,7 @@
     <ClCompile Include="..\kinematics\kinematics\BodyGeometry.cpp" />
     <ClCompile Include="..\kinematics\kinematics\clipper.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Gear.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\GLUtils.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Joint.cpp" />
     <ClCompile Include="..\kinematics\kinematics\JointConnector.cpp" />
     <ClCompile Include="..\kinematics\kinematics\KinematicDiagram.cpp" />
@@ -152,8 +153,10 @@
     <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis4R.cpp" />
     <ClCompile Include="..\kinematics\kinematics\LinkageSynthesisRRRP.cpp" />
     <ClCompile Include="..\kinematics\kinematics\PinJoint.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\SCADExporter.cpp" />
     <ClCompile Include="..\kinematics\kinematics\SliderHinge.cpp" />
     <ClCompile Include="..\kinematics\kinematics\Solution.cpp" />
+    <ClCompile Include="..\kinematics\kinematics\STLExporter.cpp" />
     <ClCompile Include="..\kinematics\kinematics\ZOrder.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -201,7 +204,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="GLWidget3D.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="LinkageSynthesisOptionDialog.cpp" />
@@ -212,11 +214,9 @@
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="RenderManager.cpp" />
-    <ClCompile Include="SCADExporter.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Shape.cpp" />
-    <ClCompile Include="STLExporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -265,6 +265,7 @@
     <ClInclude Include="..\kinematics\kinematics\BodyGeometry.h" />
     <ClInclude Include="..\kinematics\kinematics\clipper.hpp" />
     <ClInclude Include="..\kinematics\kinematics\Gear.h" />
+    <ClInclude Include="..\kinematics\kinematics\GLUtils.h" />
     <ClInclude Include="..\kinematics\kinematics\Joint.h" />
     <ClInclude Include="..\kinematics\kinematics\JointConnector.h" />
     <ClInclude Include="..\kinematics\kinematics\KinematicDiagram.h" />
@@ -276,8 +277,11 @@
     <ClInclude Include="..\kinematics\kinematics\LinkageSynthesis4R.h" />
     <ClInclude Include="..\kinematics\kinematics\LinkageSynthesisRRRP.h" />
     <ClInclude Include="..\kinematics\kinematics\PinJoint.h" />
+    <ClInclude Include="..\kinematics\kinematics\SCADExporter.h" />
     <ClInclude Include="..\kinematics\kinematics\SliderHinge.h" />
     <ClInclude Include="..\kinematics\kinematics\Solution.h" />
+    <ClInclude Include="..\kinematics\kinematics\STLExporter.h" />
+    <ClInclude Include="..\kinematics\kinematics\Vertex.h" />
     <ClInclude Include="..\kinematics\kinematics\ZOrder.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Camera.h" />
@@ -286,7 +290,6 @@
     <ClInclude Include="GeneratedFiles\ui_LinkageSynthesisOptionDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_MainWindow.h" />
     <ClInclude Include="GeneratedFiles\ui_OptionDialog.h" />
-    <ClInclude Include="GLUtils.h" />
     <CustomBuild Include="GLWidget3D.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing GLWidget3D.h...</Message>
@@ -346,12 +349,9 @@
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="RenderManager.h" />
-    <ClInclude Include="SCADExporter.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Shape.h" />
-    <ClInclude Include="STLExporter.h" />
-    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.qrc">

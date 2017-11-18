@@ -3,9 +3,8 @@
 #include "glew.h"
 #include <vector>
 #include <QMap>
-#include "Vertex.h"
+#include <kinematics.h>
 #include "ShadowMapping.h"
-#include "GLUtils.h"
 #include <boost/shared_ptr.hpp>
 #include "Shader.h"
 #include <map>
@@ -14,21 +13,21 @@ class GeometryObject {
 public:
 	GLuint vao;
 	GLuint vbo;
-	std::vector<Vertex> vertices;
+	std::vector<kinematics::Vertex> vertices;
 	bool lighting;
 	bool vaoCreated;
 	bool vaoOutdated;
 
 public:
 	GeometryObject();
-	GeometryObject(const std::vector<Vertex>& vertices, bool lighting = true);
-	void addVertices(const std::vector<Vertex>& vertices);
+	GeometryObject(const std::vector<kinematics::Vertex>& vertices, bool lighting = true);
+	void addVertices(const std::vector<kinematics::Vertex>& vertices);
 	void createVAO();
 };
 
 class RenderManager {
 public:
-	static enum { RENDERING_MODE_BASIC = 0, RENDERING_MODE_SSAO, RENDERING_MODE_CONTOUR, RENDERING_MODE_LINE, RENDERING_MODE_HATCHING, RENDERING_MODE_SKETCHY };
+	static enum { RENDERING_MODE_BASIC = 0, RENDERING_MODE_SSAO, RENDERING_MODE_CONTOUR, RENDERING_MODE_LINE, RENDERING_MODE_HATCHING };
 
 public:
 	Shader shader;
@@ -75,13 +74,10 @@ public:
 	void resize(int width,int height);
 	void resizeSsaoKernel();
 
-	void addFaces(const std::vector<boost::shared_ptr<glutils::Face> >& faces, bool lighting);
-	void addObject(const QString& object_name, const QString& texture_file, const std::vector<Vertex>& vertices, bool lighting);
+	void addObject(const QString& object_name, const QString& texture_file, const std::vector<kinematics::Vertex>& vertices, bool lighting);
 	void removeObjects();
 	void removeObject(const QString& object_name);
-	void centerObjects();
 	void renderAll();
-	void renderAllExcept(const QString& object_name);
 	void render(const QString& object_name);
 	void updateShadowMap(GLWidget3D* glWidget3D, const glm::vec3& light_dir, const glm::mat4& light_mvpMatrix);
 	

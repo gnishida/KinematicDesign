@@ -18,3 +18,7 @@
 #include "kinematics/LeastSquareSolver.h"
 #include "kinematics/Solution.h"
 #include "kinematics/ZOrder.h"
+#include "kinematics/STLExporter.h"
+#include "kinematics/SCADExporter.h"
+#include "kinematics/Vertex.h"
+#include "kinematics/GLUtils.h"

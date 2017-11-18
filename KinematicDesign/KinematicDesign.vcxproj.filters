@@ -65,9 +65,6 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GLUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BoundingBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -149,12 +146,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_GLWidget3D.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="STLExporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SCADExporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OptionDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -177,6 +168,15 @@
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
     <ClCompile Include="..\kinematics\kinematics\LinkageSynthesis.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\SCADExporter.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\STLExporter.cpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kinematics\kinematics\GLUtils.cpp">
       <Filter>Source Files\kinematics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -219,13 +219,7 @@
     <ClInclude Include="ShadowMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BoundingBox.h">
@@ -300,12 +294,6 @@
     <ClInclude Include="GeneratedFiles\ui_LinkageSynthesisOptionDialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="STLExporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SCADExporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_OptionDialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -319,6 +307,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\kinematics\kinematics\clipper.hpp">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\SCADExporter.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\STLExporter.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\GLUtils.h">
+      <Filter>Source Files\kinematics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kinematics\kinematics\Vertex.h">
       <Filter>Source Files\kinematics</Filter>
     </ClInclude>
   </ItemGroup>
