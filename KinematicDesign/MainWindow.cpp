@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	groupMode->addAction(ui.actionMovingCircle);
 	groupMode->addAction(ui.actionMovingPolygon);
 	groupMode->addAction(ui.actionLinkageRegion);
-	groupMode->addAction(ui.actionLinkageAvoidanceRegion);
+	groupMode->addAction(ui.actionLinkageAvoidance);
 	groupMode->addAction(ui.actionKinematics);
 	ui.actionSelect->setChecked(true);
 
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionMovingCircle, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionMovingPolygon, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionLinkageRegion, SIGNAL(triggered()), this, SLOT(onModeChanged()));
-	connect(ui.actionLinkageAvoidanceRegion, SIGNAL(triggered()), this, SLOT(onModeChanged()));
+	connect(ui.actionLinkageAvoidance, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionKinematics, SIGNAL(triggered()), this, SLOT(onModeChanged()));
 	connect(ui.actionAddLayer, SIGNAL(triggered()), this, SLOT(onAddLayer()));
 	connect(ui.actionInsertLayer, SIGNAL(triggered()), this, SLOT(onInsertLayer()));
@@ -77,6 +77,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionRenderSSAO, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderLine, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderHatching, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
+
+	// create tool bar for file menu
+	ui.mainToolBar->addAction(ui.actionNew);
+	ui.mainToolBar->addAction(ui.actionOpen);
+	ui.mainToolBar->addAction(ui.actionSave);
+	ui.mainToolBar->addSeparator();
+
+	// create tool bar for modes
+	ui.mainToolBar->addAction(ui.actionFixedRectangle);
+	ui.mainToolBar->addAction(ui.actionFixedCircle);
+	ui.mainToolBar->addAction(ui.actionFixedPolygon);
+	ui.mainToolBar->addAction(ui.actionMovingRectangle);
+	ui.mainToolBar->addAction(ui.actionMovingCircle);
+	ui.mainToolBar->addAction(ui.actionMovingPolygon);
+	ui.mainToolBar->addAction(ui.actionLinkageRegion);
+	ui.mainToolBar->addAction(ui.actionLinkageAvoidance);
+	ui.mainToolBar->addSeparator();
+
+	// create tool bar for linkage generation
+	ui.mainToolBar->addAction(ui.actionCalculateSolution4RLinkage);
+	ui.mainToolBar->addAction(ui.actionCalculateSolutionSliderCrank);
 }
 
 MainWindow::~MainWindow() {
@@ -190,7 +211,7 @@ void MainWindow::onModeChanged() {
 	else if (ui.actionLinkageRegion->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_LINKAGE_REGION);
 	}
-	else if (ui.actionLinkageAvoidanceRegion->isChecked()) {
+	else if (ui.actionLinkageAvoidance->isChecked()) {
 		glWidget->setMode(GLWidget3D::MODE_LINKAGE_AVOIDANCE);
 	}
 	else if (ui.actionKinematics->isChecked()) {
