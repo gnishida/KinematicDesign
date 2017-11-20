@@ -135,12 +135,12 @@ namespace kinematics {
 
 	bool polygonPolygonIntersection(const std::vector<glm::dvec2>& polygon1, const std::vector<glm::dvec2>& polygon2) {
 		// make the polygons closed
-		polygon poly1 = polygon1;
+		contour poly1 = polygon1;
 		boost::geometry::correct(poly1);
-		polygon poly2 = polygon2;
+		contour poly2 = polygon2;
 		boost::geometry::correct(poly2);
 
-		std::deque<polygon> output;
+		std::deque<contour> output;
 		boost::geometry::intersection(poly1, poly2, output);
 		if (output.size() > 0) return true;
 		else return false;
@@ -535,13 +535,13 @@ namespace kinematics {
 	}
 
 	double area(const std::vector<glm::dvec2>& points) {
-		polygon poly = points;
+		contour poly = points;
 		boost::geometry::correct(poly);
 		return boost::geometry::area(poly);
 	}
 
 	bool withinPolygon(const std::vector<glm::dvec2>& points, const glm::dvec2& pt) {
-		polygon poly = points;
+		contour poly = points;
 		boost::geometry::correct(poly);
 		return boost::geometry::within(pt, poly);
 	}
@@ -565,6 +565,53 @@ namespace kinematics {
 			max_y = std::max(max_y, points[i].y);
 		}
 		return BBox(glm::dvec2(min_x, min_y), glm::dvec2(max_x, max_y));
+	}
+
+	std::vector<std::vector<glm::dvec2>> unionPolygon(std::vector<std::vector<glm::dvec2>> polygons) {
+		if (polygons.size() <= 1) return polygons;
+
+		std::vector<polygon> plgns(polygons.size());
+		for (int i = 0; i < polygons.size(); i++) {
+			boost::geometry::assign_points(plgns[i], polygons[i]);
+			boost::geometry::correct(plgns[i]);
+		}
+
+		bool updated = true;
+		while (updated) {
+			updated = false;
+			for (int i = 0; i < plgns.size(); i++) {
+				bool intersected = false;
+				int index;
+				for (int j = i + 1; j < plgns.size(); j++) {
+					if (boost::geometry::intersects(plgns[i], plgns[j])) {
+						intersected = true;
+						index = j;
+						break;
+					}
+				}
+
+				if (intersected) {
+					std::vector<polygon> marged;
+					boost::geometry::union_(plgns[i], plgns[index], marged);
+					plgns.erase(plgns.begin() + index);
+					plgns.erase(plgns.begin() + i);
+					plgns.insert(plgns.end(), marged.begin(), marged.end());
+
+					updated = true;
+					break;
+				}
+			}
+		}
+
+		std::vector<std::vector<glm::dvec2>> ans(plgns.size());
+		for (int i = 0; i < plgns.size(); i++) {
+			for (int j = 0; j < plgns[i].outer().size(); j++) {
+				ans[i].push_back(glm::dvec2(plgns[i].outer()[j].x(), plgns[i].outer()[j].y()));
+			}
+			if (ans[i].back() == ans[i].front()) ans[i].pop_back();
+		}
+
+		return ans;
 	}
 
 	std::vector<glm::dvec2> generateBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_width) {

@@ -8,6 +8,8 @@
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include "BBox.h"
 
 namespace kinematics {
@@ -90,14 +92,16 @@ namespace kinematics {
 	bool withinPolygon(const std::vector<glm::dvec2>& points, const glm::dvec2& pt);
 	bool withinPolygon(const std::vector<std::vector<glm::dvec2>>& polygons, const glm::dvec2& pt);
 	BBox boundingBox(const std::vector<glm::dvec2>& points);
+	std::vector<std::vector<glm::dvec2>> unionPolygon(std::vector<std::vector<glm::dvec2>> polygons);
 
 	std::vector<glm::dvec2> generateBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_width);
 	std::vector<glm::dvec2> generateRoundedBarPolygon(const glm::dvec2& p1, const glm::dvec2& p2, float link_radius, int num_slices = 36);
 	std::vector<glm::dvec2> generateCirclePolygon(const glm::dvec2& p, float radius, int num_slices = 36);
 
-	typedef std::vector<glm::dvec2> polygon;
+	typedef std::vector<glm::dvec2> contour;
+	typedef boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> polygon;
 
 }
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(glm::dvec2, double, boost::geometry::cs::cartesian, x, y)
-BOOST_GEOMETRY_REGISTER_RING(kinematics::polygon)
+BOOST_GEOMETRY_REGISTER_RING(kinematics::contour)

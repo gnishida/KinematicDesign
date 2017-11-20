@@ -519,18 +519,18 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	this->linkage_type = linkage_type;
 
 	// get the geometry of fixed rigid bodies, moving bodies, linkage regions
-	fixed_body_pts.clear();
-	body_pts.resize(design.moving_bodies.size());
+	fixed_bodies.clear();
+	moving_bodies.resize(design.moving_bodies.size());
 	std::vector<std::vector<glm::dmat3x3>> poses(design.moving_bodies.size());
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
-		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
+		fixed_bodies.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
 		poses[i].resize(design.moving_bodies[i].poses.size());
 
-		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
+		moving_bodies[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
 
 		// set pose matrices
 		for (int j = 0; j < design.moving_bodies[i].poses.size(); j++) {
@@ -558,6 +558,17 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 	}
 
+	// merged fixed body
+	std::vector<std::vector<glm::dvec2>> polygons(design.fixed_bodies.size());
+	for (int i = 0; i < design.fixed_bodies.size(); i++) {
+		polygons[i] = design.fixed_bodies[i]->getPoints();
+	}
+	polygons = kinematics::unionPolygon(polygons);
+	std::vector<kinematics::Object25D> merged_fixed_bodies;
+	for (int i = 0; i < polygons.size(); i++) {
+		merged_fixed_bodies.push_back(kinematics::Object25D(polygons[i], -kinematics::options->body_depth, 0));
+	}
+	
 	kinematics.clear();
 
 	if (linkage_type == LINKAGE_4R) {
@@ -570,9 +581,9 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
 	}
 
-	solutions.resize(body_pts.size());
-	selected_solutions.resize(body_pts.size());
-	for (int i = 0; i < body_pts.size(); i++) {
+	solutions.resize(moving_bodies.size());
+	selected_solutions.resize(moving_bodies.size());
+	for (int i = 0; i < moving_bodies.size(); i++) {
 		time_t start = clock();
 		
 		// calculate a distance mapt for the linkage region
@@ -582,7 +593,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		// calculate the circle point curve and center point curve
 		std::vector<glm::dvec2> enlarged_linkage_region_pts;
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, fixed_body_pts, body_pts[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i], enlarged_linkage_region_pts);
+		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, merged_fixed_bodies, moving_bodies[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i], enlarged_linkage_region_pts);
 
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
@@ -599,8 +610,8 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], fixed_body_pts, body_pts[i], rotatable_crank, avoid_branch_defect, 1.0, weights, num_particles, num_iterations, record_file);
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, body_pts[i], true, fixed_body_pts);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], merged_fixed_bodies, moving_bodies[i], rotatable_crank, avoid_branch_defect, 1.0, weights, num_particles, num_iterations, record_file);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies);
 
 		kinematics.push_back(kin);
 
@@ -629,15 +640,15 @@ void GLWidget3D::constructKinematics() {
 	kinematics.clear();
 
 	// get the geometry of fixed rigid bodies, moving bodies
-	fixed_body_pts.clear();
-	body_pts.resize(design.moving_bodies.size());
+	fixed_bodies.clear();
+	moving_bodies.resize(design.moving_bodies.size());
 	std::vector<std::vector<glm::dvec2>> linkage_region_pts;
 	std::vector<std::vector<glm::dvec2>> linkage_avoidance_pts;
 	for (int i = 0; i < design.fixed_bodies.size(); i++) {
-		fixed_body_pts.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
+		fixed_bodies.push_back(kinematics::Object25D(design.fixed_bodies[i]->getPoints(), -kinematics::options->body_depth, 0));
 	}
 	for (int i = 0; i < design.moving_bodies.size(); i++) {
-		body_pts[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
+		moving_bodies[i] = kinematics::Object25D(design.moving_bodies[i].poses[0]->getPoints(), -kinematics::options->body_depth, 0);
 		
 		if (design.moving_bodies[i].linkage_region) {
 			linkage_region_pts.push_back(design.moving_bodies[i].linkage_region->getPoints());
@@ -662,7 +673,7 @@ void GLWidget3D::constructKinematics() {
 
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, { body_pts[i] }, true, fixed_body_pts);
+		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies);
 		kinematics.push_back(kin);
 	}
 	
@@ -1184,12 +1195,12 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 			}
 
 			// update the geometry
-			for (int i = 0; i < body_pts.size(); i++) {
-				synthesis->updateBodies(kinematics[i], body_pts[i]);
+			for (int i = 0; i < moving_bodies.size(); i++) {
+				synthesis->updateBodies(kinematics[i], moving_bodies[i]);
 			}
-			for (int i = 0; i < fixed_body_pts.size(); i++) {
+			for (int i = 0; i < fixed_bodies.size(); i++) {
 				for (int j = 0; j < kinematics.size(); j++) {
-					kinematics[j].diagram.addBody(kinematics[j].diagram.joints[0], kinematics[j].diagram.joints[1], fixed_body_pts[i]);
+					kinematics[j].diagram.addBody(kinematics[j].diagram.joints[0], kinematics[j].diagram.joints[1], fixed_bodies[i]);
 				}
 			}
 
