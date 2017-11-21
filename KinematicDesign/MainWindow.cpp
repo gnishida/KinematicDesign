@@ -123,6 +123,14 @@ void MainWindow::initLayerMenu(int num_layers) {
 	menuLayers[0]->setChecked(true);
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *e) {
+	glWidget->keyPressEvent(e);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* e) {
+	glWidget->keyReleaseEvent(e);
+}
+
 void MainWindow::onNew() {
 	glWidget->clear();
 	setWindowTitle("Kinematic Design");
@@ -178,14 +186,6 @@ void MainWindow::onDelete() {
 
 void MainWindow::onSelectAll() {
 	glWidget->selectAll();
-}
-
-void MainWindow::keyPressEvent(QKeyEvent *e) {
-	glWidget->keyPressEvent(e);
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent* e) {
-	glWidget->keyReleaseEvent(e);
 }
 
 void MainWindow::onModeChanged() {

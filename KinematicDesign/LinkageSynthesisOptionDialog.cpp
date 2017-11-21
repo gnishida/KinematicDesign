@@ -11,7 +11,7 @@ LinkageSynthesisOptionDialog::LinkageSynthesisOptionDialog(QWidget *parent) : QD
 	ui.lineEditStdDevPositionLast->setText("0");
 	ui.lineEditStdDevOrientationLast->setText("0");
 	ui.checkBoxAvoidBranchDefect->setChecked(true);
-	ui.checkBoxRotatableCrank->setChecked(true);
+	ui.checkBoxRotatableCrank->setChecked(false);
 	ui.lineEditPositionErrorWeight->setText("1");
 	ui.lineEditOrientationErrorWeight->setText("5");
 	ui.lineEditLinkageLocationWeight->setText("10");
