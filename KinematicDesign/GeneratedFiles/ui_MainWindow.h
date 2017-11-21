@@ -250,6 +250,9 @@ public:
         actionLinkageAvoidance->setIcon(icon19);
         actionGenerateWattI = new QAction(MainWindowClass);
         actionGenerateWattI->setObjectName(QStringLiteral("actionGenerateWattI"));
+        QIcon icon20;
+        icon20.addFile(QStringLiteral("Resources/watt_i_linkage.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionGenerateWattI->setIcon(icon20);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);

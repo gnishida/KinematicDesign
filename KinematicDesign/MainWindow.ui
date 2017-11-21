@@ -523,6 +523,10 @@
    </property>
   </action>
   <action name="actionGenerateWattI">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/watt_i_linkage.png</normaloff>Resources/watt_i_linkage.png</iconset>
+   </property>
    <property name="text">
     <string>Generate Watt I</string>
    </property>
