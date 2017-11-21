@@ -114,11 +114,14 @@ namespace kinematics {
 		}
 		//resample(particles, num_particles, particles, max_cost);
 
-		QFile file("particle_filter.txt");
-		file.open(QIODevice::WriteOnly);
-		QTextStream out(&file);
+		QFile* file;
+		QTextStream* out;
 
 		if (record_file) {
+			file = new QFile("particle_filter.txt");
+			file->open(QIODevice::WriteOnly);
+			out = new QTextStream(file);
+
 			std::vector<double> values;
 			for (int i = 0; i < particles.size(); i++) {
 				if (particles[i].cost == std::numeric_limits<double>::max()) continue;
@@ -128,7 +131,7 @@ namespace kinematics {
 			double mean_val;
 			double sd_val;
 			calculateStatistics(values, mean_val, sd_val);
-			out << mean_val << "," << sd_val << "\n";
+			(*out) << mean_val << "," << sd_val << "\n";
 		}
 
 		// particle filter
@@ -176,10 +179,15 @@ namespace kinematics {
 				double mean_val;
 				double sd_val;
 				calculateStatistics(values, mean_val, sd_val);
-				out << mean_val << "," << sd_val << "\n";
+				(*out) << mean_val << "," << sd_val << "\n";
 			}
 		}
-		file.close();
+
+		if (record_file) {
+			file->close();
+			delete out;
+			delete file;
+		}
 
 		// sort the particles based on the costs
 		sort(particles.begin(), particles.end(), compare);
