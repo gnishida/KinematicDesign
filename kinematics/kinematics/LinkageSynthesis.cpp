@@ -108,7 +108,7 @@ namespace kinematics {
 
 		double max_cost = 0;
 		for (int i = 0; i < solutions.size(); i++) {
-			double cost = calculateCost(solutions[i], moving_body, dist_map, dist_map_bbox, weights);
+			double cost = calculateCost(solutions[i], fixed_bodies, moving_body, dist_map, dist_map_bbox, weights);
 			max_cost = std::max(max_cost, cost);
 			particles[i] = Particle(cost, solutions[i]);
 		}
@@ -149,7 +149,7 @@ namespace kinematics {
 					// check the hard constraints
 					if (checkHardConstraints(new_particles[i].solution.points, new_particles[i].solution.poses, linkage_region_pts, linkage_avoidance_pts, fixed_bodies, moving_body, rotatable_crank, avoid_branch_defect, min_link_length, new_particles[i].solution.zorder)) {
 						// calculate the score
-						double cost = calculateCost(new_particles[i].solution, moving_body, dist_map, dist_map_bbox, weights);
+						double cost = calculateCost(new_particles[i].solution, fixed_bodies, moving_body, dist_map, dist_map_bbox, weights);
 						new_particles[i] = Particle(cost, new_particles[i].solution);
 					}
 					else {

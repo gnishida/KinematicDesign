@@ -77,9 +77,9 @@ namespace kinematics {
 		boost::shared_ptr<Link> addLink(bool driver, std::vector<boost::shared_ptr<Joint>> joints, bool actual_link = true, double z = 0);
 		void addBody(boost::shared_ptr<Joint> joint1, boost::shared_ptr<Joint> joint2, const Object25D& polygons);
 		void addPolygonToBody(int body_id, const Polygon25D& polygon);
-		void connectJointsToBodies(std::vector<Object25D>& fixed_bodies, const std::vector<std::vector<int>>& zorder);
-		void connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_bodies, double link_z);
-		void connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& moving_body, double link_z);
+		void connectJointsToBodies(std::vector<Object25D>& fixed_bodies, const std::vector<std::vector<int>>& zorder, std::vector<glm::dvec2>& connected_pts);
+		glm::dvec2 connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_bodies, double link_z);
+		glm::dvec2 connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& moving_body, double link_z);
 		void load(const QString& filename);
 		void save(const QString& filename);
 		void updateBodyAdjacency();

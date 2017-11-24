@@ -267,13 +267,15 @@ namespace kinematics {
 		}
 	}
 
-	double LinkageSynthesisRRRP::calculateCost(Solution& solution, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<double>& weights) {
+	double LinkageSynthesisRRRP::calculateCost(Solution& solution, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<double>& weights) {
 		double dist = 0;
 		for (int i = 0; i < solution.points.size(); i++) {
 			dist += dist_map.at<double>(solution.points[i].y - dist_map_bbox.minPt.y, solution.points[i].x - dist_map_bbox.minPt.x);
 		}
 		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, moving_body);
-		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]);
+		std::vector<glm::dvec2> connected_pts;
+		Kinematics kin = constructKinematics(solution.points, solution.zorder, moving_body, true, fixed_bodies, connected_pts);
+		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[4] - connected_pts[2]) + glm::length(solution.points[2] - connected_pts[3]) + +glm::length(solution.points[3] - connected_pts[4]);
 		int max_zorder = 0;
 		for (int i = 0; i < solution.zorder.size(); i++) {
 			for (int j = 0; j < solution.zorder[i].size(); j++) {
@@ -287,7 +289,7 @@ namespace kinematics {
 	/**
 	* Construct a linkage.
 	*/
-	Kinematics LinkageSynthesisRRRP::constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies) {
+	Kinematics LinkageSynthesisRRRP::constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies, std::vector<glm::dvec2>& connected_pts) {
 		kinematics::Kinematics kin;
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], zorder.size() == 3 ? zorder[2][0] : 1)));
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], zorder.size() == 3 ? zorder[2][1] : 1)));
@@ -301,9 +303,9 @@ namespace kinematics {
 		std::vector<Object25D> copied_fixed_bodies = fixed_bodies;
 
 		// update the geometry
-		updateBodies(kin, moving_body);
+		updateMovingBodies(kin, moving_body);
 		if (connect_joints) {
-			kin.diagram.connectJointsToBodies(copied_fixed_bodies, zorder);
+			kin.diagram.connectJointsToBodies(copied_fixed_bodies, zorder, connected_pts);
 		}
 
 		// add the fixed rigid bodies
@@ -317,7 +319,7 @@ namespace kinematics {
 	/**
 	* update bodies.
 	*/
-	void LinkageSynthesisRRRP::updateBodies(Kinematics& kin, const Object25D& moving_body) {
+	void LinkageSynthesisRRRP::updateMovingBodies(Kinematics& kin, const Object25D& moving_body) {
 		kin.diagram.bodies.clear();
 		kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], moving_body);
 	}
@@ -508,7 +510,8 @@ namespace kinematics {
 	}
 
 	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, int collision_check_type) {
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, (collision_check_type == 1 || collision_check_type == 3), fixed_bodies);
+		std::vector<glm::dvec2> connector_pts;
+		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, (collision_check_type == 1 || collision_check_type == 3), fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
 
 		// set the initial point of slider and direction
@@ -664,7 +667,8 @@ namespace kinematics {
 	}
 
 	Kinematics LinkageSynthesisRRRP::recordCollisionForConnectors(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D> fixed_bodies, const Object25D& moving_body) {
-		Kinematics kinematics = constructKinematics(points, {}, moving_body, true, fixed_bodies);
+		std::vector<glm::dvec2> connector_pts;
+		Kinematics kinematics = constructKinematics(points, {}, moving_body, true, fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
 
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
@@ -818,7 +822,8 @@ namespace kinematics {
 		}
 
 		// create a kinematics
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, {});
+		std::vector<glm::dvec2> connector_pts;
+		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, {}, connector_pts);
 		kinematics.diagram.initialize();
 
 		// initialize the trajectory of the moving body

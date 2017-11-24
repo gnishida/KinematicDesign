@@ -234,7 +234,7 @@ namespace kinematics {
 	 * this function updates the fixed bodies and moving bodies such that
 	 * all the joints are properly connected to some rigid bodies.
 	 */
-	void KinematicDiagram::connectJointsToBodies(std::vector<Object25D>& fixed_bodies, const std::vector<std::vector<int>>& zorder) {
+	void KinematicDiagram::connectJointsToBodies(std::vector<Object25D>& fixed_bodies, const std::vector<std::vector<int>>& zorder, std::vector<glm::dvec2>& connected_pts) {
 		int N = fixed_bodies.size();
 
 		// clear the connectors
@@ -244,7 +244,8 @@ namespace kinematics {
 		int cnt = 0;
 		for (int j = 0; j < joints.size(); j++) {
 			if (joints[j]->ground) {
-				connectFixedJointToBody(joints[j], fixed_bodies, zorder.size() == 3 ? zorder[0][cnt++] : 1);
+				glm::dvec2 connected_pt = connectFixedJointToBody(joints[j], fixed_bodies, zorder.size() == 3 ? zorder[0][cnt++] : 1);
+				connected_pts.push_back(connected_pt);
 			}
 		}
 
@@ -254,8 +255,10 @@ namespace kinematics {
 			if (bodies[j]->pivot1->ground ||bodies[j]->pivot2->ground) continue;
 
 			std::vector<glm::dvec2> body_pts = bodies[j]->getActualPoints()[0];
-			connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
-			connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
+			glm::dvec2 connected_pt1 = connectMovingJointToBody(bodies[j]->pivot1, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
+			connected_pts.push_back(connected_pt1);
+			glm::dvec2 connected_pt2 = connectMovingJointToBody(bodies[j]->pivot2, j, body_pts, zorder.size() == 3 ? zorder[1][cnt++] : 1);
+			connected_pts.push_back(connected_pt2);
 		}
 
 		// add links as additional connectors
@@ -283,11 +286,13 @@ namespace kinematics {
 	/**
 	 * Connect fixed joint to a body by adding a connector
 	 * Joint has a information of z order that indicates the z order of the connected link.
+	 * Based on the z orders of the joint and joint connector, the direction of the joint, upward or downward, can be determined.
 	 *
 	 * @param joint	joint
-	 * @param z		z order of the connector
+	 * @param z		z order of the joint connector
 	 */
-	void KinematicDiagram::connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_bodies, double link_z) {
+	glm::dvec2 KinematicDiagram::connectFixedJointToBody(boost::shared_ptr<kinematics::Joint> joint, std::vector<Object25D>& fixed_bodies, double link_z) {
+		glm::dvec2 closest_point;
 		int fixed_body_id = -1;
 
 		// check if the joint is within the rigid body
@@ -305,6 +310,8 @@ namespace kinematics {
 		double height = 0;
 
 		if (is_inside) {
+			closest_point = joint->pos;
+
 			// create connector object
 			connectors.push_back(JointConnector(joint, joint->pos));
 
@@ -315,17 +322,15 @@ namespace kinematics {
 			fixed_bodies[fixed_body_id].push_back(kinematics::Polygon25D(pts, -options->body_depth - z - height, -options->body_depth - z));
 		}
 		else {
-			glm::dvec2 closest_point;
-
 			// find the closest point of a rigid body
 			double min_dist = std::numeric_limits<double>::max();
 			for (int k = 0; k < fixed_bodies.size(); k++) {
 				glm::dvec2 cp = kinematics::closestOffsetPoint(fixed_bodies[k].polygons[0].points, joint->pos, options->body_margin);
 
-				// extend the point a little into the rigid body
-				glm::dvec2 v = glm::normalize(cp - joint->pos);
+				// extend the point a little into the rigid body				
+				/*glm::dvec2 v = glm::normalize(cp - joint->pos);
 				v *= options->link_width / 2;
-				cp += v;
+				cp += v;*/
 
 				double dist = glm::length(cp - joint->pos);
 				if (dist < min_dist) {
@@ -403,14 +408,19 @@ namespace kinematics {
 			fixed_bodies[fixed_body_id].push_back(kinematics::Polygon25D(pts, pts2, z, z + height, false));
 			fixed_bodies[fixed_body_id].push_back(kinematics::Polygon25D(pts2, pts, -options->body_depth - z - height, -options->body_depth - z, false));
 		}
+
+		return closest_point;
 	}
 
-	void KinematicDiagram::connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& moving_body, double link_z) {
+	glm::dvec2 KinematicDiagram::connectMovingJointToBody(boost::shared_ptr<Joint> joint, int body_id, const std::vector<glm::dvec2>& moving_body, double link_z) {
+		glm::dvec2 closest_point;
 		std::vector<glm::dvec2> pts;
 		double z = 0;
 		double height = 0;
 
 		if (kinematics::withinPolygon(moving_body, joint->pos)) {
+			closest_point = joint->pos;
+
 			// create connector object
 			connectors.push_back(JointConnector(joint, bodies[body_id]->worldToLocal(joint->pos), bodies[body_id]));
 
@@ -422,25 +432,25 @@ namespace kinematics {
 		}
 		else {
 			// find the closest point of a rigid body
-			glm::dvec2 closest_pt = kinematics::closestOffsetPoint(moving_body, joint->pos, options->body_margin);
+			glm::dvec2 closest_point = kinematics::closestOffsetPoint(moving_body, joint->pos, options->body_margin);
 
 			// extend the point a little into the rigid body
-			glm::dvec2 v1 = glm::normalize(closest_pt - joint->pos);
+			/*glm::dvec2 v1 = glm::normalize(closest_point - joint->pos);
 			v1 *= options->link_width / 2;
-			closest_pt += v1;
+			closest_point += v1;*/
 
 			// create connector object
-			connectors.push_back(JointConnector(joint, bodies[body_id]->worldToLocal(closest_pt), bodies[body_id]));
+			connectors.push_back(JointConnector(joint, bodies[body_id]->worldToLocal(closest_point), bodies[body_id]));
 
 			// Create the base of the connecting part
-			pts = generateCirclePolygon(closest_pt, options->link_width / 2);
+			pts = generateCirclePolygon(closest_point, options->link_width / 2);
 			z = 0;
 			height = link_z * (options->link_depth + options->joint_cap_depth + options->gap * 2) - options->link_depth;
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, -options->body_depth - z - height, -options->body_depth - z));
 
 			// create a geometry to extend the body to the joint
-			pts = generateRoundedBarPolygon(closest_pt, joint->pos, options->link_width / 2);
+			pts = generateRoundedBarPolygon(closest_point, joint->pos, options->link_width / 2);
 			z += height;
 			height = options->link_depth;
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, z, z + height));
@@ -497,6 +507,8 @@ namespace kinematics {
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts, pts2, z, z + height, false));
 			addPolygonToBody(body_id, kinematics::Polygon25D(pts2, pts, -options->body_depth - z - height, -options->body_depth - z, false));
 		}
+
+		return closest_point;
 	}
 
 	void KinematicDiagram::load(const QString& filename) {
