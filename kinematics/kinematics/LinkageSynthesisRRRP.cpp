@@ -150,7 +150,7 @@ namespace kinematics {
 	}
 
 	bool LinkageSynthesisRRRP::optimizeLinkForThreePoses(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, glm::dvec2& A0, glm::dvec2& A1) {
-		// sample a point within the valid region as the local coordinate of a circle point
+		// calculate the local coordinate of A1
 		glm::dvec2 a = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(A1, 1));
 
 		glm::dvec2 A2(poses[1] * glm::dvec3(a, 1));
@@ -199,23 +199,8 @@ namespace kinematics {
 		starting_point(2, 0) = A1.x;
 		starting_point(3, 0) = A1.y;
 
-		column_vector lower_bound(4);
-		column_vector upper_bound(4);
-		double min_range = std::numeric_limits<double>::max();
-		for (int i = 0; i < 4; i++) {
-			// set the lower bound
-			lower_bound(i, 0) = i % 2 == 0 ? bbox.minPt.x : bbox.minPt.y;
-			lower_bound(i, 0) = std::min(lower_bound(i, 0), starting_point(i, 0));
-
-			// set the upper bound
-			upper_bound(i, 0) = i % 2 == 0 ? bbox.maxPt.x : bbox.maxPt.y;
-			upper_bound(i, 0) = std::max(upper_bound(i, 0), starting_point(i, 0));
-
-			min_range = std::min(min_range, upper_bound(i, 0) - lower_bound(i, 0));
-		}
-
 		try {
-			find_min_bobyqa(SolverForSlider(poses), starting_point, 14, lower_bound, upper_bound, min_range * 0.19, min_range * 0.0001, 1000);
+			find_min_using_approximate_derivatives(dlib::bfgs_search_strategy(), dlib::objective_delta_stop_strategy(1e-7), SolverForSlider(poses), starting_point, -1);
 
 			A1.x = starting_point(2, 0);
 			A1.y = starting_point(3, 0);
@@ -224,7 +209,7 @@ namespace kinematics {
 			if (!withinPolygon(linkage_region_pts, A1)) return false;
 		}
 		catch (std::exception& e) {
-			//std::cout << e.what() << std::endl;
+			return false;
 		}
 
 		// calculate the local coordinate of A1
