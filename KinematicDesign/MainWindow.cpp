@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionCollisionCheck, SIGNAL(triggered()), this, SLOT(onCollisionCheck()));
 	connect(ui.actionOptions, SIGNAL(triggered()), this, SLOT(onOptions()));
 	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
+	connect(ui.actionShowGridLines, SIGNAL(triggered()), this, SLOT(onShowGridLines()));
 	connect(ui.actionRenderBasic, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderSSAO, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderLine, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
@@ -409,6 +410,11 @@ void MainWindow::onOptions() {
 
 void MainWindow::onShowSolutions() {
 	glWidget->show_solutions = ui.actionShowSolutions->isChecked();
+	update();
+}
+
+void MainWindow::onShowGridLines() {
+	glWidget->show_grid_lines = ui.actionShowGridLines->isChecked();
 	update();
 }
 

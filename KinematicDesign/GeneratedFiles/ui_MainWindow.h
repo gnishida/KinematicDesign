@@ -69,6 +69,7 @@ public:
     QAction *actionAho;
     QAction *actionLinkageAvoidance;
     QAction *actionGenerateWattI;
+    QAction *actionShowGridLines;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -253,6 +254,10 @@ public:
         QIcon icon20;
         icon20.addFile(QStringLiteral("Resources/watt_i_linkage.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionGenerateWattI->setIcon(icon20);
+        actionShowGridLines = new QAction(MainWindowClass);
+        actionShowGridLines->setObjectName(QStringLiteral("actionShowGridLines"));
+        actionShowGridLines->setCheckable(true);
+        actionShowGridLines->setChecked(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -342,6 +347,7 @@ public:
         menuKinematics->addAction(actionCollisionCheck);
         menuKinematics->addAction(actionOptions);
         menuView->addAction(actionShowSolutions);
+        menuView->addAction(actionShowGridLines);
         menuView->addSeparator();
         menuView->addAction(actionRenderBasic);
         menuView->addAction(actionRenderSSAO);
@@ -410,6 +416,7 @@ public:
         actionAho->setText(QApplication::translate("MainWindowClass", "Aho", 0));
         actionLinkageAvoidance->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", 0));
         actionGenerateWattI->setText(QApplication::translate("MainWindowClass", "Generate Watt I", 0));
+        actionShowGridLines->setText(QApplication::translate("MainWindowClass", "Show Grid Lines", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

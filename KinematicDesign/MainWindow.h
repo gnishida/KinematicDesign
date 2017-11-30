@@ -53,6 +53,7 @@ public slots:
 	void onCollisionCheck();
 	void onOptions();
 	void onShowSolutions();
+	void onShowGridLines();
 	void onRenderingChanged();
 };
 

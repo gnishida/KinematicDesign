@@ -65,6 +65,7 @@ public:
 	QTimer* animation_timer;
 	bool collision_check;
 	bool show_solutions;
+	bool show_grid_lines;
 
 public:
 	GLWidget3D(MainWindow *parent = 0);

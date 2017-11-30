@@ -32,6 +32,7 @@ GLWidget3D::GLWidget3D(MainWindow *parent) : QGLWidget(QGLFormat(QGL::SampleBuff
 	animation_timer = NULL;
 	collision_check = true;
 	show_solutions = false;
+	show_grid_lines = true;
 
 	// This is necessary to prevent the screen overdrawn by OpenGL
 	setAutoFillBackground(false);
@@ -899,15 +900,17 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 	painter.setOpacity(1.0f);
 	if (abs(camera.xrot) < 10 && abs(camera.yrot) < 10) {
 		// draw grid
-		painter.save();
-		painter.setPen(QPen(QColor(224, 224, 224), 1));
-		for (int i = -200; i <= 200; i++) {
-			glm::dvec2 p = worldToScreenCoordinates(glm::dvec2(i * 5, i * 5));
-			painter.drawLine(p.x, 0, p.x, height());
-			glm::dvec2 p2 = worldToScreenCoordinates(glm::dvec2(0, i * 5));
-			painter.drawLine(0, p.y, width(), p.y);
+		if (show_grid_lines) {
+			painter.save();
+			painter.setPen(QPen(QColor(224, 224, 224), 1));
+			for (int i = -200; i <= 200; i++) {
+				glm::dvec2 p = worldToScreenCoordinates(glm::dvec2(i * 5, i * 5));
+				painter.drawLine(p.x, 0, p.x, height());
+				glm::dvec2 p2 = worldToScreenCoordinates(glm::dvec2(0, i * 5));
+				painter.drawLine(0, p.y, width(), p.y);
+			}
+			painter.restore();
 		}
-		painter.restore();
 
 		// draw 2D
 		glm::vec2 offset = glm::vec2(camera.pos.x, -camera.pos.y) * (float)scale();
@@ -970,6 +973,19 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 			for (int i = 0; i < kinematics.size(); i++) {
 				kinematics[i].draw(painter, QPointF(width() * 0.5 - offset.x, height() * 0.5 - offset.y), scale());
 			}
+		}
+
+		// draw axes
+		if (show_grid_lines) {
+			painter.save();
+			painter.setPen(QPen(QColor(128, 128, 128), 1));
+			glm::dvec2 x1 = worldToScreenCoordinates(glm::dvec2(-10000, 0));
+			glm::dvec2 x2 = worldToScreenCoordinates(glm::dvec2(10000, 0));
+			painter.drawLine(0, x1.y, width(), x2.y);
+			glm::dvec2 y1 = worldToScreenCoordinates(glm::dvec2(0, -10000));
+			glm::dvec2 y2 = worldToScreenCoordinates(glm::dvec2(0, 10000));
+			painter.drawLine(y1.x, height(), y2.x, 0);
+			painter.restore();
 		}
 	}
 	painter.end();
