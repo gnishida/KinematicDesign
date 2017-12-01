@@ -13,22 +13,16 @@ namespace kinematics {
 
 	Kinematics::Kinematics(double simulation_speed) {
 		this->simulation_speed = simulation_speed;
-		show_assemblies = true;
 		show_links = true;
 		show_bodies = true;
 	}
 
 	void Kinematics::clear() {
 		diagram.clear();
-		trace_end_effector.clear();
 	}
 
 	void Kinematics::load(const QString& filename) {
-		trace_end_effector.clear();
-
 		diagram.load(filename);
-
-		//trace_end_effector.resize(assemblies.size());
 	}
 
 	void Kinematics::save(const QString& filename) {
@@ -167,10 +161,6 @@ namespace kinematics {
 
 	void Kinematics::invertSpeed() {
 		simulation_speed = -simulation_speed;
-	}
-
-	void Kinematics::showAssemblies(bool flag) {
-		show_assemblies = flag;
 	}
 
 	void Kinematics::showLinks(bool flag) {

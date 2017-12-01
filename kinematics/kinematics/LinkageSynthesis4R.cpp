@@ -557,6 +557,11 @@ namespace kinematics {
 		return false;
 	}
 
+	/**
+	 * Check collision. If there are any collisions, return true.
+	 *
+	 * @param collision_check_type	1 -    / 2 - consider only the main body / 3 - 
+	 */
 	bool LinkageSynthesis4R::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, int collision_check_type) {
 		std::vector<glm::dvec2> connector_pts;
 		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, (collision_check_type == 1 || collision_check_type == 3), fixed_bodies, connector_pts);

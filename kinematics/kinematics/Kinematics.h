@@ -17,10 +17,7 @@ namespace kinematics {
 	class Kinematics {
 	public:
 		KinematicDiagram diagram;
-		std::vector<std::vector<glm::vec2>> trace_end_effector;
-
 		double simulation_speed;
-		bool show_assemblies;
 		bool show_links;
 		bool show_bodies;
 
@@ -37,7 +34,6 @@ namespace kinematics {
 		void speedUp();
 		void speedDown();
 		void invertSpeed();
-		void showAssemblies(bool flag);
 		void showLinks(bool flag);
 		void showBodies(bool flag);
 	};
