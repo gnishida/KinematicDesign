@@ -413,23 +413,25 @@ namespace kinematics {
 	* Find the closest point of a polygon from the specified point.
 	*/
 	glm::dvec2 closestOffsetPoint(const std::vector<glm::dvec2>& points, const glm::dvec2& p, double margin, int num_samples) {
+		const double scale = 100;
+
 		ClipperLib::Path subj;
 		for (int i = 0; i < points.size(); i++) {
-			subj.push_back(ClipperLib::IntPoint(points[i].x * 100, points[i].y * 100));
+			subj.push_back(ClipperLib::IntPoint(points[i].x * scale, points[i].y * scale));
 		}
 
 		ClipperLib::Paths solution;
 		ClipperLib::ClipperOffset co;
 		co.AddPath(subj, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-		co.Execute(solution, -margin);
+		co.Execute(solution, -margin * scale);
 
 		double min_dist = std::numeric_limits<double>::max();
 		glm::dvec2 ans;
 		for (int i = 0; i < solution.size(); i++) {
 			std::vector<glm::dvec2> offset_points;
 			for (int j = 0; j < solution[i].size(); j++) {
-				double x = solution[i][j].X * 0.01;
-				double y = solution[i][j].Y * 0.01;
+				double x = (double)solution[i][j].X / scale;
+				double y = (double)solution[i][j].Y / scale;
 				offset_points.push_back(glm::dvec2(x, y));
 			}
 
