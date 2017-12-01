@@ -1199,12 +1199,6 @@ void GLWidget3D::mouseReleaseEvent(QMouseEvent *e) {
 		camera.yrot = 0;
 		camera.updateMVPMatrix();
 		front_faced = true;
-		/*
-		}
-		else {
-		front_faced = false;
-		}
-		*/
 	}
 	else if (mode == MODE_MOVE || mode == MODE_ROTATION || mode == MODE_RESIZE) {
 		history.push(design);

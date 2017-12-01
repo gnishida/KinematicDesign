@@ -69,6 +69,16 @@ namespace kinematics {
 		}
 	}
 
+	/**
+	* Step forward the linkage.
+	*
+	* @param collision_check	0 - no collision check
+	*                           1 - check collision and throw exception if collision occurs
+	*                           2 - check collision only for the main bodies and throw exception if collision occurs
+	*                           3 - only record the collision between connectors
+	* @param need_recovery_for_collision
+	*                           true - when collision occurs, recover the state right before the collision
+	*/
 	void Kinematics::stepForward(int collision_check, bool need_recovery_for_collision) {
 		// save the current state
 		KinematicDiagram prev_state;

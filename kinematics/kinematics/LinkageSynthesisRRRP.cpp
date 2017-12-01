@@ -323,7 +323,7 @@ namespace kinematics {
 		// collision check
 		// moving_body[0] means the main body without the joint connectors
 		glm::dvec2 slider_end_pos1, slider_end_pos2;
-		if (checkCollision(poses, points, fixed_bodies, moving_body[0], linkage_avoidance_pts, slider_end_pos1, slider_end_pos2, 2)) return false;
+		if (checkCollision(poses, points, fixed_bodies, moving_body[0], linkage_avoidance_pts, slider_end_pos1, slider_end_pos2)) return false;
 
 		// locate the two endpoints of the bar
 		points[1] = slider_end_pos1 - slider_dir * 2.0;
@@ -494,9 +494,20 @@ namespace kinematics {
 		return false;
 	}
 
-	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, int collision_check_type) {
+	/**
+	* Check collision. If there are any collisions, return true.
+	* Only the main body is checked for collision.
+	*
+	* @param poses					N poses
+	* @param points					joint coordinates
+	* @param fixed_bodies			list of fixed bodies
+	* @param moving_body			moving body
+	* @param linkage_avoidance_pts	region to avoid for the linkage
+	* @return						true if collision occurs
+	*/
+	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2) {
 		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, (collision_check_type == 1 || collision_check_type == 3), fixed_bodies, connector_pts);
+		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
 
 		// set the initial point of slider and direction
@@ -571,7 +582,7 @@ namespace kinematics {
 		// run forward until collision is deteted or all the poses are reached
 		while (true) {
 			try {
-				kinematics.stepForward(collision_check_type, false);
+				kinematics.stepForward(2, false);	// check only the main body for collision
 				double dist = glm::dot(kinematics.diagram.joints[3]->pos - orig_slider_pos, slider_dir);
 				if (dist > slider_max_dist) {
 					slider_max_dist = dist;
@@ -879,7 +890,7 @@ namespace kinematics {
 		// run forward until collision is deteted or all the poses are reached
 		while (true) {
 			try {
-				kinematics.stepForward(2, false);
+				kinematics.stepForward(0, false);	// no collision check
 			}
 			catch (char* ex) {
 				// if only some of the poses are reached before collision, the collision is detected.
