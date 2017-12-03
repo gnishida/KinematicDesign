@@ -362,6 +362,10 @@
    </property>
   </action>
   <action name="actionRun">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/run.png</normaloff>Resources/run.png</iconset>
+   </property>
    <property name="text">
     <string>Run</string>
    </property>
@@ -372,11 +376,19 @@
    </property>
   </action>
   <action name="actionStop">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/stop.png</normaloff>Resources/stop.png</iconset>
+   </property>
    <property name="text">
     <string>Stop</string>
    </property>
   </action>
   <action name="actionStepForward">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/step_forward.png</normaloff>Resources/step_forward.png</iconset>
+   </property>
    <property name="text">
     <string>Step Forward</string>
    </property>
@@ -385,6 +397,10 @@
    </property>
   </action>
   <action name="actionStepBackward">
+   <property name="icon">
+    <iconset>
+     <normaloff>Resources/step_backward.png</normaloff>Resources/step_backward.png</iconset>
+   </property>
    <property name="text">
     <string>Step Backward</string>
    </property>

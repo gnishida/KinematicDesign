@@ -101,6 +101,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.mainToolBar->addAction(ui.actionGenerate4RLinkage);
 	ui.mainToolBar->addAction(ui.actionGenerateSliderCrank);
 	ui.mainToolBar->addAction(ui.actionGenerateWattI);
+	ui.mainToolBar->addSeparator();
+
+	// create tool bar for kinematic simulation
+	ui.mainToolBar->addAction(ui.actionStepBackward);
+	ui.mainToolBar->addAction(ui.actionRun);
+	ui.mainToolBar->addAction(ui.actionStop);
+	ui.mainToolBar->addAction(ui.actionStepForward);
 }
 
 MainWindow::~MainWindow() {

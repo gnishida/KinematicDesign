@@ -596,18 +596,15 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		std::vector<glm::dvec2> enlarged_linkage_region_pts;
 		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, merged_fixed_bodies, moving_bodies[i], sigmas, rotatable_crank, avoid_branch_defect, 1.0, solutions[i], enlarged_linkage_region_pts);
 
+		time_t end = clock();
+		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << solutions[i].size() << " candidates." << std::endl;
+
 		if (solutions[i].size() == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
 		}
-		else if (solutions[i].size() == 1) {
-			mainWin->ui.statusBar->showMessage("1 candidate was found.");
-		}
 		else {
-			mainWin->ui.statusBar->showMessage(QString("%1 candidates were found.").arg(solutions[i].size()));
+			mainWin->ui.statusBar->showMessage("Running a particle filter...");
 		}
-
-		time_t end = clock();
-		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << solutions[i].size() << " candidates." << std::endl;
 
 		start = clock();
 
@@ -619,6 +616,13 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		end = clock();
 		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for particle filter." << std::endl;
+	}
+
+	if (solutions[0].size() == 0) {
+		mainWin->ui.statusBar->showMessage("No candidate was found.");
+	}
+	else {
+		mainWin->ui.statusBar->showMessage("The linkage mechanism has been generated.");
 	}
 
 	// setup the kinematic system
