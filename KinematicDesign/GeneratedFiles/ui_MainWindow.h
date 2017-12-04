@@ -70,6 +70,7 @@ public:
     QAction *actionLinkageAvoidance;
     QAction *actionGenerateWattI;
     QAction *actionShowGridLines;
+    QAction *actionShowInputPoses;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -270,6 +271,10 @@ public:
         actionShowGridLines->setObjectName(QStringLiteral("actionShowGridLines"));
         actionShowGridLines->setCheckable(true);
         actionShowGridLines->setChecked(true);
+        actionShowInputPoses = new QAction(MainWindowClass);
+        actionShowInputPoses->setObjectName(QStringLiteral("actionShowInputPoses"));
+        actionShowInputPoses->setCheckable(true);
+        actionShowInputPoses->setChecked(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -360,6 +365,7 @@ public:
         menuKinematics->addAction(actionOptions);
         menuView->addAction(actionShowSolutions);
         menuView->addAction(actionShowGridLines);
+        menuView->addAction(actionShowInputPoses);
         menuView->addSeparator();
         menuView->addAction(actionRenderBasic);
         menuView->addAction(actionRenderSSAO);
@@ -429,6 +435,7 @@ public:
         actionLinkageAvoidance->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", 0));
         actionGenerateWattI->setText(QApplication::translate("MainWindowClass", "Generate Watt I", 0));
         actionShowGridLines->setText(QApplication::translate("MainWindowClass", "Show Grid Lines", 0));
+        actionShowInputPoses->setText(QApplication::translate("MainWindowClass", "Show Input Poses", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

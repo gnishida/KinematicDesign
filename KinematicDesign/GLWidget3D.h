@@ -66,6 +66,7 @@ public:
 	bool collision_check;
 	bool show_solutions;
 	bool show_grid_lines;
+	bool show_input_poses;
 
 public:
 	GLWidget3D(MainWindow *parent = 0);

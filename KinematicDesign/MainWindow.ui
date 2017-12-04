@@ -117,6 +117,7 @@
     </property>
     <addaction name="actionShowSolutions"/>
     <addaction name="actionShowGridLines"/>
+    <addaction name="actionShowInputPoses"/>
     <addaction name="separator"/>
     <addaction name="actionRenderBasic"/>
     <addaction name="actionRenderSSAO"/>
@@ -557,6 +558,17 @@
    </property>
    <property name="text">
     <string>Show Grid Lines</string>
+   </property>
+  </action>
+  <action name="actionShowInputPoses">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Input Poses</string>
    </property>
   </action>
  </widget>

@@ -54,6 +54,7 @@ public slots:
 	void onOptions();
 	void onShowSolutions();
 	void onShowGridLines();
+	void onShowInputPoses();
 	void onRenderingChanged();
 };
 

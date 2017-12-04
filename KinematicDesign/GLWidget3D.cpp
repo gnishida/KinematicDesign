@@ -33,6 +33,7 @@ GLWidget3D::GLWidget3D(MainWindow *parent) : QGLWidget(QGLFormat(QGL::SampleBuff
 	collision_check = true;
 	show_solutions = false;
 	show_grid_lines = true;
+	show_input_poses = true;
 
 	// This is necessary to prevent the screen overdrawn by OpenGL
 	setAutoFillBackground(false);
@@ -959,6 +960,7 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 			painter.setBrush(QColor(255, 255, 255, 160));
 			painter.drawRect(0, 0, width(), height());
 
+			// draw solutions
 			if (show_solutions && selectedJoint.first >= 0) {
 				int linkage_id = selectedJoint.first;
 				painter.setPen(QPen(QColor(255, 128, 128, 64), 1));
@@ -970,6 +972,23 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 				painter.setBrush(QBrush(QColor(128, 128, 255, 64)));
 				for (int i = 0; i < solutions[linkage_id].size(); i++) {
 					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[1].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[1].y * scale(), 3, 3);
+				}
+			}
+
+			// draw input poses
+			if (show_input_poses) {
+				painter.setPen(QPen(QColor(0, 0, 0), 1, Qt::DashLine));
+				painter.setBrush(QBrush(QColor(0, 0, 0, 0)));
+				for (int i = 0; i < design.moving_bodies.size(); i++) {
+					for (int j = 0; j < design.moving_bodies[i].poses.size(); j++) {
+						QPolygonF pts;
+						std::vector<glm::dvec2>& body = design.moving_bodies[i].poses[j]->getPoints();
+						for (int k = 0; k < body.size(); k++) {
+							pts.push_back(QPointF(width() * 0.5 - offset.x + body[k].x * scale(), height() * 0.5 - offset.y - body[k].y * scale()));
+						}
+						pts.push_back(pts.front());
+						painter.drawPolygon(pts);
+					}
 				}
 			}
 

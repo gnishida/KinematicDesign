@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionOptions, SIGNAL(triggered()), this, SLOT(onOptions()));
 	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
 	connect(ui.actionShowGridLines, SIGNAL(triggered()), this, SLOT(onShowGridLines()));
+	connect(ui.actionShowInputPoses, SIGNAL(triggered()), this, SLOT(onShowInputPoses()));
 	connect(ui.actionRenderBasic, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderSSAO, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
 	connect(ui.actionRenderLine, SIGNAL(triggered()), this, SLOT(onRenderingChanged()));
@@ -425,6 +426,11 @@ void MainWindow::onShowSolutions() {
 
 void MainWindow::onShowGridLines() {
 	glWidget->show_grid_lines = ui.actionShowGridLines->isChecked();
+	update();
+}
+
+void MainWindow::onShowInputPoses() {
+	glWidget->show_input_poses = ui.actionShowInputPoses->isChecked();
 	update();
 }
 
