@@ -21,7 +21,7 @@ namespace kinematics {
 	* @param solutions1	the output solutions for the driving crank, each of which contains a pair of the center point and the circle point
 	* @param solutions2	the output solutions for the follower, each of which contains a pair of the fixed point and the slider point
 	*/
-	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<Solution>& solutions, std::vector<glm::dvec2>& enlarged_linkage_region_pts) {
+	void LinkageSynthesisRRRP::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, std::vector<Solution>& solutions, std::vector<glm::dvec2>& enlarged_linkage_region_pts) {
 		solutions.clear();
 
 		srand(0);
@@ -78,7 +78,7 @@ namespace kinematics {
 
 				// check hard constraints
 				std::vector<std::vector<int>> zorder;
-				if (!checkHardConstraints(points, perturbed_poses, enlarged_linkage_region_pts, linkage_avoidance_pts, fixed_bodies, moving_body, rotatable_crank, avoid_branch_defect, min_link_length, zorder)) continue;
+				if (!checkHardConstraints(points, perturbed_poses, enlarged_linkage_region_pts, linkage_avoidance_pts, fixed_bodies, moving_body, rotatable_crank, avoid_branch_defect, min_transmission_angle, min_link_length, zorder)) continue;
 				
 				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, zorder));
 				cnt++;
@@ -241,10 +241,10 @@ namespace kinematics {
 		return true;
 	}
 
-	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
+	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
 		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
-			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, fixed_bodies, moving_body, rotatable_crank, avoid_branch_defect, min_link_length, weights, num_particles, num_iterations, record_file);
+			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, fixed_bodies, moving_body, rotatable_crank, avoid_branch_defect, min_transmission_angle, min_link_length, weights, num_particles, num_iterations, record_file);
 			return solutions[0];
 		}
 		else {
@@ -309,7 +309,7 @@ namespace kinematics {
 		kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], moving_body);
 	}
 
-	bool LinkageSynthesisRRRP::checkHardConstraints(std::vector<glm::dvec2>& points, const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, bool rotatable_crank, bool avoid_branch_defect, double min_link_length, std::vector<std::vector<int>>& zorder) {
+	bool LinkageSynthesisRRRP::checkHardConstraints(std::vector<glm::dvec2>& points, const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, std::vector<std::vector<int>>& zorder) {
 		glm::dvec2 slider_dir = points[3] - points[1];
 
 		// check hard constraints
@@ -323,7 +323,7 @@ namespace kinematics {
 		// collision check
 		// moving_body[0] means the main body without the joint connectors
 		glm::dvec2 slider_end_pos1, slider_end_pos2;
-		if (checkCollision(poses, points, fixed_bodies, moving_body[0], linkage_avoidance_pts, slider_end_pos1, slider_end_pos2)) return false;
+		if (checkCollision(poses, points, fixed_bodies, moving_body[0], linkage_avoidance_pts, slider_end_pos1, slider_end_pos2, avoid_branch_defect, min_transmission_angle)) return false;
 
 		// locate the two endpoints of the bar
 		points[1] = slider_end_pos1 - slider_dir * 2.0;
@@ -505,7 +505,7 @@ namespace kinematics {
 	* @param linkage_avoidance_pts	region to avoid for the linkage
 	* @return						true if collision occurs
 	*/
-	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2) {
+	bool LinkageSynthesisRRRP::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts, glm::dvec2& slider_end_pos1, glm::dvec2& slider_end_pos2, bool avoid_branch_defect, double min_transmission_angle) {
 		std::vector<glm::dvec2> connector_pts;
 		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
@@ -602,6 +602,14 @@ namespace kinematics {
 			// check if the joints are within the linkage avoidance region
 			for (int i = 0; i < kinematics.diagram.joints.size(); i++) {
 				if (withinPolygon(linkage_avoidance_pts, kinematics.diagram.joints[i]->pos)) return true;
+			}
+
+			// check the transmission angle
+			if (avoid_branch_defect) {
+				glm::dvec2 a = kinematics.diagram.joints[2]->pos - kinematics.diagram.joints[3]->pos;
+				glm::dvec2 b = kinematics.diagram.joints[3]->pos - kinematics.diagram.joints[1]->pos;
+				double t_angle = std::acos(glm::dot(a, b) / glm::length(a) / glm::length(b));
+				if (std::abs(t_angle) < min_transmission_angle) return true;
 			}
 
 			// calculate the angle of the driving crank
