@@ -101,7 +101,7 @@ namespace kinematics {
 		dist_map.convertTo(dist_map, CV_64F);
 	}
 
-	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
+	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
 		BBox linkage_region_bbox = boundingBox(linkage_region_pts);
 
 		std::vector<Particle> particles(solutions.size());
@@ -147,7 +147,7 @@ namespace kinematics {
 
 				if (optimizeCandidate(new_particles[i].solution.poses, linkage_region_pts, linkage_region_bbox, new_particles[i].solution.points)) {
 					// check the hard constraints
-					if (checkHardConstraints(new_particles[i].solution.points, new_particles[i].solution.poses, linkage_region_pts, linkage_avoidance_pts, fixed_bodies, moving_body, new_particles[i].solution.zorder)) {
+					if (checkHardConstraints(new_particles[i].solution.points, new_particles[i].solution.poses, linkage_region_pts, linkage_avoidance_pts, moving_body, new_particles[i].solution.zorder)) {
 						// calculate the score
 						double cost = calculateCost(new_particles[i].solution, fixed_bodies, moving_body, dist_map, dist_map_bbox, weights);
 						new_particles[i] = Particle(cost, new_particles[i].solution);
