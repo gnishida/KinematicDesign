@@ -7,7 +7,8 @@ namespace kinematics {
 	std::default_random_engine rnd_generator;
 
 	double genRand() {
-		return rand() / (float(RAND_MAX) + 1);
+		std::uniform_real_distribution<double> distribution(0, 1);
+		return distribution(rnd_generator);
 	}
 
 	double genRand(double a, double b) {
