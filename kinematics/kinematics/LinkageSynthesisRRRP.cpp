@@ -260,7 +260,7 @@ namespace kinematics {
 		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, moving_body);
 		std::vector<glm::dvec2> connected_pts;
 		Kinematics kin = constructKinematics(solution.points, solution.zorder, moving_body, true, fixed_bodies, connected_pts);
-		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[2] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[4] - connected_pts[2]) + glm::length(solution.points[2] - connected_pts[3]) + +glm::length(solution.points[3] - connected_pts[4]);
+		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[4] - connected_pts[2]) + glm::length(solution.points[2] - connected_pts[3]) + +glm::length(solution.points[3] - connected_pts[4]);
 		int max_zorder = 0;
 		for (int i = 0; i < solution.zorder.size(); i++) {
 			for (int j = 0; j < solution.zorder[i].size(); j++) {

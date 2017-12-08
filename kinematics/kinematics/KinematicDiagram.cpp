@@ -597,8 +597,6 @@ namespace kinematics {
 
 		// initialize the adancency between rigid bodies
 		initialize();
-
-		//trace_end_effector.resize(assemblies.size());
 	}
 
 	void KinematicDiagram::save(const QString& filename) {

@@ -723,8 +723,8 @@ void GLWidget3D::stepForward() {
 			}
 			catch (char* ex) {
 				kinematics[i].invertSpeed();
-				std::cerr << "Animation is stopped by error:" << std::endl;
-				std::cerr << ex << std::endl;
+				//std::cerr << "Animation is stopped by error:" << std::endl;
+				//std::cerr << ex << std::endl;
 			}
 		}
 
@@ -742,8 +742,8 @@ void GLWidget3D::stepBackward() {
 			}
 			catch (char* ex) {
 				kinematics[i].invertSpeed();
-				std::cerr << "Animation is stopped by error:" << std::endl;
-				std::cerr << ex << std::endl;
+				//std::cerr << "Animation is stopped by error:" << std::endl;
+				//std::cerr << ex << std::endl;
 			}
 		}
 
@@ -799,9 +799,8 @@ void GLWidget3D::animation_update() {
 		}
 		catch (char* ex) {
 			kinematics[i].invertSpeed();
-			//stop();
-			std::cerr << "Animation is stopped by error:" << std::endl;
-			std::cerr << ex << std::endl;
+			//std::cerr << "Animation is stopped by error:" << std::endl;
+			//std::cerr << ex << std::endl;
 		}
 	}
 
@@ -1092,7 +1091,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 
 			// select a joint to move
 			selectedJoint = std::make_pair(-1, -1);
-			double min_dist = 6;
+			double min_dist = 2;
 			for (int i = 0; i < kinematics.size(); i++) {
 				for (int j = 0; j < kinematics[i].diagram.joints.size(); j++) {
 					if (!ctrlPressed && j >= 2) continue;
@@ -1228,8 +1227,10 @@ void GLWidget3D::mouseReleaseEvent(QMouseEvent *e) {
 		mode = MODE_SELECT;
 	}
 	else if (mode == MODE_KINEMATICS) {
-		constructKinematics();
-		update3DGeometryFromKinematics();
+		if (selectedJoint.first >= 0) {
+			constructKinematics();
+			update3DGeometryFromKinematics();
+		}
 	}
 
 	update();
