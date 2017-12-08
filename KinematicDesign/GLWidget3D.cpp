@@ -574,13 +574,13 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	kinematics.clear();
 
 	if (linkage_type == LINKAGE_4R) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R());
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R(sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
 	}
 	else if (linkage_type == LINKAGE_RRRP) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP());
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP(sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
 	}
 	else if (linkage_type == LINKAGE_WATT_I) {
-		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI());
+		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI(sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
 	}
 
 	solutions.resize(moving_bodies.size());
@@ -595,7 +595,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		// calculate the circle point curve and center point curve
 		std::vector<glm::dvec2> enlarged_linkage_region_pts;
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, merged_fixed_bodies, moving_bodies[i], sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, solutions[i], enlarged_linkage_region_pts);
+		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, merged_fixed_bodies, moving_bodies[i], solutions[i], enlarged_linkage_region_pts);
 
 		time_t end = clock();
 		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << solutions[i].size() << " candidates." << std::endl;
@@ -609,7 +609,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], merged_fixed_bodies, moving_bodies[i], rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights, num_particles, num_iterations, record_file);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], merged_fixed_bodies, moving_bodies[i], weights, num_particles, num_iterations, record_file);
 		std::vector<glm::dvec2> connector_pts;
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 
