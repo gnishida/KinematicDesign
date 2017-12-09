@@ -574,13 +574,13 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	kinematics.clear();
 
 	if (linkage_type == LINKAGE_4R) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
 	}
 	else if (linkage_type == LINKAGE_RRRP) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
+		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
 	}
 	else if (linkage_type == LINKAGE_WATT_I) {
-		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0));
+		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
 	}
 
 	solutions.resize(moving_bodies.size());
@@ -609,7 +609,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], moving_bodies[i], weights, num_particles, num_iterations, record_file);
+		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], moving_bodies[i], num_particles, num_iterations, record_file);
 		std::vector<glm::dvec2> connector_pts;
 		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 

@@ -101,14 +101,14 @@ namespace kinematics {
 		dist_map.convertTo(dist_map, CV_64F);
 	}
 
-	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
+	void LinkageSynthesis::particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, int num_particles, int num_iterations, bool record_file) {
 		BBox linkage_region_bbox = boundingBox(linkage_region_pts);
 
 		std::vector<Particle> particles(solutions.size());
 
 		double max_cost = 0;
 		for (int i = 0; i < solutions.size(); i++) {
-			double cost = calculateCost(solutions[i], fixed_bodies, moving_body, dist_map, dist_map_bbox, weights);
+			double cost = calculateCost(solutions[i], fixed_bodies, moving_body, dist_map, dist_map_bbox);
 			max_cost = std::max(max_cost, cost);
 			particles[i] = Particle(cost, solutions[i]);
 		}
@@ -149,7 +149,7 @@ namespace kinematics {
 					// check the hard constraints
 					if (checkHardConstraints(new_particles[i].solution.points, new_particles[i].solution.poses, linkage_region_pts, linkage_avoidance_pts, moving_body, new_particles[i].solution.zorder)) {
 						// calculate the score
-						double cost = calculateCost(new_particles[i].solution, fixed_bodies, moving_body, dist_map, dist_map_bbox, weights);
+						double cost = calculateCost(new_particles[i].solution, fixed_bodies, moving_body, dist_map, dist_map_bbox);
 						new_particles[i] = Particle(cost, new_particles[i].solution);
 					}
 					else {
