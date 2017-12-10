@@ -51,7 +51,7 @@ namespace kinematics {
 		virtual bool checkCircuitDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) = 0;
 		virtual Kinematics constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies, std::vector<glm::dvec2>& connected_pts) = 0;
 		virtual void updateMovingBodies(Kinematics& kinematics, const Object25D& moving_body) = 0;
-		virtual double calculateCost(Solution& solution, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox) = 0;
+		virtual double calculateCost(Solution& solution, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox) = 0;
 
 		virtual std::vector<Vertex> generate3DGeometry(const std::vector<Kinematics>& kinematics) = 0;
 		virtual void saveSTL(const QString& dirname, const std::vector<Kinematics>& kinematics) = 0;

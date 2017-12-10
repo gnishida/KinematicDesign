@@ -181,7 +181,7 @@ namespace kinematics {
 		}
 	}
 
-	double LinkageSynthesis4R::calculateCost(Solution& solution, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox) {
+	double LinkageSynthesis4R::calculateCost(Solution& solution, const Object25D& moving_body, const cv::Mat& dist_map, const BBox& dist_map_bbox) {
 		double dist = 0;
 		for (int i = 0; i < solution.points.size(); i++) {
 			dist += dist_map.at<double>(solution.points[i].y - dist_map_bbox.minPt.y, solution.points[i].x - dist_map_bbox.minPt.x);
