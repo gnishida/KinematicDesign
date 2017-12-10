@@ -270,7 +270,7 @@ namespace kinematics {
 		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, moving_body);
 		std::vector<glm::dvec2> connected_pts;
 		Kinematics kin = constructKinematics(solution.points, solution.zorder, moving_body, true, fixed_bodies, connected_pts);
-		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[4] - connected_pts[2]) + glm::length(solution.points[2] - connected_pts[3]) + +glm::length(solution.points[3] - connected_pts[4]);
+		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[4] - connected_pts[2]) + glm::length(solution.points[2] - connected_pts[3]) + glm::length(solution.points[3] - connected_pts[4]);
 		int max_zorder = 0;
 		for (int i = 0; i < solution.zorder.size(); i++) {
 			for (int j = 0; j < solution.zorder[i].size(); j++) {
@@ -618,6 +618,7 @@ namespace kinematics {
 			if (avoid_branch_defect) {
 				glm::dvec2 a = kinematics.diagram.joints[2]->pos - kinematics.diagram.joints[3]->pos;
 				glm::dvec2 b = kinematics.diagram.joints[3]->pos - kinematics.diagram.joints[1]->pos;
+				b = glm::dvec2(-b.y, b.x);
 				double t_angle = std::acos(glm::dot(a, b) / glm::length(a) / glm::length(b));
 				if (std::abs(t_angle) < min_transmission_angle) return true;
 			}
