@@ -446,6 +446,8 @@ namespace kinematics {
 			}
 		}
 
+		if (min_dist == std::numeric_limits<double>::max()) throw "No closest point found.";
+
 		return ans;
 	}
 
