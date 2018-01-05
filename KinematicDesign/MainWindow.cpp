@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include "LinkageSynthesisOptionDialog.h"
 #include "OptionDialog.h"
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(onNew()));
 	connect(ui.actionOpen, SIGNAL(triggered()), this, SLOT(onOpen()));
 	connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
+	connect(ui.actionSaveImage, SIGNAL(triggered()), this, SLOT(onSaveImage()));
 	connect(ui.actionExportSTL, SIGNAL(triggered()), this, SLOT(onExportSTL()));
 	connect(ui.actionExportSCAD, SIGNAL(triggered()), this, SLOT(onExportSCAD()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
@@ -159,6 +161,16 @@ void MainWindow::onSave() {
 
 	glWidget->save(filename);
 	setWindowTitle("Kinematic Design - " + QFileInfo(filename).fileName());
+}
+
+void MainWindow::onSaveImage() {
+	if (!QDir("screenshot").exists()) {
+		QDir().mkdir("screenshot");
+	}
+	QDateTime dateTime = QDateTime().currentDateTime();
+	QString str = QString("screenshot/") + dateTime.toString("yyyyMMddhhmmss") + QString(".png");
+
+	glWidget->saveImage(str);
 }
 
 void MainWindow::onExportSTL() {

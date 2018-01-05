@@ -37,6 +37,9 @@
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveImage"/>
+    <addaction name="separator"/>
     <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -569,6 +572,14 @@
    </property>
    <property name="text">
     <string>Show Input Poses</string>
+   </property>
+  </action>
+  <action name="actionSaveImage">
+   <property name="text">
+    <string>Save Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

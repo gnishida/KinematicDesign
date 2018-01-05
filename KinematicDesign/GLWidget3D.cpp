@@ -476,6 +476,16 @@ void GLWidget3D::saveSCAD(const QString& dirname) {
 	synthesis->saveSCAD(dirname, kinematics);
 }
 
+void GLWidget3D::saveImage(const QString& filename) {
+	/*
+	QPixmap pixmap(size());
+	render(&pixmap);
+	pixmap.save(filename);
+	*/
+	QImage image = grabFrameBuffer();
+	image.save(filename);
+}
+
 glm::dvec2 GLWidget3D::screenToWorldCoordinates(const glm::dvec2& p) {
 	return screenToWorldCoordinates(p.x, p.y);
 }

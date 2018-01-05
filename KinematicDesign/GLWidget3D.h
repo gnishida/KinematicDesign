@@ -90,6 +90,7 @@ public:
 	void save(const QString& filename);
 	void saveSTL(const QString& dirname);
 	void saveSCAD(const QString& dirname);
+	void saveImage(const QString& filename);
 	glm::dvec2 screenToWorldCoordinates(const glm::dvec2& p);
 	glm::dvec2 screenToWorldCoordinates(double x, double y);
 	glm::dvec2 worldToScreenCoordinates(const glm::dvec2& p);

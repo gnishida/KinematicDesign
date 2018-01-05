@@ -29,6 +29,7 @@ public slots:
 	void onNew();
 	void onOpen();
 	void onSave();
+	void onSaveImage();
 	void onExportSTL();
 	void onExportSCAD();
 	void onUndo();

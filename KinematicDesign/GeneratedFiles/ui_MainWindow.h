@@ -71,6 +71,7 @@ public:
     QAction *actionGenerateWattI;
     QAction *actionShowGridLines;
     QAction *actionShowInputPoses;
+    QAction *actionSaveImage;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -275,6 +276,8 @@ public:
         actionShowInputPoses->setObjectName(QStringLiteral("actionShowInputPoses"));
         actionShowInputPoses->setCheckable(true);
         actionShowInputPoses->setChecked(true);
+        actionSaveImage = new QAction(MainWindowClass);
+        actionSaveImage->setObjectName(QStringLiteral("actionSaveImage"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -318,6 +321,9 @@ public:
         menuFile->addAction(actionNew);
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
+        menuFile->addSeparator();
+        menuFile->addAction(actionSaveImage);
+        menuFile->addSeparator();
         menuFile->addAction(menuExport->menuAction());
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
@@ -436,6 +442,8 @@ public:
         actionGenerateWattI->setText(QApplication::translate("MainWindowClass", "Generate Watt I", 0));
         actionShowGridLines->setText(QApplication::translate("MainWindowClass", "Show Grid Lines", 0));
         actionShowInputPoses->setText(QApplication::translate("MainWindowClass", "Show Input Poses", 0));
+        actionSaveImage->setText(QApplication::translate("MainWindowClass", "Save Image", 0));
+        actionSaveImage->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+P", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
