@@ -88,6 +88,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.mainToolBar->addAction(ui.actionSave);
 	ui.mainToolBar->addSeparator();
 
+	// create tool bar for edit menu
+	ui.mainToolBar->addAction(ui.actionUndo);
+	ui.mainToolBar->addAction(ui.actionRedo);
+	ui.mainToolBar->addAction(ui.actionCopy);
+	ui.mainToolBar->addAction(ui.actionPaste);
+	ui.mainToolBar->addAction(ui.actionDelete);
+	ui.mainToolBar->addSeparator();
+
 	// create tool bar for modes
 	ui.mainToolBar->addAction(ui.actionSelect);
 	ui.mainToolBar->addAction(ui.actionFixedRectangle);
