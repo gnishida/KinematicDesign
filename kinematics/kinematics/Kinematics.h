@@ -16,6 +16,7 @@ namespace kinematics {
 	
 	class Kinematics {
 	public:
+		int linkage_type;
 		KinematicDiagram diagram;
 		double simulation_speed;
 		bool show_links;

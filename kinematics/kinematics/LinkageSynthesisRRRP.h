@@ -13,7 +13,7 @@ namespace kinematics {
 		LinkageSynthesisRRRP(const std::vector<Object25D>& fixed_bodies, const std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights);
 
 	public:
-		void calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const Object25D& moving_body, std::vector<Solution>& solutions, std::vector<glm::dvec2>& enlarged_linkage_region_pts);
+		void calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const Object25D& moving_body, std::vector<Solution>& solutions);
 		bool optimizeCandidate(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, std::vector<glm::dvec2>& points);
 		bool optimizeLink(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, glm::dvec2& A0, glm::dvec2& A1);
 		bool optimizeLinkForThreePoses(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, glm::dvec2& A0, glm::dvec2& A1);
@@ -34,8 +34,8 @@ namespace kinematics {
 		Kinematics recordCollisionForConnectors(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D> fixed_bodies, const Object25D& moving_body);
 		double tortuosityOfTrajectory(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const Object25D& moving_body);
 
-		std::vector<Vertex> generate3DGeometry(const std::vector<Kinematics>& kinematics);
-		void saveSCAD(const QString& dirname, const std::vector<Kinematics>& kinematics);
+		void generate3DGeometry(const Kinematics& kinematics, std::vector<Vertex>& vertices);
+		void saveSCAD(const QString& dirname, int index, const Kinematics& kinematics);
 		void saveSTL(const QString& dirname, const std::vector<Kinematics>& kinematics);
 	};
 

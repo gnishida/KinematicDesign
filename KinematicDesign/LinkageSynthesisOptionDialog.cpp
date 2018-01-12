@@ -3,6 +3,8 @@
 LinkageSynthesisOptionDialog::LinkageSynthesisOptionDialog(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);
 
+	ui.checkBox4RLinkage->setChecked(true);
+	ui.checkBoxSliderCrank->setChecked(true);
 	ui.lineEditNumSamples->setText("10000");
 	ui.lineEditStdDevPositionFirst->setText("0");
 	ui.lineEditStdDevOrientationFirst->setText("0");

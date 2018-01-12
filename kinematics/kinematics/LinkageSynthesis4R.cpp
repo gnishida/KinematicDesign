@@ -31,51 +31,40 @@ namespace kinematics {
 	* @param solutions1	the output solutions for the world coordinates of the driving crank at the first pose, each of which contains a pair of the center point and the circle point
 	* @param solutions2	the output solutions for the world coordinates of the follower at the first pose, each of which contains a pair of the center point and the circle point
 	*/
-	void LinkageSynthesis4R::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const Object25D& moving_body, std::vector<Solution>& solutions, std::vector<glm::dvec2>& enlarged_linkage_region_pts) {
+	void LinkageSynthesis4R::calculateSolution(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, int num_samples, const Object25D& moving_body, std::vector<Solution>& solutions) {
 		solutions.clear();
 
 		srand(0);
 
-		// calculate the center of the valid regions
-		BBox bbox = boundingBox(linkage_region_pts);
-		glm::dvec2 bbox_center = bbox.center();
-
 		int cnt = 0;
-		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
-			// calculate the enlarged linkage region for the sampling region
-			enlarged_linkage_region_pts.clear();
-			for (int i = 0; i < linkage_region_pts.size(); i++) {
-				enlarged_linkage_region_pts.push_back((linkage_region_pts[i] - bbox_center) * (double)scale + bbox_center);
-			}
 
-			// calculate the bounding boxe of the valid regions
-			BBox enlarged_bbox = boundingBox(enlarged_linkage_region_pts);
+		// calculate the bounding boxe of the valid regions
+		BBox bbox = boundingBox(linkage_region_pts);
 
-			for (int iter = 0; iter < num_samples && cnt < num_samples; iter++) {
-				printf("\rsampling %d/%d", cnt, (scale - 1) * num_samples + iter + 1);
+		for (int iter = 0; iter < num_samples && cnt < num_samples; iter++) {
+			printf("\rsampling %d/%d", cnt, iter + 1);
 
-				// perturbe the poses a little
-				double position_error = 0.0;
-				double orientation_error = 0.0;
-				std::vector<glm::dmat3x3> perturbed_poses = perturbPoses(poses, sigmas, position_error, orientation_error);
+			// perturbe the poses a little
+			double position_error = 0.0;
+			double orientation_error = 0.0;
+			std::vector<glm::dmat3x3> perturbed_poses = perturbPoses(poses, sigmas, position_error, orientation_error);
 
-				// sample joints within the linkage region
-				std::vector<glm::dvec2> points(4);
-				for (int i = 0; i < points.size(); i++) {
-					while (true) {
-						points[i] = glm::dvec2(genRand(enlarged_bbox.minPt.x, enlarged_bbox.maxPt.x), genRand(enlarged_bbox.minPt.y, enlarged_bbox.maxPt.y));
-						if (withinPolygon(enlarged_linkage_region_pts, points[i])) break;
-					}
+			// sample joints within the linkage region
+			std::vector<glm::dvec2> points(4);
+			for (int i = 0; i < points.size(); i++) {
+				while (true) {
+					points[i] = glm::dvec2(genRand(bbox.minPt.x, bbox.maxPt.x), genRand(bbox.minPt.y, bbox.maxPt.y));
+					if (withinPolygon(linkage_region_pts, points[i])) break;
 				}
-
-				if (!optimizeCandidate(perturbed_poses, enlarged_linkage_region_pts, enlarged_bbox, points)) continue;
-
-				// check hard constraints
-				std::vector<std::vector<int>> zorder;
-				if (!checkHardConstraints(points, perturbed_poses, enlarged_linkage_region_pts, linkage_avoidance_pts, moving_body, zorder)) continue;
-				solutions.push_back(Solution(points, position_error, orientation_error, perturbed_poses, zorder));
-				cnt++;
 			}
+
+			if (!optimizeCandidate(perturbed_poses, linkage_region_pts, bbox, points)) continue;
+
+			// check hard constraints
+			std::vector<std::vector<int>> zorder;
+			if (!checkHardConstraints(points, perturbed_poses, linkage_region_pts, linkage_avoidance_pts, moving_body, zorder)) continue;
+			solutions.push_back(Solution(0, points, position_error, orientation_error, perturbed_poses, zorder));
+			cnt++;
 		}
 		printf("\n");
 	}
@@ -177,7 +166,7 @@ namespace kinematics {
 			return solutions[0];
 		}
 		else {
-			return Solution({ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, poses);
+			return Solution(0, { { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, poses);
 		}
 	}
 
@@ -206,6 +195,7 @@ namespace kinematics {
 	*/
 	Kinematics LinkageSynthesis4R::constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies, std::vector<glm::dvec2>& connected_pts) {
 		Kinematics kin;
+		kin.linkage_type = 0;
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], zorder.size() == 3 ? zorder[2][0] : 1)));
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(1, true, points[1], zorder.size() == 3 ? zorder[2][1] : 1)));
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(2, false, points[2], zorder.size() == 3 ? zorder[2][0] : 1)));
@@ -1029,37 +1019,31 @@ namespace kinematics {
 		return length_of_trajectory / length_of_straight;
 	}
 
-	std::vector<Vertex> LinkageSynthesis4R::generate3DGeometry(const std::vector<Kinematics>& kinematics) {
-		std::vector<Vertex> vertices;
-
-		for (int i = 0; i < kinematics.size(); i++) {
-			// generate geometry of rigid bodies
-			for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
-				for (int k = 0; k < kinematics[i].diagram.bodies[j]->size(); k++) {
-					std::vector<glm::dvec2> points = kinematics[i].diagram.bodies[j]->getActualPoints(k);
-					std::vector<glm::dvec2> points2 = kinematics[i].diagram.bodies[j]->getActualPoints2(k);
-					float z = kinematics[i].diagram.bodies[j]->polygons[k].depth1;
-					float depth = kinematics[i].diagram.bodies[j]->polygons[k].depth2 - kinematics[i].diagram.bodies[j]->polygons[k].depth1;
-					glutils::drawPrism(points, points2, depth, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				}
-			}
-
-			// generate geometry of links
-			for (int j = 0; j < kinematics[i].diagram.links.size(); j++) {
-				// For the coupler, we can use the moving body itself as a coupler, 
-				// so we do not need to create a coupler link.
-				if (!kinematics[i].diagram.links[j]->actual_link) continue;
-
-				glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
-				glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(p1, p2, options->link_width / 2);
-				float z = kinematics[i].diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth;
-				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
-				glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->link_depth)), vertices);
+	void LinkageSynthesis4R::generate3DGeometry(const Kinematics& kinematics, std::vector<Vertex>& vertices) {
+		// generate geometry of rigid bodies
+		for (int j = 0; j < kinematics.diagram.bodies.size(); j++) {
+			for (int k = 0; k < kinematics.diagram.bodies[j]->size(); k++) {
+				std::vector<glm::dvec2> points = kinematics.diagram.bodies[j]->getActualPoints(k);
+				std::vector<glm::dvec2> points2 = kinematics.diagram.bodies[j]->getActualPoints2(k);
+				float z = kinematics.diagram.bodies[j]->polygons[k].depth1;
+				float depth = kinematics.diagram.bodies[j]->polygons[k].depth2 - kinematics.diagram.bodies[j]->polygons[k].depth1;
+				glutils::drawPrism(points, points2, depth, glm::vec4(0.7, 1, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
 			}
 		}
 
-		return vertices;
+		// generate geometry of links
+		for (int j = 0; j < kinematics.diagram.links.size(); j++) {
+			// For the coupler, we can use the moving body itself as a coupler, 
+			// so we do not need to create a coupler link.
+			if (!kinematics.diagram.links[j]->actual_link) continue;
+
+			glm::dvec2& p1 = kinematics.diagram.links[j]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics.diagram.links[j]->joints[1]->pos;
+			std::vector<glm::dvec2> pts = generateRoundedBarPolygon(p1, p2, options->link_width / 2);
+			float z = kinematics.diagram.links[j]->z * (options->link_depth + options->gap * 2 + options->joint_cap_depth) - options->link_depth;
+			glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, z)), vertices);
+			glutils::drawPrism(pts, options->link_depth, glm::vec4(0.7, 0.7, 0.7, 1), glm::translate(glm::mat4(), glm::vec3(0, 0, -options->body_depth - z - options->link_depth)), vertices);
+		}
 	}
 
 	void LinkageSynthesis4R::saveSTL(const QString& dirname, const std::vector<Kinematics>& kinematics) {
@@ -1105,32 +1089,30 @@ namespace kinematics {
 		}
 	}
 
-	void LinkageSynthesis4R::saveSCAD(const QString& dirname, const std::vector<Kinematics>& kinematics) {
-		for (int i = 0; i < kinematics.size(); i++) {
-			// generate geometry of rigid bodies
-			for (int j = 0; j < kinematics[i].diagram.bodies.size(); j++) {
-				QString name = QString("body_%1_%2").arg(i).arg(j);
-				QString filename = dirname + "/" + name + ".scad";
-				SCADExporter::save(filename, name, kinematics[i].diagram.bodies[j]);
-			}
+	void LinkageSynthesis4R::saveSCAD(const QString& dirname, int index, const Kinematics& kinematics) {
+		// generate geometry of rigid bodies
+		for (int j = 0; j < kinematics.diagram.bodies.size(); j++) {
+			QString name = QString("body_%1_%2").arg(index).arg(j);
+			QString filename = dirname + "/" + name + ".scad";
+			SCADExporter::save(filename, name, kinematics.diagram.bodies[j]);
+		}
 
-			// generate geometry of links
-			for (int j = 0; j < kinematics[i].diagram.links.size(); j++) {
-				// For the coupler, we can use the moving body itself as a coupler, 
-				// so we do not need to create a coupler link.
-				if (!kinematics[i].diagram.links[j]->actual_link) continue;
+		// generate geometry of links
+		for (int j = 0; j < kinematics.diagram.links.size(); j++) {
+			// For the coupler, we can use the moving body itself as a coupler, 
+			// so we do not need to create a coupler link.
+			if (!kinematics.diagram.links[j]->actual_link) continue;
 
-				glm::dvec2& p1 = kinematics[i].diagram.links[j]->joints[0]->pos;
-				glm::dvec2& p2 = kinematics[i].diagram.links[j]->joints[1]->pos;
-				std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(), p2 - p1, options->link_width / 2);
-				std::vector<std::vector<glm::dvec2>> holes(2);
-				holes[0] = generateCirclePolygon(glm::vec2(), options->hole_radius);
-				holes[1] = generateCirclePolygon(p2 - p1, options->hole_radius);
+			glm::dvec2& p1 = kinematics.diagram.links[j]->joints[0]->pos;
+			glm::dvec2& p2 = kinematics.diagram.links[j]->joints[1]->pos;
+			std::vector<glm::dvec2> pts = generateRoundedBarPolygon(glm::vec2(), p2 - p1, options->link_width / 2);
+			std::vector<std::vector<glm::dvec2>> holes(2);
+			holes[0] = generateCirclePolygon(glm::vec2(), options->hole_radius);
+			holes[1] = generateCirclePolygon(p2 - p1, options->hole_radius);
 
-				QString name = QString("link_%1_%2").arg(i).arg(j);
-				QString filename = dirname + "/" + name + ".scad";
-				SCADExporter::save(filename, name, pts, holes, options->link_depth);
-			}
+			QString name = QString("link_%1_%2").arg(index).arg(j);
+			QString filename = dirname + "/" + name + ".scad";
+			SCADExporter::save(filename, name, pts, holes, options->link_depth);
 		}
 	}
 

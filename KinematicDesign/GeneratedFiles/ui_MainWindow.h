@@ -43,7 +43,7 @@ public:
     QAction *actionAddLayer;
     QAction *actionInsertLayer;
     QAction *actionDeleteLayer;
-    QAction *actionGenerate4RLinkage;
+    QAction *actionGenerateLinkage;
     QAction *actionCollisionCheck;
     QAction *actionLinkageRegion;
     QAction *actionKinematics;
@@ -165,11 +165,11 @@ public:
         actionInsertLayer->setObjectName(QStringLiteral("actionInsertLayer"));
         actionDeleteLayer = new QAction(MainWindowClass);
         actionDeleteLayer->setObjectName(QStringLiteral("actionDeleteLayer"));
-        actionGenerate4RLinkage = new QAction(MainWindowClass);
-        actionGenerate4RLinkage->setObjectName(QStringLiteral("actionGenerate4RLinkage"));
+        actionGenerateLinkage = new QAction(MainWindowClass);
+        actionGenerateLinkage->setObjectName(QStringLiteral("actionGenerateLinkage"));
         QIcon icon12;
         icon12.addFile(QStringLiteral("Resources/fourbar_linkage.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionGenerate4RLinkage->setIcon(icon12);
+        actionGenerateLinkage->setIcon(icon12);
         actionCollisionCheck = new QAction(MainWindowClass);
         actionCollisionCheck->setObjectName(QStringLiteral("actionCollisionCheck"));
         actionCollisionCheck->setCheckable(true);
@@ -356,9 +356,7 @@ public:
         menuLayer->addAction(actionInsertLayer);
         menuLayer->addAction(actionDeleteLayer);
         menuLayer->addSeparator();
-        menuKinematics->addAction(actionGenerate4RLinkage);
-        menuKinematics->addAction(actionGenerateSliderCrank);
-        menuKinematics->addAction(actionGenerateWattI);
+        menuKinematics->addAction(actionGenerateLinkage);
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionRun);
         menuKinematics->addAction(actionRunBackward);
@@ -412,7 +410,7 @@ public:
         actionAddLayer->setText(QApplication::translate("MainWindowClass", "Add Layer", 0));
         actionInsertLayer->setText(QApplication::translate("MainWindowClass", "Insert Layer", 0));
         actionDeleteLayer->setText(QApplication::translate("MainWindowClass", "Delete Layer", 0));
-        actionGenerate4RLinkage->setText(QApplication::translate("MainWindowClass", "Generate 4R Linkage", 0));
+        actionGenerateLinkage->setText(QApplication::translate("MainWindowClass", "Generate Linkage", 0));
         actionCollisionCheck->setText(QApplication::translate("MainWindowClass", "Collision Check", 0));
         actionLinkageRegion->setText(QApplication::translate("MainWindowClass", "Linkage Region", 0));
         actionKinematics->setText(QApplication::translate("MainWindowClass", "Kinematics", 0));

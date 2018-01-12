@@ -3,6 +3,7 @@
 #include "LinkageSynthesisOptionDialog.h"
 #include "OptionDialog.h"
 #include <QDateTime>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
@@ -64,9 +65,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionAddLayer, SIGNAL(triggered()), this, SLOT(onAddLayer()));
 	connect(ui.actionInsertLayer, SIGNAL(triggered()), this, SLOT(onInsertLayer()));
 	connect(ui.actionDeleteLayer, SIGNAL(triggered()), this, SLOT(onDeleteLayer()));
-	connect(ui.actionGenerate4RLinkage, SIGNAL(triggered()), this, SLOT(onGenerate4RLinkage()));
-	connect(ui.actionGenerateSliderCrank, SIGNAL(triggered()), this, SLOT(onGenerateSliderCrank()));
-	connect(ui.actionGenerateWattI, SIGNAL(triggered()), this, SLOT(onGenerateWattI()));
+	connect(ui.actionGenerateLinkage, SIGNAL(triggered()), this, SLOT(onGenerateLinkage()));
 	connect(ui.actionRun, SIGNAL(triggered()), this, SLOT(onRun()));
 	connect(ui.actionRunBackward, SIGNAL(triggered()), this, SLOT(onRunBackward()));
 	connect(ui.actionStop, SIGNAL(triggered()), this, SLOT(onStop()));
@@ -109,9 +108,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.mainToolBar->addSeparator();
 
 	// create tool bar for linkage generation
-	ui.mainToolBar->addAction(ui.actionGenerate4RLinkage);
-	ui.mainToolBar->addAction(ui.actionGenerateSliderCrank);
-	ui.mainToolBar->addAction(ui.actionGenerateWattI);
+	ui.mainToolBar->addAction(ui.actionGenerateLinkage);
 	ui.mainToolBar->addSeparator();
 
 	// create tool bar for kinematic simulation
@@ -289,9 +286,20 @@ void MainWindow::onLayerChanged() {
 	}
 }
 
-void MainWindow::onGenerate4RLinkage() {
+void MainWindow::onGenerateLinkage() {
 	LinkageSynthesisOptionDialog dlg;
 	if (dlg.exec()) {
+		int linkage_type = 0;
+		if (dlg.ui.checkBox4RLinkage->isChecked()) linkage_type |= 1;
+		if (dlg.ui.checkBoxSliderCrank->isChecked()) linkage_type |= 2;
+		if (linkage_type == 0) {
+			QMessageBox msg(this);
+			msg.setWindowTitle("Error");
+			msg.setText("Please select at least one linkage type.");
+			msg.exec();
+			return;
+		}
+
 		std::vector<std::pair<double, double>> sigmas = {
 			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
 			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
@@ -307,69 +315,7 @@ void MainWindow::onGenerate4RLinkage() {
 			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
 		};
 
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_4R,
-			dlg.ui.lineEditNumSamples->text().toInt(),
-			sigmas,
-			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
-			dlg.ui.lineEditMinTransmissionAngle->text().toDouble(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
-			weights,
-			dlg.ui.lineEditNumParticles->text().toInt(),
-			dlg.ui.lineEditNumIterations->text().toInt(),
-			dlg.ui.checkBoxRecordFile->isChecked());
-	}
-}
-
-void MainWindow::onGenerateSliderCrank() {
-	LinkageSynthesisOptionDialog dlg;
-	if (dlg.exec()) {
-		std::vector<std::pair<double, double>> sigmas = {
-			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
-			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
-			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
-		};
-
-		std::vector<double> weights = {
-			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
-			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
-			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
-			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
-			dlg.ui.lineEditSizeWeight->text().toDouble(),
-			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
-		};
-
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_RRRP,
-			dlg.ui.lineEditNumSamples->text().toInt(),
-			sigmas,
-			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
-			dlg.ui.lineEditMinTransmissionAngle->text().toDouble(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
-			weights,
-			dlg.ui.lineEditNumParticles->text().toInt(),
-			dlg.ui.lineEditNumIterations->text().toInt(),
-			dlg.ui.checkBoxRecordFile->isChecked());
-	}
-}
-
-void MainWindow::onGenerateWattI() {
-	LinkageSynthesisOptionDialog dlg;
-	if (dlg.exec()) {
-		std::vector<std::pair<double, double>> sigmas = {
-			std::make_pair(dlg.ui.lineEditStdDevPositionFirst->text().toDouble(), dlg.ui.lineEditStdDevOrientationFirst->text().toDouble()),
-			std::make_pair(dlg.ui.lineEditStdDevPositionMiddle->text().toDouble(), dlg.ui.lineEditStdDevOrientationMiddle->text().toDouble()),
-			std::make_pair(dlg.ui.lineEditStdDevPositionLast->text().toDouble(), dlg.ui.lineEditStdDevOrientationLast->text().toDouble())
-		};
-
-		std::vector<double> weights = {
-			dlg.ui.lineEditPositionErrorWeight->text().toDouble(),
-			dlg.ui.lineEditOrientationErrorWeight->text().toDouble(),
-			dlg.ui.lineEditLinkageLocationWeight->text().toDouble(),
-			dlg.ui.lineEditTrajectoryWeight->text().toDouble(),
-			dlg.ui.lineEditSizeWeight->text().toDouble(),
-			dlg.ui.lineEditLinkageDepthWeight->text().toDouble()
-		};
-
-		glWidget->calculateSolutions(GLWidget3D::LINKAGE_WATT_I,
+		glWidget->calculateSolutions(linkage_type,
 			dlg.ui.lineEditNumSamples->text().toInt(),
 			sigmas,
 			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),

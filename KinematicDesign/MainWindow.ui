@@ -100,9 +100,7 @@
     <property name="title">
      <string>Kinematics</string>
     </property>
-    <addaction name="actionGenerate4RLinkage"/>
-    <addaction name="actionGenerateSliderCrank"/>
-    <addaction name="actionGenerateWattI"/>
+    <addaction name="actionGenerateLinkage"/>
     <addaction name="separator"/>
     <addaction name="actionRun"/>
     <addaction name="actionRunBackward"/>
@@ -328,13 +326,13 @@
     <string>Delete Layer</string>
    </property>
   </action>
-  <action name="actionGenerate4RLinkage">
+  <action name="actionGenerateLinkage">
    <property name="icon">
     <iconset>
      <normaloff>Resources/fourbar_linkage.png</normaloff>Resources/fourbar_linkage.png</iconset>
    </property>
    <property name="text">
-    <string>Generate 4R Linkage</string>
+    <string>Generate Linkage</string>
    </property>
   </action>
   <action name="actionCollisionCheck">

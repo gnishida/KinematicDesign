@@ -469,11 +469,13 @@ void GLWidget3D::save(const QString& filename) {
 }
 
 void GLWidget3D::saveSTL(const QString& dirname) {
-	synthesis->saveSTL(dirname, kinematics);
+	//synthesis->saveSTL(dirname, kinematics);
 }
 
 void GLWidget3D::saveSCAD(const QString& dirname) {
-	synthesis->saveSCAD(dirname, kinematics);
+	for (int i = 0; i < kinematics.size(); i++) {
+		synthesis[kinematics[i].linkage_type]->saveSCAD(dirname, i, kinematics[i]);
+	}
 }
 
 void GLWidget3D::saveImage(const QString& filename) {
@@ -512,7 +514,10 @@ void GLWidget3D::update3DGeometry() {
 
 void GLWidget3D::update3DGeometryFromKinematics() {
 	renderManager.removeObjects();
-	std::vector<kinematics::Vertex> vertices = synthesis->generate3DGeometry(kinematics);
+	std::vector<kinematics::Vertex> vertices;
+	for (int i = 0; i < kinematics.size(); i++) {
+		synthesis[kinematics[i].linkage_type]->generate3DGeometry(kinematics[i], vertices);
+	}
 	renderManager.addObject("kinematics", "", vertices, true);
 
 	// update shadow map
@@ -582,18 +587,17 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 	}
 	
 	kinematics.clear();
+	synthesis.clear();
+	synthesis.resize(2);
 
-	if (linkage_type == LINKAGE_4R) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
+	if (linkage_type & LINKAGE_4R) {
+		synthesis[0] = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesis4R(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
 	}
-	else if (linkage_type == LINKAGE_RRRP) {
-		synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
-	}
-	else if (linkage_type == LINKAGE_WATT_I) {
-		//synthesis = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisWattI(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
+	if (linkage_type & LINKAGE_RRRP) {
+		synthesis[1] = boost::shared_ptr<kinematics::LinkageSynthesis>(new kinematics::LinkageSynthesisRRRP(merged_fixed_bodies, sigmas, rotatable_crank, avoid_branch_defect, min_transmission_angle, 1.0, weights));
 	}
 
-	solutions.resize(moving_bodies.size());
+	solutions.resize(moving_bodies.size(), {});
 	selected_solutions.resize(moving_bodies.size());
 	for (int i = 0; i < moving_bodies.size(); i++) {
 		time_t start = clock();
@@ -601,16 +605,36 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		// calculate a distance mapt for the linkage region
 		cv::Mat dist_map;
 		kinematics::BBox dist_map_bbox;
-		synthesis->createDistanceMapForLinkageRegion(linkage_region_pts[i], 5, dist_map_bbox, dist_map);
+		kinematics::LinkageSynthesis::createDistanceMapForLinkageRegion(linkage_region_pts[i], 5, dist_map_bbox, dist_map);
 
-		// calculate the circle point curve and center point curve
+		std::vector<std::vector<kinematics::Solution>> current_solutions(2);
+
+		// calculate the center of the valid regions
+		kinematics::BBox bbox = kinematics::boundingBox(linkage_region_pts[i]);
+		glm::dvec2 bbox_center = bbox.center();
+
 		std::vector<glm::dvec2> enlarged_linkage_region_pts;
-		synthesis->calculateSolution(poses[i], linkage_region_pts[i], linkage_avoidance_pts[i], num_samples, moving_bodies[i], solutions[i], enlarged_linkage_region_pts);
+
+		int cnt = 0;
+		for (int scale = 1; scale <= 3 && cnt == 0; scale++) {
+			// calculate the enlarged linkage region for the sampling region
+			enlarged_linkage_region_pts = kinematics::LinkageSynthesis::enlargePolygon(linkage_region_pts[i], bbox_center, scale);
+
+			// calculate the bounding boxe of the valid regions
+			kinematics::BBox enlarged_bbox = kinematics::boundingBox(enlarged_linkage_region_pts);
+
+			// calculate the circle point curve and center point curve
+			for (int j = 0; j < synthesis.size(); j++) {
+				if (!synthesis[j]) continue;
+				synthesis[j]->calculateSolution(poses[i], enlarged_linkage_region_pts, linkage_avoidance_pts[i], num_samples, moving_bodies[i], current_solutions[j]);
+				cnt += current_solutions[j].size();
+			}
+		}
 
 		time_t end = clock();
-		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << solutions[i].size() << " candidates." << std::endl;
+		std::cout << "Elapsed: " << (double)(end - start) / CLOCKS_PER_SEC << " sec for obtaining " << cnt << " candidates." << std::endl;
 
-		if (solutions[i].size() == 0) {
+		if (cnt == 0) {
 			mainWin->ui.statusBar->showMessage("No candidate was found.");
 		}
 		else {
@@ -619,10 +643,20 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 
 		start = clock();
 
-		selected_solutions[i] = synthesis->findBestSolution(poses[i], solutions[i], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], moving_bodies[i], num_particles, num_iterations, record_file);
-		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
+		kinematics::Kinematics kin;
+		selected_solutions[i].cost = std::numeric_limits<double>::max();
+		for (int j = 0; j < synthesis.size(); j++) {
+			if (!synthesis[j]) continue;
+			kinematics::Solution solution = synthesis[j]->findBestSolution(poses[i], current_solutions[j], enlarged_linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts[i], moving_bodies[i], num_particles, num_iterations, record_file);
+			if (solution.cost < selected_solutions[i].cost) {
+				selected_solutions[i] = solution;
+			}
 
+			solutions[i].insert(solutions[i].end(), current_solutions[j].begin(), current_solutions[j].end());
+		}
+
+		std::vector<glm::dvec2> connector_pts;
+		kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 		kinematics.push_back(kin);
 
 		end = clock();
@@ -659,7 +693,7 @@ void GLWidget3D::constructKinematics() {
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
 		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kin = synthesis->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
+		kinematics::Kinematics kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 		kinematics.push_back(kin);
 	}
 	
@@ -972,15 +1006,12 @@ void GLWidget3D::paintEvent(QPaintEvent *event) {
 			// draw solutions
 			if (show_solutions && selectedJoint.first >= 0) {
 				int linkage_id = selectedJoint.first;
-				painter.setPen(QPen(QColor(255, 128, 128, 64), 1));
-				painter.setBrush(QBrush(QColor(255, 128, 128, 64)));
-				for (int i = 0; i < solutions[linkage_id].size(); i++) {
-					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[0].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[0].y * scale(), 3, 3);
-				}
 				painter.setPen(QPen(QColor(128, 128, 255, 64), 1));
 				painter.setBrush(QBrush(QColor(128, 128, 255, 64)));
 				for (int i = 0; i < solutions[linkage_id].size(); i++) {
-					painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[1].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[1].y * scale(), 3, 3);
+					if (selectedJoint.second < solutions[linkage_id][i].points.size()) {
+						painter.drawEllipse(width() * 0.5 - offset.x + solutions[linkage_id][i].points[selectedJoint.second].x * scale(), height() * 0.5 - offset.y - solutions[linkage_id][i].points[selectedJoint.second].y * scale(), 3, 3);
+					}
 				}
 			}
 
@@ -1104,7 +1135,6 @@ void GLWidget3D::mousePressEvent(QMouseEvent *e) {
 			double min_dist = 2;
 			for (int i = 0; i < kinematics.size(); i++) {
 				for (int j = 0; j < kinematics[i].diagram.joints.size(); j++) {
-					if (!ctrlPressed && j >= 2) continue;
 					double dist = glm::length(kinematics[i].diagram.joints[j]->pos - pt);
 					if (dist < min_dist) {
 						min_dist = dist;
@@ -1181,35 +1211,10 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *e) {
 			int joint_id = selectedJoint.second;
 			glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
 
-			if (ctrlPressed) {
-				// move the selected joint
-				kinematics[linkage_id].diagram.joints[joint_id]->pos = pt;
-			}
-			else {
-				// select a solution
-				glm::dvec2 pt = screenToWorldCoordinates(e->x(), e->y());
-				int selectedSolution = findSolution(solutions[linkage_id], pt, joint_id);
-
-				if (selectedSolution >= 0) {
-					selected_solutions[linkage_id] = solutions[linkage_id][selectedSolution];
-
-					// move the joints according to the selected solution
-					for (int i = 0; i < solutions[linkage_id][selectedSolution].points.size(); i++) {
-						kinematics[linkage_id].diagram.joints[i]->pos = solutions[linkage_id][selectedSolution].points[i];
-					}
-
-					// move the other linkages back to the first pose
-					for (int i = 0; i < kinematics.size(); i++) {
-						if (i == linkage_id) continue;
-
-						int selectedSolution = findSolution(solutions[i], kinematics[i].diagram.joints[0]->pos, 0);
-						if (selectedSolution >= 0) {
-							for (int j = 0; j < solutions[i][selectedSolution].points.size(); j++) {
-								kinematics[i].diagram.joints[j]->pos = solutions[i][selectedSolution].points[j];
-							}
-						}
-					}
-				}
+			// select a solution
+			int selectedSolution = findSolution(solutions[linkage_id], pt, joint_id);
+			if (selectedSolution >= 0) {
+				selected_solutions[linkage_id] = solutions[linkage_id][selectedSolution];
 			}
 
 			// update the geometry
