@@ -396,12 +396,11 @@ namespace kinematics {
 		glm::dvec2 inv_W = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
 
 		int linkage_type = getType(points);
-		std::pair<double, double> range = checkRange(points);
 
 		double total_cw = 0;
 		double total_ccw = 0;
-		double prev = 0;
-		for (int i = 0; i < poses.size(); i++) {
+		double prev = atan2(points[2].y - points[0].y, points[2].x - points[0].x);
+		for (int i = 1; i < poses.size(); i++) {
 			// calculate the coordinates of the circle point of the driving crank in the world coordinate system
 			glm::dvec2 X = glm::dvec2(poses[i] * glm::dvec3(inv_W, 1));
 			//std::cout << X.x << "," << X.y << std::endl;
@@ -413,37 +412,37 @@ namespace kinematics {
 			double theta = atan2(dir.y, dir.x);
 
 			if (theta >= prev) {
-				if (linkage_type == 0 || linkage_type == 2) {
-					total_cw += M_PI * 2 - theta + prev;
-					total_ccw += theta - prev;
-				}
-				else if (linkage_type == 2 || linkage_type == 3 || linkage_type == 4 || linkage_type == 7) {
-					total_cw = M_PI * 999; // out of range
+				total_cw += M_PI * 2 - theta + prev;
+				total_ccw += theta - prev;
+
+				if (linkage_type == 4 || linkage_type == 7) {
+					total_cw = M_PI * 999;
 					total_ccw += theta - prev;
 				}
 				else if (linkage_type == 5 || linkage_type == 6) {
-					if (theta < range.first) {
-						theta += M_PI * 2;
+					if ((theta > 0 && prev > 0) || (theta < 0 && prev < 0)) {
+						total_cw = M_PI * 999;
 					}
-					total_cw = M_PI * 999; // out of range
-					total_ccw += theta - prev;
+					if ((theta > 0 && prev < 0) || (theta < 0 && prev > 0)) {
+						total_ccw = M_PI * 999;
+					}
 				}
 			}
 			else {
-				if (linkage_type == 0 || linkage_type == 2) {
+				total_cw += prev - theta;
+				total_ccw += M_PI * 2 - prev + theta;
+
+				if (linkage_type == 4 || linkage_type == 7) {
 					total_cw += prev - theta;
-					total_ccw += M_PI * 2 - prev + theta;
-				}
-				else if (linkage_type == 2 || linkage_type == 3 || linkage_type == 4 || linkage_type == 7) {
-					total_cw += prev - theta;
-					total_ccw = M_PI * 999;	// out of range
+					total_ccw = M_PI * 999;
 				}
 				else if (linkage_type == 5 || linkage_type == 6) {
-					if (theta < range.first) {
-						theta += M_PI * 2;
+					if ((theta > 0 && prev < 0) || (theta < 0 && prev > 0)) {
+						total_cw = M_PI * 999;
 					}
-					total_cw += prev - theta;
-					total_ccw = M_PI * 999;	// out of range
+					if ((theta > 0 && prev > 0) || (theta < 0 && prev < 0)) {
+						total_ccw = M_PI * 999;
+					}
 				}
 			}
 
