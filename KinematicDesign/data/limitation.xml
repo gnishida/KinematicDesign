@@ -1,0 +1,38 @@
+<design date="01/14/2018" version="1.0" author="Gen Nishida">
+    <fixed_body type="polygon">
+        <pose theta="0" y="19.95" x="-20.15"/>
+        <point y="0" x="0"/>
+        <point y="0" x="5.199999999999999"/>
+        <point y="-14.9" x="5.199999999999999"/>
+        <point y="-14.9" x="17.4"/>
+        <point y="0.1000000000000014" x="17.4"/>
+        <point y="0.1000000000000014" x="22.4"/>
+        <point y="-14.8" x="22.4"/>
+        <point y="-14.8" x="35"/>
+        <point y="-0.09999999999999787" x="35"/>
+        <point y="-0.09999999999999787" x="40.2"/>
+        <point y="-19.8" x="40.2"/>
+        <point y="-19.8" x="0.09999999999999787"/>
+    </fixed_body>
+    <moving_body>
+        <shape type="rectangle">
+            <pose theta="0" y="19.95" x="-11.55"/>
+            <params height="-14.3" width="4.700000000000001"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0" y="36.95000000000001" x="-2.750000000000001"/>
+            <params height="-14.3" width="4.700000000000001"/>
+        </shape>
+        <shape type="rectangle">
+            <pose theta="0" y="19.84999999999999" x="6.749999999999999"/>
+            <params height="-14.3" width="4.700000000000001"/>
+        </shape>
+        <linkage_region type="polygon">
+            <pose theta="0" y="35.65" x="-20.25"/>
+            <point y="0" x="0"/>
+            <point y="0" x="40.5"/>
+            <point y="-35.4" x="40.5"/>
+            <point y="-35.4" x="0.1000000000000014"/>
+        </linkage_region>
+    </moving_body>
+</design>
