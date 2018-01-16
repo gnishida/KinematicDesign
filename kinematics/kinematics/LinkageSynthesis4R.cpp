@@ -395,55 +395,24 @@ namespace kinematics {
 	bool LinkageSynthesis4R::checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
 		glm::dvec2 inv_W = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(points[2], 1));
 
-		int linkage_type = getType(points);
-
 		double total_cw = 0;
 		double total_ccw = 0;
-		double prev = atan2(points[2].y - points[0].y, points[2].x - points[0].x);
+		double prev = std::atan2(points[2].y - points[0].y, points[2].x - points[0].x);
+
 		for (int i = 1; i < poses.size(); i++) {
 			// calculate the coordinates of the circle point of the driving crank in the world coordinate system
 			glm::dvec2 X = glm::dvec2(poses[i] * glm::dvec3(inv_W, 1));
-			//std::cout << X.x << "," << X.y << std::endl;
-
-			// calculate the direction from the ground pivot (center point) of the driving crank to the circle point
-			glm::dvec2 dir = X - points[0];
 
 			// calculate its angle
-			double theta = atan2(dir.y, dir.x);
+			double theta = std::atan2(X.y - points[0].y, X.x - points[0].x);
 
 			if (theta >= prev) {
 				total_cw += M_PI * 2 - theta + prev;
 				total_ccw += theta - prev;
-
-				if (linkage_type == 4 || linkage_type == 7) {
-					total_cw = M_PI * 999;
-					total_ccw += theta - prev;
-				}
-				else if (linkage_type == 5 || linkage_type == 6) {
-					if ((theta > 0 && prev > 0) || (theta < 0 && prev < 0)) {
-						total_cw = M_PI * 999;
-					}
-					if ((theta > 0 && prev < 0) || (theta < 0 && prev > 0)) {
-						total_ccw = M_PI * 999;
-					}
-				}
 			}
 			else {
 				total_cw += prev - theta;
 				total_ccw += M_PI * 2 - prev + theta;
-
-				if (linkage_type == 4 || linkage_type == 7) {
-					total_cw += prev - theta;
-					total_ccw = M_PI * 999;
-				}
-				else if (linkage_type == 5 || linkage_type == 6) {
-					if ((theta > 0 && prev < 0) || (theta < 0 && prev > 0)) {
-						total_cw = M_PI * 999;
-					}
-					if ((theta > 0 && prev > 0) || (theta < 0 && prev < 0)) {
-						total_ccw = M_PI * 999;
-					}
-				}
 			}
 
 			prev = theta;
