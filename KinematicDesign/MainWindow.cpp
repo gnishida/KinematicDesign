@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionStepForward, SIGNAL(triggered()), this, SLOT(onStepForward()));
 	connect(ui.actionStepBackward, SIGNAL(triggered()), this, SLOT(onStepBackward()));
 	connect(ui.actionCollisionCheck, SIGNAL(triggered()), this, SLOT(onCollisionCheck()));
+	connect(ui.actionRestrictMotionRange, SIGNAL(triggered()), this, SLOT(onRestrictMotionRange()));
 	connect(ui.actionOptions, SIGNAL(triggered()), this, SLOT(onOptions()));
 	connect(ui.actionShowSolutions, SIGNAL(triggered()), this, SLOT(onShowSolutions()));
 	connect(ui.actionShowGridLines, SIGNAL(triggered()), this, SLOT(onShowGridLines()));
@@ -350,6 +351,10 @@ void MainWindow::onStepBackward() {
 
 void MainWindow::onCollisionCheck() {
 	glWidget->collision_check = ui.actionCollisionCheck->isChecked();
+}
+
+void MainWindow::onRestrictMotionRange() {
+	glWidget->restrict_motion_range = ui.actionRestrictMotionRange->isChecked();
 }
 
 void MainWindow::onOptions() {

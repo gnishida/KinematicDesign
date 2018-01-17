@@ -72,6 +72,7 @@ public:
     QAction *actionShowGridLines;
     QAction *actionShowInputPoses;
     QAction *actionSaveImage;
+    QAction *actionRestrictMotionRange;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -278,6 +279,10 @@ public:
         actionShowInputPoses->setChecked(true);
         actionSaveImage = new QAction(MainWindowClass);
         actionSaveImage->setObjectName(QStringLiteral("actionSaveImage"));
+        actionRestrictMotionRange = new QAction(MainWindowClass);
+        actionRestrictMotionRange->setObjectName(QStringLiteral("actionRestrictMotionRange"));
+        actionRestrictMotionRange->setCheckable(true);
+        actionRestrictMotionRange->setChecked(true);
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindowClass->setCentralWidget(centralWidget);
@@ -366,6 +371,7 @@ public:
         menuKinematics->addAction(actionStepBackward);
         menuKinematics->addSeparator();
         menuKinematics->addAction(actionCollisionCheck);
+        menuKinematics->addAction(actionRestrictMotionRange);
         menuKinematics->addAction(actionOptions);
         menuView->addAction(actionShowSolutions);
         menuView->addAction(actionShowGridLines);
@@ -442,6 +448,7 @@ public:
         actionShowInputPoses->setText(QApplication::translate("MainWindowClass", "Show Input Poses", 0));
         actionSaveImage->setText(QApplication::translate("MainWindowClass", "Save Image", 0));
         actionSaveImage->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+P", 0));
+        actionRestrictMotionRange->setText(QApplication::translate("MainWindowClass", "Restrict Motion Range", 0));
         menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
         menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
         menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));

@@ -110,6 +110,7 @@
     <addaction name="actionStepBackward"/>
     <addaction name="separator"/>
     <addaction name="actionCollisionCheck"/>
+    <addaction name="actionRestrictMotionRange"/>
     <addaction name="actionOptions"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -578,6 +579,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionRestrictMotionRange">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Restrict Motion Range</string>
    </property>
   </action>
  </widget>

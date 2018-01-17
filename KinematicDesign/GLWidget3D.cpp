@@ -31,6 +31,7 @@ GLWidget3D::GLWidget3D(MainWindow *parent) : QGLWidget(QGLFormat(QGL::SampleBuff
 	linkage_type = LINKAGE_4R;
 	animation_timer = NULL;
 	collision_check = true;
+	restrict_motion_range = true;
 	show_solutions = false;
 	show_grid_lines = true;
 	show_input_poses = true;
@@ -658,7 +659,7 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 		}
 
 		std::vector<glm::dvec2> connector_pts;
-		kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
+		kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].poses, selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 		kinematics.push_back(kin);
 
 		end = clock();
@@ -695,7 +696,7 @@ void GLWidget3D::constructKinematics() {
 	// construct kinamtics
 	for (int i = 0; i < selected_solutions.size(); i++) {
 		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
+		kinematics::Kinematics kin = synthesis[selected_solutions[i].linkage_type]->constructKinematics(selected_solutions[i].poses, selected_solutions[i].points, selected_solutions[i].zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
 		kinematics.push_back(kin);
 	}
 	

@@ -21,6 +21,8 @@ namespace kinematics {
 		double simulation_speed;
 		bool show_links;
 		bool show_bodies;
+		double min_angle;
+		double max_angle;
 
 	public:
 		Kinematics(double simulation_speed = 0.02);
@@ -29,8 +31,8 @@ namespace kinematics {
 		void load(const QString& filename);
 		void save(const QString& filename);
 		void forwardKinematics(int collision_check);
-		void stepForward(int collision_check, bool need_recovery_for_collision = true);
-		void stepBackward(int collision_check, bool need_recovery_for_collision = true);
+		void stepForward(int collision_check, bool need_recovery_for_collision = true, bool motion_range_restricted = false);
+		void stepBackward(int collision_check, bool need_recovery_for_collision = true, bool motion_range_restricted = false);
 		void draw(QPainter& painter, const QPointF& origin, float scale) const;
 		void speedUp();
 		void speedDown();

@@ -176,7 +176,7 @@ namespace kinematics {
 		}
 		double tortuosity = tortuosityOfTrajectory(solution.poses, solution.points, moving_body);
 		std::vector<glm::dvec2> connected_pts;
-		Kinematics kin = constructKinematics(solution.points, solution.zorder, moving_body, true, fixed_bodies, connected_pts);
+		Kinematics kin = constructKinematics(solution.poses, solution.points, solution.zorder, moving_body, true, fixed_bodies, connected_pts);
 		//double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[2] - connected_pts[2]) + glm::length(solution.points[3] - connected_pts[3]);
 		double size = glm::length(solution.points[0] - solution.points[2]) + glm::length(solution.points[1] - solution.points[3]) + glm::length(solution.points[0] - connected_pts[0]) + glm::length(solution.points[1] - connected_pts[1]) + glm::length(solution.points[2] - connected_pts[2]) + glm::length(solution.points[3] - connected_pts[3]);
 		int max_zorder = 0;
@@ -192,7 +192,7 @@ namespace kinematics {
 	/**
 	* Construct a linkage.
 	*/
-	Kinematics LinkageSynthesis4R::constructKinematics(const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies, std::vector<glm::dvec2>& connected_pts) {
+	Kinematics LinkageSynthesis4R::constructKinematics(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<std::vector<int>>& zorder, const Object25D& moving_body, bool connect_joints, const std::vector<Object25D>& fixed_bodies, std::vector<glm::dvec2>& connected_pts) {
 		Kinematics kin;
 		kin.linkage_type = 0;
 		kin.diagram.addJoint(boost::shared_ptr<kinematics::PinJoint>(new kinematics::PinJoint(0, true, points[0], zorder.size() == 3 ? zorder[2][0] : 1)));
@@ -216,6 +216,11 @@ namespace kinematics {
 		for (int i = 0; i < copied_fixed_bodies.size(); i++) {
 			kin.diagram.addBody(kin.diagram.joints[0], kin.diagram.joints[1], copied_fixed_bodies[i]);
 		}
+
+		// calculte the range of motion
+		std::pair<double, double> angle_range = checkRange(poses, points);
+		kin.min_angle = angle_range.first;
+		kin.max_angle = angle_range.second;
 
 		return kin;
 	}
@@ -320,54 +325,43 @@ namespace kinematics {
 		else return false;
 	}
 
-	std::pair<double, double> LinkageSynthesis4R::checkRange(const std::vector<glm::dvec2>& points) {
-		double g = glm::length(points[0] - points[1]);
-		double a = glm::length(points[0] - points[2]);
-		double b = glm::length(points[1] - points[3]);
-		double h = glm::length(points[2] - points[3]);
+	std::pair<double, double> LinkageSynthesis4R::checkRange(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
+		if (poses.size() <= 2) return{ 0, 0 };
 
-		double T1 = g + h - a - b;
-		double T2 = b + g - a - h;
-		double T3 = b + h - a - g;
+		glm::dvec2 dir1 = points[2] - points[0];
+		glm::dvec2 dir2 = glm::dvec2(poses[1] * glm::inverse(poses[0]) * glm::dvec3(points[2], 1)) - points[0];
+		glm::dvec2 dir3 = glm::dvec2(poses.back() * glm::inverse(poses[0]) * glm::dvec3(points[2], 1)) - points[0];
 
-		double theta_min = 0;
-		double theta_max = M_PI * 2;
+		double angle1 = std::atan2(dir1.y, dir1.x);
+		double angle2 = std::atan2(dir2.y, dir2.x);
+		double angle3 = std::atan2(dir3.y, dir3.x);
 
-		int linkage_type = getType(points);
-		if (linkage_type == 2) {
-			if (crossProduct(points[0] - points[2], points[1] - points[0]) >= 0) {
-				theta_min = acos((a * a + g * g - (h - b) * (h - b)) / 2 / a / g);
-				theta_max = acos((a * a + g * g - (h + b) * (h + b)) / 2 / a / g);
-			}
-			else {
-				theta_min = -acos((a * a + g * g - (h + b) * (h + b)) / 2 / a / g);
-				theta_max = -acos((a * a + g * g - (h - b) * (h - b)) / 2 / a / g);
-			}
+		// try clock-wise order
+		double a1 = angle1;
+		double a2 = angle2;
+		double a3 = angle3;
+		if (a2 > a1) {
+			a2 -= M_PI * 2;
 		}
-		else if (linkage_type == 3) {
-			if (crossProduct(points[0] - points[2], points[1] - points[0]) >= 0) {
-				theta_min = acos((a * a + g * g - (b - h) * (b - h)) / 2 / a / g);
-				theta_max = acos((a * a + g * g - (b + h) * (b + h)) / 2 / a / g);
-			}
-			else {
-				theta_min = -acos((a * a + g * g - (b + h) * (b + h)) / 2 / a / g);
-				theta_max = -acos((a * a + g * g - (b - h) * (b - h)) / 2 / a / g);
-			}
+		while (a3 > a2) {
+			a3 -= M_PI * 2;
 		}
-		else if (linkage_type == 4 || linkage_type == 7) {
-			theta_max = acos((a * a + g * g - (b + h) * (b + h)) / 2 / a / g);
-			theta_min = -theta_max;
-		}
-		else if (linkage_type == 5) {
-			theta_min = acos((a * a + g * g - (b - h) * (b - h)) / 2 / a / g);
-			theta_max = M_PI * 2 - theta_min;
-		}
-		else if (linkage_type == 6) {
-			theta_min = acos((a * a + g * g - (h - b) * (h - b)) / 2 / a / g);
-			theta_max = M_PI * 2 - theta_min;
+		if (a1 - a3 < M_PI * 2) {
+			return{ std::min(a1, a3), std::max(a1, a3) };
 		}
 
-		return{ theta_min, theta_max };
+		// try counter-clock-wise order
+		if (angle2 < angle1) {
+			angle2 += M_PI * 2;
+		}
+		if (angle3 < angle2) {
+			angle3 += M_PI * 2;
+		}
+		if (angle3 - angle1 < M_PI * 2) {
+			return{ std::min(angle1, angle3), std::max(angle1, angle3) };
+		}
+
+		return{ 0, 0 };
 	}
 
 	/**
@@ -522,7 +516,7 @@ namespace kinematics {
 	 */
 	bool LinkageSynthesis4R::checkCollision(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D>& fixed_bodies, const Object25D& moving_body, const std::vector<glm::dvec2>& linkage_avoidance_pts) {
 		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, fixed_bodies, connector_pts);
+		kinematics::Kinematics kinematics = constructKinematics(poses, points, {}, moving_body, false, fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
 
 		// check the transmission angle
@@ -678,7 +672,7 @@ namespace kinematics {
 
 	Kinematics LinkageSynthesis4R::recordCollisionForConnectors(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points, const std::vector<Object25D> fixed_bodies, const Object25D& moving_body) {
 		std::vector<glm::dvec2> connector_pts;
-		Kinematics kinematics = constructKinematics(points, {}, moving_body, true, fixed_bodies, connector_pts);
+		Kinematics kinematics = constructKinematics(poses, points, {}, moving_body, true, fixed_bodies, connector_pts);
 		kinematics.diagram.initialize();
 
 		// calculate the rotational angle of the driving crank for 1st, 2nd, and last poses
@@ -833,7 +827,7 @@ namespace kinematics {
 
 		// create a kinematics
 		std::vector<glm::dvec2> connector_pts;
-		kinematics::Kinematics kinematics = constructKinematics(points, {}, moving_body, false, {}, connector_pts);
+		kinematics::Kinematics kinematics = constructKinematics(poses, points, {}, moving_body, false, {}, connector_pts);
 		kinematics.diagram.initialize();
 
 		// initialize the trajectory of the moving body
