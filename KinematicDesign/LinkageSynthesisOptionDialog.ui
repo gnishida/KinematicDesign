@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>676</height>
+    <height>647</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,24 +49,11 @@
     <string>Avoid branch/poor transmission angle defect</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBoxRotatableCrank">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>330</y>
-     <width>131</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Fully rotatable crank</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButtonOK">
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>630</y>
+     <y>600</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -79,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>630</y>
+     <y>600</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -282,7 +269,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>360</y>
+     <y>330</y>
      <width>311</width>
      <height>151</height>
     </rect>
@@ -433,7 +420,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>520</y>
+     <y>490</y>
      <width>311</width>
      <height>91</height>
     </rect>

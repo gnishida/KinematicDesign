@@ -320,7 +320,6 @@ void MainWindow::onGenerateLinkage() {
 			sigmas,
 			dlg.ui.checkBoxAvoidBranchDefect->isChecked(),
 			dlg.ui.lineEditMinTransmissionAngle->text().toDouble(),
-			dlg.ui.checkBoxRotatableCrank->isChecked(),
 			weights,
 			dlg.ui.lineEditNumParticles->text().toInt(),
 			dlg.ui.lineEditNumIterations->text().toInt(),

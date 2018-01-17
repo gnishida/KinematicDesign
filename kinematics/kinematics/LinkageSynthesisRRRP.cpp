@@ -14,10 +14,9 @@
 
 namespace kinematics {
 	
-	LinkageSynthesisRRRP::LinkageSynthesisRRRP(const std::vector<Object25D>& fixed_bodies, const std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights) {
+	LinkageSynthesisRRRP::LinkageSynthesisRRRP(const std::vector<Object25D>& fixed_bodies, const std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights) {
 		this->fixed_bodies = fixed_bodies;
 		this->sigmas = sigmas;
-		this->rotatable_crank = rotatable_crank;
 		this->avoid_branch_defect = avoid_branch_defect;
 		this->min_transmission_angle = min_transmission_angle;
 		this->min_link_length = min_link_length;
@@ -290,7 +289,6 @@ namespace kinematics {
 		if (glm::length(points[0] - points[1]) < min_link_length) return false;
 		if (glm::length(points[2] - points[3]) < min_link_length) return false;
 
-		if (rotatable_crank && checkRotatableCrankDefect(points)) return false;
 		if (avoid_branch_defect && checkBranchDefect(poses, points)) return false;
 		if (checkCircuitDefect(poses, points)) return false;
 
@@ -356,21 +354,6 @@ namespace kinematics {
 		}
 		//else if (S1 < 0 && S2 >= 0) return 2;
 		else return 3;
-	}
-
-	/**
-	* Check if the linkage has rotatable crank defect.
-	* If the crank is not fully rotatable, true is returned.
-	*/
-	bool LinkageSynthesisRRRP::checkRotatableCrankDefect(const std::vector<glm::dvec2>& points) {
-		int linkage_type = getType(points);
-
-		if (linkage_type == 0) {
-			return false;
-		}
-		else {
-			return true;
-		}
 	}
 
 	bool LinkageSynthesisRRRP::checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {

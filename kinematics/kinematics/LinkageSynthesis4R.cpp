@@ -14,10 +14,9 @@
 
 namespace kinematics {
 
-	LinkageSynthesis4R::LinkageSynthesis4R(const std::vector<Object25D>& fixed_bodies, const std::vector<std::pair<double, double>>& sigmas, bool rotatable_crank, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights) {
+	LinkageSynthesis4R::LinkageSynthesis4R(const std::vector<Object25D>& fixed_bodies, const std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, double min_transmission_angle, double min_link_length, const std::vector<double>& weights) {
 		this->fixed_bodies = fixed_bodies;
 		this->sigmas = sigmas;
-		this->rotatable_crank = rotatable_crank;
 		this->avoid_branch_defect = avoid_branch_defect;
 		this->min_transmission_angle = min_transmission_angle;
 		this->min_link_length = min_link_length;
@@ -234,7 +233,6 @@ namespace kinematics {
 		if (glm::length(points[2] - points[3]) < min_link_length) return false;
 
 		if (checkFolding(points)) return false;
-		if (rotatable_crank && checkRotatableCrankDefect(points)) return false;
 		if (avoid_branch_defect && checkBranchDefect(poses, points)) return false;
 		if (checkCircuitDefect(poses, points)) return false;
 		if (checkOrderDefect(poses, points)) return false;
@@ -370,21 +368,6 @@ namespace kinematics {
 		}
 
 		return{ theta_min, theta_max };
-	}
-
-	/**
-	* Check if the linkage has a rotatable crank defect.
-	* If the crank is not fully rotatable, true is returned.
-	*/
-	bool LinkageSynthesis4R::checkRotatableCrankDefect(const std::vector<glm::dvec2>& points) {
-		int linkage_type = getType(points);
-
-		if (linkage_type == 0 || linkage_type == 1) {
-			return false;
-		}
-		else {
-			return true;
-		}
 	}
 
 	/**

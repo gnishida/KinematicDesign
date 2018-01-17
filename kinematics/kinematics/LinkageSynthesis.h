@@ -14,7 +14,6 @@ namespace kinematics {
 	protected:
 		std::vector<Object25D> fixed_bodies;
 		std::vector<std::pair<double, double>> sigmas;
-		bool rotatable_crank;
 		bool avoid_branch_defect;
 		double min_transmission_angle;
 		double min_link_length;
