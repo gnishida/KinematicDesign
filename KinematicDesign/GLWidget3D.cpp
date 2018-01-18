@@ -842,7 +842,7 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent* e) {
 void GLWidget3D::animation_update() {
 	for (int i = 0; i < kinematics.size(); i++) {
 		try {
-			kinematics[i].stepForward(collision_check ? 1 : 0);
+			kinematics[i].stepForward(collision_check ? 1 : 0, true, restrict_motion_range);
 		}
 		catch (char* ex) {
 			kinematics[i].invertSpeed();
