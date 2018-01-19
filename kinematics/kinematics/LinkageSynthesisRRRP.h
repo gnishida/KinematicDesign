@@ -26,6 +26,7 @@ namespace kinematics {
 
 		bool checkHardConstraints(std::vector<glm::dvec2>& points, const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, std::vector<std::vector<int>>& zorder);
 		int getType(const std::vector<glm::dvec2>& points);
+		std::pair<double, double> checkRange(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points);
 		bool checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points);
 		bool checkBranchDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points);
 		bool checkCircuitDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points);

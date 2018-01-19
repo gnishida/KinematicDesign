@@ -271,6 +271,11 @@ namespace kinematics {
 			kin.diagram.addBody(kin.diagram.joints[0], kin.diagram.joints[1], copied_fixed_bodies[i]);
 		}
 
+		// calculte the range of motion
+		std::pair<double, double> angle_range = checkRange(poses, points);
+		kin.min_angle = angle_range.first;
+		kin.max_angle = angle_range.second;
+
 		return kin;
 	}
 
@@ -354,6 +359,45 @@ namespace kinematics {
 		}
 		//else if (S1 < 0 && S2 >= 0) return 2;
 		else return 3;
+	}
+
+	std::pair<double, double> LinkageSynthesisRRRP::checkRange(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
+		if (poses.size() <= 2) return{ 0, 0 };
+
+		glm::dvec2 dir1 = points[2] - points[0];
+		glm::dvec2 dir2 = glm::dvec2(poses[1] * glm::inverse(poses[0]) * glm::dvec3(points[2], 1)) - points[0];
+		glm::dvec2 dir3 = glm::dvec2(poses.back() * glm::inverse(poses[0]) * glm::dvec3(points[2], 1)) - points[0];
+
+		double angle1 = std::atan2(dir1.y, dir1.x);
+		double angle2 = std::atan2(dir2.y, dir2.x);
+		double angle3 = std::atan2(dir3.y, dir3.x);
+
+		// try clock-wise order
+		double a1 = angle1;
+		double a2 = angle2;
+		double a3 = angle3;
+		if (a2 > a1) {
+			a2 -= M_PI * 2;
+		}
+		while (a3 > a2) {
+			a3 -= M_PI * 2;
+		}
+		if (a1 - a3 < M_PI * 2) {
+			return{ std::min(a1, a3), std::max(a1, a3) };
+		}
+
+		// try counter-clock-wise order
+		if (angle2 < angle1) {
+			angle2 += M_PI * 2;
+		}
+		if (angle3 < angle2) {
+			angle3 += M_PI * 2;
+		}
+		if (angle3 - angle1 < M_PI * 2) {
+			return{ std::min(angle1, angle3), std::max(angle1, angle3) };
+		}
+
+		return{ 0, 0 };
 	}
 
 	bool LinkageSynthesisRRRP::checkOrderDefect(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& points) {
