@@ -644,6 +644,19 @@ void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vect
 			mainWin->ui.statusBar->showMessage("Running a particle filter...");
 		}
 
+		// use a default linkage if no solution is found
+		if (cnt == 0) {
+			for (int j = 0; j < synthesis.size(); j++) {
+				if (!synthesis[j]) continue;
+				kinematics::Kinematics kin;
+				solutions[i].push_back(kinematics::Solution(0, { { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, 0, 0, poses[i]));
+				std::vector<glm::dvec2> connector_pts;
+				kin = synthesis[j]->constructKinematics(poses[i], solutions[i].back().points, solutions[i].back().zorder, moving_bodies[i], true, fixed_bodies, connector_pts);
+				kinematics.push_back(kin);
+			}
+			continue;
+		}
+
 		start = clock();
 
 		kinematics::Kinematics kin;
