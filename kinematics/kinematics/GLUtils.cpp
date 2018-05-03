@@ -13,21 +13,21 @@ namespace kinematics {
 		typedef boost::geometry::model::d2::point_xy<double>		point_2d;
 
 		BoundingBox::BoundingBox() {
-			minPt.x = (std::numeric_limits<float>::max)();
-			minPt.y = (std::numeric_limits<float>::max)();
-			minPt.z = (std::numeric_limits<float>::max)();
-			maxPt.x = -(std::numeric_limits<float>::max)();
-			maxPt.y = -(std::numeric_limits<float>::max)();
-			maxPt.z = -(std::numeric_limits<float>::max)();
+			minPt.x = std::numeric_limits<double>::max();
+			minPt.y = std::numeric_limits<double>::max();
+			minPt.z = std::numeric_limits<double>::max();
+			maxPt.x = -std::numeric_limits<double>::max();
+			maxPt.y = -std::numeric_limits<double>::max();
+			maxPt.z = -std::numeric_limits<double>::max();
 		}
 
-		BoundingBox::BoundingBox(const std::vector<glm::vec2>& points) {
-			minPt.x = (std::numeric_limits<float>::max)();
-			minPt.y = (std::numeric_limits<float>::max)();
-			minPt.z = 0.0f;
-			maxPt.x = -(std::numeric_limits<float>::max)();
-			maxPt.y = -(std::numeric_limits<float>::max)();
-			maxPt.z = 0.0f;
+		BoundingBox::BoundingBox(const std::vector<glm::dvec2>& points) {
+			minPt.x = std::numeric_limits<double>::max();
+			minPt.y = std::numeric_limits<double>::max();
+			minPt.z = 0.0;
+			maxPt.x = -std::numeric_limits<double>::max();
+			maxPt.y = -std::numeric_limits<double>::max();
+			maxPt.z = 0.0;
 
 			for (int i = 0; i < points.size(); ++i) {
 				minPt.x = std::min(minPt.x, points[i].x);
@@ -37,13 +37,13 @@ namespace kinematics {
 			}
 		}
 
-		BoundingBox::BoundingBox(const std::vector<glm::vec3>& points) {
-			minPt.x = (std::numeric_limits<float>::max)();
-			minPt.y = (std::numeric_limits<float>::max)();
-			minPt.z = (std::numeric_limits<float>::max)();
-			maxPt.x = -(std::numeric_limits<float>::max)();
-			maxPt.y = -(std::numeric_limits<float>::max)();
-			maxPt.z = -(std::numeric_limits<float>::max)();
+		BoundingBox::BoundingBox(const std::vector<glm::dvec3>& points) {
+			minPt.x = std::numeric_limits<double>::max();
+			minPt.y = std::numeric_limits<double>::max();
+			minPt.z = std::numeric_limits<double>::max();
+			maxPt.x = -std::numeric_limits<double>::max();
+			maxPt.y = -std::numeric_limits<double>::max();
+			maxPt.z = -std::numeric_limits<double>::max();
 
 			for (int i = 0; i < points.size(); ++i) {
 				minPt.x = std::min(minPt.x, points[i].x);
@@ -55,13 +55,13 @@ namespace kinematics {
 			}
 		}
 
-		BoundingBox::BoundingBox(const std::vector<std::vector<glm::vec3> >& points) {
-			minPt.x = (std::numeric_limits<float>::max)();
-			minPt.y = (std::numeric_limits<float>::max)();
-			minPt.z = (std::numeric_limits<float>::max)();
-			maxPt.x = -(std::numeric_limits<float>::max)();
-			maxPt.y = -(std::numeric_limits<float>::max)();
-			maxPt.z = -(std::numeric_limits<float>::max)();
+		BoundingBox::BoundingBox(const std::vector<std::vector<glm::dvec3> >& points) {
+			minPt.x = (std::numeric_limits<double>::max)();
+			minPt.y = (std::numeric_limits<double>::max)();
+			minPt.z = (std::numeric_limits<double>::max)();
+			maxPt.x = -(std::numeric_limits<double>::max)();
+			maxPt.y = -(std::numeric_limits<double>::max)();
+			maxPt.z = -(std::numeric_limits<double>::max)();
 
 			for (int i = 0; i < points.size(); ++i) {
 				for (int k = 0; k < points[i].size(); ++k) {
@@ -75,14 +75,14 @@ namespace kinematics {
 			}
 		}
 
-		void BoundingBox::addPoint(const glm::vec2& point) {
+		void BoundingBox::addPoint(const glm::dvec2& point) {
 			minPt.x = std::min(minPt.x, point.x);
 			minPt.y = std::min(minPt.y, point.y);
 			maxPt.x = std::max(maxPt.x, point.x);
 			maxPt.y = std::max(maxPt.y, point.y);
 		}
 
-		void BoundingBox::addPoint(const glm::vec3& point) {
+		void BoundingBox::addPoint(const glm::dvec3& point) {
 			minPt.x = std::min(minPt.x, point.x);
 			minPt.y = std::min(minPt.y, point.y);
 			minPt.z = std::min(minPt.z, point.z);
@@ -91,76 +91,37 @@ namespace kinematics {
 			maxPt.z = std::max(maxPt.z, point.z);
 		}
 
-		bool BoundingBox::contains(const glm::vec2& point, float threshold) {
+		bool BoundingBox::contains(const glm::dvec2& point, double threshold) const {
 			if (point.x < minPt.x - threshold || point.x > maxPt.x + threshold) return false;
 			if (point.y < minPt.y - threshold || point.y > maxPt.y + threshold) return false;
 			return true;
 		}
 
-		bool BoundingBox::contains(const glm::vec3& point, float threshold) {
+		bool BoundingBox::contains(const glm::dvec3& point, double threshold) const {
 			if (point.x < minPt.x - threshold || point.x > maxPt.x + threshold) return false;
 			if (point.y < minPt.y - threshold || point.y > maxPt.y + threshold) return false;
 			if (point.z < minPt.z - threshold || point.z > maxPt.z + threshold) return false;
 			return true;
 		}
 
-		Face::Face(const std::string& name, const std::string& grammar_type, const std::vector<Vertex>& vertices) {
-			this->name = name;
-			this->grammar_type = grammar_type;
-			this->vertices = vertices;
-
-			for (int i = 0; i < vertices.size(); ++i) {
-				bbox.addPoint(vertices[i].position);
-			}
-		}
-
-		Face::Face(const std::string& name, const std::string& grammar_type, const std::vector<Vertex>& vertices, const std::string& texture) {
-			this->name = name;
-			this->grammar_type = grammar_type;
-			this->vertices = vertices;
-			this->texture = texture;
-
-			for (int i = 0; i < vertices.size(); ++i) {
-				bbox.addPoint(vertices[i].position);
-			}
-		}
-
-		void Face::select() {
-			backupColor = vertices[0].color;
-	
-			for (int i = 0; i < vertices.size(); ++i) {
-				vertices[i].color = glm::vec4(1, 0, 0, 1);
-
-				// Hack: translate the face upward so that it appears
-				vertices[i].position += vertices[i].normal * 0.05f;
-			}
-		}
-
-		void Face::unselect() {
-			for (int i = 0; i < vertices.size(); ++i) {
-				vertices[i].color = backupColor;
-
-				// Hack: translate the face downward so that it disappears
-				vertices[i].position -= vertices[i].normal * 0.05f;
-			}
-		}
-
-		Face Face::rotate(float rad, const glm::vec3& axis) {
-			std::vector<Vertex> rotatedVertices(vertices.size());
-
-			glm::mat4 mat(glm::rotate(glm::mat4(), rad, axis));
-
-			for (int i = 0; i < vertices.size(); ++i) {
-				rotatedVertices[i].position = glm::vec3(mat * glm::vec4(vertices[i].position, 1));
-			}
-
-			return Face(name, grammar_type, rotatedVertices, texture);
+		float croosProduct(const glm::vec2& a, const glm::vec2& b) {
+			return a.x * b.y - a.y - b.x;
 		}
 
 		/**
 		 * Test if the point is inside the polygon
 		 */
 		bool isWithinPolygon(const glm::vec2& p, const std::vector<glm::vec2>& points) {
+			boost::geometry::model::ring<point_2d> contour;
+			for (int i = 0; i < points.size(); ++i) {
+				contour.push_back(point_2d(points[i].x, points[i].y));
+			}
+			boost::geometry::correct(contour);
+
+			return boost::geometry::within(point_2d(p.x, p.y), contour);
+		}
+
+		bool isWithinPolygon(const glm::dvec2& p, const std::vector<glm::dvec2>& points) {
 			boost::geometry::model::ring<point_2d> contour;
 			for (int i = 0; i < points.size(); ++i) {
 				contour.push_back(point_2d(points[i].x, points[i].y));
@@ -181,8 +142,8 @@ namespace kinematics {
 		}
 
 		/**
-		 * Compute the offset polygon.
-		 */
+			* Compute the offset polygon.
+			*/
 		void offsetPolygon(const std::vector<glm::vec2>& points, float offsetDistance, std::vector<glm::vec2>& offset_points) {
 			offset_points.clear();
 
@@ -213,8 +174,8 @@ namespace kinematics {
 		}
 
 		/*
-		 * Return the distance from segment ab to point c.
-		 */
+			* Return the distance from segment ab to point c.
+			*/
 		float distance(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, bool segmentOnly) {
 			float r_numerator = (c.x-a.x) * (b.x-a.x) + (c.y-a.y) * (b.y-a.y);
 			float r_denomenator = (b.x-a.x) * (b.x-a.x) + (b.y-a.y) * (b.y-a.y);
@@ -243,17 +204,17 @@ namespace kinematics {
 		}
 
 		/*
-		 * Return the distance from segment ab to point c.
-		 */
+			* Return the distance from segment ab to point c.
+			*/
 		float distance(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c) {
 			glm::vec3 v = glm::normalize(b - a);
 			return glm::length(glm::cross(a - c, v));
 		}
 
 		/**
-		 * Line-line intersection
-		 * Compute the intersection of a line that pass though p1 and whose vector is v1 and another line that pass through p2 and whose vector is v2.
-		 */
+			* Line-line intersection
+			* Compute the intersection of a line that pass though p1 and whose vector is v1 and another line that pass through p2 and whose vector is v2.
+			*/
 		glm::vec3 lineLineIntersection(const glm::vec3& p1, const glm::vec3& v1, const glm::vec3& p2, const glm::vec3& v2, float weight1, float weight2) {
 			// tentative implementation (might be wrong)
 			glm::mat2 m1;
@@ -275,16 +236,16 @@ namespace kinematics {
 		}
 
 		/**
-		 * Ray-Plane intersection
-		 * Compute the intersection of a ray that starts from a and its direction v, and a plane whose normal is n and p is on the plane.
-		 */
+			* Ray-Plane intersection
+			* Compute the intersection of a ray that starts from a and its direction v, and a plane whose normal is n and p is on the plane.
+			*/
 		glm::vec3 rayPlaneIntersection(const glm::vec3& a, const glm::vec3& v, const glm::vec3& p, const glm::vec3& n) {
 			return a + v * glm::dot(p - a, n) / glm::dot(v, n);
 		}
 
 		/**
-		 * Ray-Triangle intersection
-		 */
+			* Ray-Triangle intersection
+			*/
 		bool rayTriangleIntersection(const glm::vec3& a, const glm::vec3& v, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, glm::vec3& intPt) {
 			glm::vec3 n = glm::cross(p2 - p1, p3 - p1);
 			intPt = a + v * glm::dot(p1 - a, n) / glm::dot(v, n);
@@ -302,20 +263,20 @@ namespace kinematics {
 			R(2, 1) = (p3 - p1).z;
 
 			cv::Mat_<double> st = R.inv(cv::DECOMP_SVD) * L;
-	
+		
 			if (st(0, 0) >= 0 && st(1, 0) >= 0 && st(0, 0) + st(1, 0) <= 1) return true;
 			else return false;
 		}
 
 		/**
-		 * Compute the barycentroic coordinates.
-		 *
-		 * @param p1	point 1
-		 * @param p2	point 2
-		 * @param p3	point 3
-		 * @param p		point
-		 * @return		the barycentroic coodinates
-		 */
+			* Compute the barycentroic coordinates.
+			*
+			* @param p1	point 1
+			* @param p2	point 2
+			* @param p3	point 3
+			* @param p		point
+			* @return		the barycentroic coodinates
+			*/
 		glm::vec2 barycentricCoordinates(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3, const glm::vec2& p) {
 			float den = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
 			float alpha = ((p.x - p1.x) * (p3.y - p1.y) - (p.y - p1.y) * (p3.x - p1.x)) / den;
@@ -325,11 +286,8 @@ namespace kinematics {
 		}
 
 		void drawCircle(float r1, float r2, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, int slices) {
-			glm::vec4 p1(0, 0, 0, 1);
-			glm::vec4 n(0, 0, 1, 0);
-
-			p1 = mat * p1;
-			n = mat * n;
+			glm::vec3 p1(mat * glm::vec4(0, 0, 0, 1));
+			glm::vec3 n(mat * glm::vec4(0, 0, 1, 0));
 
 			for (int i = 0; i < slices; ++i) {
 				float theta1 = (float)i / slices * M_PI * 2.0f;
@@ -340,7 +298,7 @@ namespace kinematics {
 
 				p2 = mat * p2;
 				p3 = mat * p3;
-		
+			
 				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), color));
 				vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n), color, 1));
 				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), color, 1));
@@ -348,12 +306,9 @@ namespace kinematics {
 		}
 
 		void drawCircle(float r1, float r2, float texWidth, float texHeight, const glm::mat4& mat, std::vector<Vertex>& vertices, int slices) {
-			glm::vec4 p1(0, 0, 0, 1);
-			glm::vec4 n(0, 0, 1, 0);
+			glm::vec3 p1(mat * glm::vec4(0, 0, 0, 1));
+			glm::vec3 n(mat * glm::vec4(0, 0, 1, 0));
 			glm::vec2 t1(r1 / texWidth, r2 / texHeight);
-
-			p1 = mat * p1;
-			n = mat * n;
 
 			for (int i = 0; i < slices; ++i) {
 				float theta1 = (float)i / slices * M_PI * 2.0f;
@@ -368,87 +323,72 @@ namespace kinematics {
 				p2 = mat * p2;
 				p3 = mat * p3;
 
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), glm::vec4(1, 1, 1, 1), t1));
-				vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n), glm::vec4(1, 1, 1, 1), t2, 1));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), glm::vec4(1, 1, 1, 1), t3, 1));
+				vertices.push_back(Vertex(p1, n, glm::vec4(1, 1, 1, 1), t1));
+				vertices.push_back(Vertex(glm::vec3(p2), n, glm::vec4(1, 1, 1, 1), t2, 1));
+				vertices.push_back(Vertex(glm::vec3(p3), n, glm::vec4(1, 1, 1, 1), t3, 1));
 			}
 		}
 
 		void drawQuad(float w, float h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
-			glm::vec4 p1(-w * 0.5, -h * 0.5, 0, 1);
-			glm::vec4 p2(w * 0.5, -h * 0.5, 0, 1);
-			glm::vec4 p3(w * 0.5, h * 0.5, 0, 1);
-			glm::vec4 p4(-w * 0.5, h * 0.5, 0, 1);
-			glm::vec4 n(0, 0, 1, 0);
+			glm::vec3 p1(mat * glm::vec4(-w * 0.5, -h * 0.5, 0, 1));
+			glm::vec3 p2(mat * glm::vec4(w * 0.5, -h * 0.5, 0, 1));
+			glm::vec3 p3(mat * glm::vec4(w * 0.5, h * 0.5, 0, 1));
+			glm::vec3 p4(mat * glm::vec4(-w * 0.5, h * 0.5, 0, 1));
+			glm::vec3 n(mat * glm::vec4(0, 0, 1, 0));
 
-			p1 = mat * p1;
-			p2 = mat * p2;
-			p3 = mat * p3;
-			p4 = mat * p4;
-			n = mat * n;
+			vertices.push_back(Vertex(p1, n, color, glm::vec2(0, 0)));
+			vertices.push_back(Vertex(p2, n, color, glm::vec2(1, 0), 1));
+			vertices.push_back(Vertex(p3, n, color, glm::vec2(1, 1)));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), color, glm::vec2(0, 0)));
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n), color, glm::vec2(1, 0), 1));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), color, glm::vec2(1, 1)));
-
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), color, glm::vec2(0, 0)));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), color, glm::vec2(1, 1)));
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n), color, glm::vec2(0, 1), 1));
+			vertices.push_back(Vertex(p1, n, color, glm::vec2(0, 0)));
+			vertices.push_back(Vertex(p3, n, color, glm::vec2(1, 1)));
+			vertices.push_back(Vertex(p4, n, color, glm::vec2(0, 1), 1));
 		}
 
 		void drawQuad(float w, float h, const glm::vec2& t1, const glm::vec2& t2, const glm::vec2& t3, const glm::vec2& t4, const glm::mat4& mat, std::vector<Vertex>& vertices) {
-			glm::vec4 p1(-w * 0.5, -h * 0.5, 0, 1);
-			glm::vec4 p2(w * 0.5, -h * 0.5, 0, 1);
-			glm::vec4 p3(w * 0.5, h * 0.5, 0, 1);
-			glm::vec4 p4(-w * 0.5, h * 0.5, 0, 1);
-			glm::vec4 n(0, 0, 1, 0);
+			glm::vec3 p1(mat * glm::vec4(-w * 0.5, -h * 0.5, 0, 1));
+			glm::vec3 p2(mat * glm::vec4(w * 0.5, -h * 0.5, 0, 1));
+			glm::vec3 p3(mat * glm::vec4(w * 0.5, h * 0.5, 0, 1));
+			glm::vec3 p4(mat * glm::vec4(-w * 0.5, h * 0.5, 0, 1));
+			glm::vec3 n(mat * glm::vec4(0, 0, 1, 0));
 
-			p1 = mat * p1;
-			p2 = mat * p2;
-			p3 = mat * p3;
-			p4 = mat * p4;
-			n = mat * n;
+			vertices.push_back(Vertex(p1, n, glm::vec4(1, 1, 1, 1), t1));
+			vertices.push_back(Vertex(p2, n, glm::vec4(1, 1, 1, 1), t2, 1));
+			vertices.push_back(Vertex(p3, n, glm::vec4(1, 1, 1, 1), t3));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), glm::vec4(1, 1, 1, 1), t1));
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n), glm::vec4(1, 1, 1, 1), t2, 1));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), glm::vec4(1, 1, 1, 1), t3));
-
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n), glm::vec4(1, 1, 1, 1), t1));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n), glm::vec4(1, 1, 1, 1), t3));
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n), glm::vec4(1, 1, 1, 1), t4, 1));
+			vertices.push_back(Vertex(p1, n, glm::vec4(1, 1, 1, 1), t1));
+			vertices.push_back(Vertex(p3, n, glm::vec4(1, 1, 1, 1), t3));
+			vertices.push_back(Vertex(p4, n, glm::vec4(1, 1, 1, 1), t4, 1));
 		}
 
 		void drawPolygon(const std::vector<glm::vec3>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices) {
-			glm::vec4 p1(points.back(), 1);
-			p1 = mat * p1;
+			glm::vec3 p1(mat * glm::vec4(points.back(), 1));
 			glm::vec2 t1 = texCoords.back();
-			glm::vec4 p2(points[0], 1);
-			p2 = mat * p2;
+			glm::vec3 p2(mat * glm::vec4(points[0], 1));
 			glm::vec2 t2 = texCoords[0];
 
-			glm::vec3 normal;
-			bool normal_computed = false;
+			// calculate the normal vector
+			glm::vec3 normal(mat * glm::vec4(0, 0, 1, 0));
 
 			for (int i = 0; i < points.size() - 2; ++i) {
-				glm::vec4 p3(points[i + 1], 1);
-				p3 = mat * p3;
+				glm::vec3 p3(mat * glm::vec4(points[i + 1], 1));
 				glm::vec2 t3 = texCoords[i + 1];
 
-				if (!normal_computed) {
-					normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
-					normal_computed = true;
-				}
-
-				vertices.push_back(Vertex(glm::vec3(p1), normal, color, t1));
-				if (i < points.size() - 3) {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2));
-				}
-				if (i > 0) {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3));
+				// create the triangle only if two adjacent edges are not collinear.
+				if (glm::length(glm::cross(p2 - p1, p3 - p2)) > 0.01) {
+					vertices.push_back(Vertex(glm::vec3(p1), normal, color, t1));
+					if (i < points.size() - 3) {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2));
+					}
+					if (i > 0) {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3));
+					}
 				}
 
 				p2 = p3;
@@ -457,33 +397,30 @@ namespace kinematics {
 		}
 
 		void drawPolygon(const std::vector<glm::vec3>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
-			glm::vec4 p1(points.back(), 1);
-			p1 = mat * p1;
-			glm::vec4 p2(points[0], 1);
-			p2 = mat * p2;
+			glm::vec3 p1(mat * glm::vec4(points.back(), 1));
+			glm::vec3 p2(mat * glm::vec4(points[0], 1));
 
-			glm::vec3 normal;
-			bool normal_computed = false;
+			// calculate the normal vector
+			glm::vec3 normal(mat * glm::vec4(0, 0, 1, 0));
 
 			for (int i = 0; i < points.size() - 2; ++i) {
-				glm::vec4 p3(points[i + 1], 1);
-				p3 = mat * p3;
+				glm::vec3 p3(mat * glm::vec4(points[i + 1], 1));
 
-				if (!normal_computed) {
-					normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
-					normal_computed = true;
-				}
-
-				vertices.push_back(Vertex(glm::vec3(p1), normal, color));
-				if (i < points.size() - 3) {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color));
-				}
-				if (i > 0) {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color));
+				// create the triangle only if two adjacent edges are not collinear.
+				if (glm::length(glm::cross(p2 - p1, p3 - p2)) > 0.01) {
+					vertices.push_back(Vertex(glm::vec3(p1), normal, color));
+					if (i < points.size() - 3) {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color));
+					}
+					if (i > 0) {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color));
+					}
 				}
 
 				p2 = p3;
@@ -491,34 +428,30 @@ namespace kinematics {
 		}
 
 		void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
-			glm::vec4 p1(points.back(), 0, 1);
-			p1 = mat * p1;
-			glm::vec4 p2(points[0], 0, 1);
-			p2 = mat * p2;
+			glm::vec3 p1(mat * glm::vec4(points.back(), 0, 1));
+			glm::vec3 p2(mat * glm::vec4(points[0], 0, 1));
 
-			glm::vec3 normal;
-			bool normal_computed = false;
+			// calculate the normal vector
+			glm::vec3 normal(mat * glm::vec4(0, 0, 1, 0));
 
 			for (int i = 0; i < points.size() - 2; ++i) {
-				glm::vec4 p3(points[i + 1], 0, 1);
-				p3 = mat * p3;
+				glm::vec3 p3(mat * glm::vec4(points[i + 1], 0, 1));
 
-				if (!normal_computed) {
-					normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
-					if (flip) normal = -normal;
-					normal_computed = true;
-				}
-
-				vertices.push_back(Vertex(glm::vec3(p1), normal, color));
-				if (i < points.size() - 3) {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color));
-				}
-				if (i > 0) {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color));
+				// create the triangle only if two adjacent edges are not collinear.
+				if (glm::length(glm::cross(p2 - p1, p3 - p2)) > 0.01) {
+					vertices.push_back(Vertex(glm::vec3(p1), normal, color));
+					if (i < points.size() - 3) {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color));
+					}
+					if (i > 0) {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color));
+					}
 				}
 
 				p2 = p3;
@@ -526,37 +459,33 @@ namespace kinematics {
 		}
 
 		void drawPolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const std::vector<glm::vec2>& texCoords, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
-			glm::vec4 p1(points.back(), 0, 1);
-			p1 = mat * p1;
+			glm::vec3 p1(mat * glm::vec4(points.back(), 0, 1));
 			glm::vec2 t1 = texCoords.back();
-			glm::vec4 p2(points[0], 0, 1);
-			p2 = mat * p2;
+			glm::vec3 p2(mat * glm::vec4(points[0], 0, 1));
 			glm::vec2 t2 = texCoords[0];
 
-			glm::vec3 normal;
-			bool normal_computed = false;
+			// calculate the normal vector
+			glm::vec3 normal(mat * glm::vec4(0, 0, 1, 0));
 
 			for (int i = 0; i < points.size() - 2; ++i) {
-				glm::vec4 p3(points[i + 1], 0, 1);
-				p3 = mat * p3;
+				glm::vec3 p3(mat * glm::vec4(points[i + 1], 0, 1));
 				glm::vec2 t3 = texCoords[i + 1];
 
-				if (!normal_computed) {
-					normal = glm::normalize(glm::cross(glm::vec3(p2 - p1), glm::vec3(p3 - p1)));
-					if (flip) normal = -normal;
-					normal_computed = true;
-				}
-
-				vertices.push_back(Vertex(glm::vec3(p1), normal, color, t1));
-				if (i < points.size() - 3) {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2));
-				}
-				if (i > 0) {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3, 1));
-				} else {
-					vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3));
+				// create the triangle only if two adjacent edges are not collinear.
+				if (glm::length(glm::cross(p2 - p1, p3 - p2)) > 0.01) {
+					vertices.push_back(Vertex(glm::vec3(p1), normal, color, t1));
+					if (i < points.size() - 3) {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p2), normal, color, t2));
+					}
+					if (i > 0) {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3, 1));
+					}
+					else {
+						vertices.push_back(Vertex(glm::vec3(p3), normal, color, t3));
+					}
 				}
 
 				p2 = p3;
@@ -565,25 +494,25 @@ namespace kinematics {
 		}
 
 		void drawConcavePolygon(const std::vector<glm::vec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
-			float max_x = 0.0f;
-			float max_y = 0.0f;
+			float min_x = std::numeric_limits<float>::max();
+			float max_x = -std::numeric_limits<float>::max();
+			float min_y = std::numeric_limits<float>::max();
+			float max_y = -std::numeric_limits<float>::max();
 
 			Polygon_2 polygon;
 			for (int i = 0; i < points.size(); ++i) {
 				polygon.push_back(Point_2(points[i].x, points[i].y));
 
-				if (points[i].x > max_x) {
-					max_x = points[i].x;
-				}
-				if (points[i].y > max_y) {
-					max_y = points[i].y;
-				}
+				min_x = std::min(min_x, points[i].x);
+				max_x = std::max(max_x, points[i].x);
+				min_y = std::min(min_y, points[i].y);
+				max_y = std::max(max_y, points[i].y);
 			}
 
 			if (polygon.is_clockwise_oriented()) {
 				polygon.reverse_orientation();
 			}
-	
+		
 			// tesselate the concave polygon
 			Polygon_list partition_polys;
 			Traits       partition_traits;
@@ -594,7 +523,7 @@ namespace kinematics {
 				std::vector<glm::vec2> texCoords;
 				for (auto vit = fit->vertices_begin(); vit != fit->vertices_end(); ++vit) {
 					pts.push_back(glm::vec2(vit->x(), vit->y()));
-					texCoords.push_back(glm::vec2(vit->x() / max_x, vit->y() / max_y));
+					texCoords.push_back(glm::vec2((vit->x() - min_x) / (max_x - min_x), (vit->y() - min_y) / (max_y - min_y)));
 				}
 
 				drawPolygon(pts, color, texCoords, mat, vertices, flip);
@@ -602,19 +531,19 @@ namespace kinematics {
 		}
 
 		void drawConcavePolygon(const std::vector<glm::dvec2>& points, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
-			float max_x = 0.0f;
-			float max_y = 0.0f;
+			double min_x = std::numeric_limits<double>::max();
+			double max_x = -std::numeric_limits<double>::max();
+			double min_y = std::numeric_limits<double>::max();
+			double max_y = -std::numeric_limits<double>::max();
 
 			Polygon_2 polygon;
 			for (int i = 0; i < points.size(); ++i) {
 				polygon.push_back(Point_2(points[i].x, points[i].y));
 
-				if (points[i].x > max_x) {
-					max_x = points[i].x;
-				}
-				if (points[i].y > max_y) {
-					max_y = points[i].y;
-				}
+				min_x = std::min(min_x, points[i].x);
+				max_x = std::max(max_x, points[i].x);
+				min_y = std::min(min_y, points[i].y);
+				max_y = std::max(max_y, points[i].y);
 			}
 
 			if (polygon.is_clockwise_oriented()) {
@@ -631,7 +560,7 @@ namespace kinematics {
 				std::vector<glm::vec2> texCoords;
 				for (auto vit = fit->vertices_begin(); vit != fit->vertices_end(); ++vit) {
 					pts.push_back(glm::vec2(vit->x(), vit->y()));
-					texCoords.push_back(glm::vec2(vit->x() / max_x, vit->y() / max_y));
+					texCoords.push_back(glm::vec2((vit->x() - min_x) / (max_x - min_x), (vit->y() - min_y) / (max_y - min_y)));
 				}
 
 				drawPolygon(pts, color, texCoords, mat, vertices, flip);
@@ -689,7 +618,7 @@ namespace kinematics {
 
 		void drawConcavePolygon(const std::vector<glm::dvec2>& points, const std::vector<std::vector<glm::dvec2>>& holes, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices, bool flip) {
 			// Calculate the normal vector
-			glm::vec3 n = glm::vec3(mat * glm::vec4(0, 0, 1, 0));
+			glm::vec3 n(mat * glm::vec4(0, 0, 1, 0));
 
 			//Insert the polygons into a constrained triangulation
 			CDT cdt;
@@ -730,7 +659,7 @@ namespace kinematics {
 			if (polygon.is_clockwise_oriented()) {
 				polygon.reverse_orientation();
 			}
-		
+			
 			// tesselate the concave polygon
 			Polygon_list partition_polys;
 			Traits       partition_traits;
@@ -782,7 +711,7 @@ namespace kinematics {
 			drawQuad(width, height, backgroundColor, mat, vertices);
 
 			float line_width = cell_size * 0.03;
-	
+		
 			for (float x = 0; x < width * 0.5; x += cell_size) {
 				if (x == 0) {
 					glm::mat4 m = glm::translate(mat, glm::vec3(x, -height * 0.5, 0));
@@ -811,83 +740,68 @@ namespace kinematics {
 		}
 
 		void drawBox(float length_x, float length_y, float length_z, glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
-			glm::vec4 p1(-length_x * 0.5, -length_y * 0.5, -length_z * 0.5, 1);
-			glm::vec4 p2(length_x * 0.5, -length_y * 0.5, -length_z * 0.5, 1);
-			glm::vec4 p3(length_x * 0.5, length_y * 0.5, -length_z * 0.5, 1);
-			glm::vec4 p4(-length_x * 0.5, length_y * 0.5, -length_z * 0.5, 1);
-			glm::vec4 p5(-length_x * 0.5, -length_y * 0.5, length_z * 0.5, 1);
-			glm::vec4 p6(length_x * 0.5, -length_y * 0.5, length_z * 0.5, 1);
-			glm::vec4 p7(length_x * 0.5, length_y * 0.5, length_z * 0.5, 1);
-			glm::vec4 p8(-length_x * 0.5, length_y * 0.5, length_z * 0.5, 1);
-			glm::vec4 n1(-1, 0, 0, 0);
-			glm::vec4 n2(1, 0, 0, 0);
-			glm::vec4 n3(0, -1, 0, 0);
-			glm::vec4 n4(0, 1, 0, 0);
-			glm::vec4 n5(0, 0, -1, 0);
-			glm::vec4 n6(0, 0, 1, 0);
+			glm::vec3 p1(mat * glm::vec4(-length_x * 0.5, -length_y * 0.5, -length_z * 0.5, 1));
+			glm::vec3 p2(mat * glm::vec4(length_x * 0.5, -length_y * 0.5, -length_z * 0.5, 1));
+			glm::vec3 p3(mat * glm::vec4(length_x * 0.5, length_y * 0.5, -length_z * 0.5, 1));
+			glm::vec3 p4(mat * glm::vec4(-length_x * 0.5, length_y * 0.5, -length_z * 0.5, 1));
+			glm::vec3 p5(mat * glm::vec4(-length_x * 0.5, -length_y * 0.5, length_z * 0.5, 1));
+			glm::vec3 p6(mat * glm::vec4(length_x * 0.5, -length_y * 0.5, length_z * 0.5, 1));
+			glm::vec3 p7(mat * glm::vec4(length_x * 0.5, length_y * 0.5, length_z * 0.5, 1));
+			glm::vec3 p8(mat * glm::vec4(-length_x * 0.5, length_y * 0.5, length_z * 0.5, 1));
+			glm::vec3 n1(mat * glm::vec4(-1, 0, 0, 0));
+			glm::vec3 n2(mat * glm::vec4(1, 0, 0, 0));
+			glm::vec3 n3(mat * glm::vec4(0, -1, 0, 0));
+			glm::vec3 n4(mat * glm::vec4(0, 1, 0, 0));
+			glm::vec3 n5(mat * glm::vec4(0, 0, -1, 0));
+			glm::vec3 n6(mat * glm::vec4(0, 0, 1, 0));
 
-			p1 = mat * p1;
-			p2 = mat * p2;
-			p3 = mat * p3;
-			p4 = mat * p4;
-			p5 = mat * p5;
-			p6 = mat * p6;
-			p7 = mat * p7;
-			p8 = mat * p8;
-			n1 = mat * n1;
-			n2 = mat * n2;
-			n3 = mat * n3;
-			n4 = mat * n4;
-			n5 = mat * n5;
-			n6 = mat * n6;
+			vertices.push_back(Vertex(p1, n5, color));
+			vertices.push_back(Vertex(p4, n5, color, 1));
+			vertices.push_back(Vertex(p3, n5, color));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n5), color));
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n5), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n5), color));
+			vertices.push_back(Vertex(p1, n5, color));
+			vertices.push_back(Vertex(p3, n5, color));
+			vertices.push_back(Vertex(p2, n5, color, 1));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n5), color));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n5), color));
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n5), color, 1));
+			vertices.push_back(Vertex(p1, n3, color));
+			vertices.push_back(Vertex(p2, n3, color, 1));
+			vertices.push_back(Vertex(p6, n3, color));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n3), color));
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n3), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p6), glm::vec3(n3), color));
+			vertices.push_back(Vertex(p1, n3, color));
+			vertices.push_back(Vertex(p6, n3, color));
+			vertices.push_back(Vertex(p5, n3, color, 1));
 
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n3), color));
-			vertices.push_back(Vertex(glm::vec3(p6), glm::vec3(n3), color));
-			vertices.push_back(Vertex(glm::vec3(p5), glm::vec3(n3), color, 1));
+			vertices.push_back(Vertex(p2, n2, color));
+			vertices.push_back(Vertex(p3, n2, color, 1));
+			vertices.push_back(Vertex(p7, n2, color));
 
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color));
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p7), glm::vec3(n2), color));
+			vertices.push_back(Vertex(p2, n2, color));
+			vertices.push_back(Vertex(p7, n2, color));
+			vertices.push_back(Vertex(p6, n2, color, 1));
 
-			vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color));
-			vertices.push_back(Vertex(glm::vec3(p7), glm::vec3(n2), color));
-			vertices.push_back(Vertex(glm::vec3(p6), glm::vec3(n2), color, 1));
+			vertices.push_back(Vertex(p3, n4, color));
+			vertices.push_back(Vertex(p4, n4, color, 1));
+			vertices.push_back(Vertex(p8, n4, color));
 
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n4), color));
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n4), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p8), glm::vec3(n4), color));
+			vertices.push_back(Vertex(p3, n4, color));
+			vertices.push_back(Vertex(p8, n4, color));
+			vertices.push_back(Vertex(p7, n4, color, 1));
 
-			vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n4), color));
-			vertices.push_back(Vertex(glm::vec3(p8), glm::vec3(n4), color));
-			vertices.push_back(Vertex(glm::vec3(p7), glm::vec3(n4), color, 1));
+			vertices.push_back(Vertex(p4, n1, color));
+			vertices.push_back(Vertex(p1, n1, color, 1));
+			vertices.push_back(Vertex(p5, n1, color));
 
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n1), color));
-			vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p5), glm::vec3(n1), color));
+			vertices.push_back(Vertex(p4, n1, color));
+			vertices.push_back(Vertex(p5, n1, color));
+			vertices.push_back(Vertex(p8, n1, color, 1));
 
-			vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n1), color));
-			vertices.push_back(Vertex(glm::vec3(p5), glm::vec3(n1), color));
-			vertices.push_back(Vertex(glm::vec3(p8), glm::vec3(n1), color, 1));
+			vertices.push_back(Vertex(p5, n6, color));
+			vertices.push_back(Vertex(p6, n6, color, 1));
+			vertices.push_back(Vertex(p7, n6, color));
 
-			vertices.push_back(Vertex(glm::vec3(p5), glm::vec3(n6), color));
-			vertices.push_back(Vertex(glm::vec3(p6), glm::vec3(n6), color, 1));
-			vertices.push_back(Vertex(glm::vec3(p7), glm::vec3(n6), color));
-
-			vertices.push_back(Vertex(glm::vec3(p5), glm::vec3(n6), color));
-			vertices.push_back(Vertex(glm::vec3(p7), glm::vec3(n6), color));
-			vertices.push_back(Vertex(glm::vec3(p8), glm::vec3(n6), color, 1));
+			vertices.push_back(Vertex(p5, n6, color));
+			vertices.push_back(Vertex(p7, n6, color));
+			vertices.push_back(Vertex(p8, n6, color, 1));
 		}
 
 		void drawSphere(float radius, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
@@ -904,32 +818,23 @@ namespace kinematics {
 					float theta1 = M_PI * 2.0 * (float)j / slices;
 					float theta2 = M_PI * 2.0 * (float)(j + 1) / slices;
 
-					glm::vec4 p1(cosf(theta1) * r1, sinf(theta1) * r1, sinf(phi1) * radius, 1);
-					glm::vec4 p2(cosf(theta2) * r1, sinf(theta2) * r1, sinf(phi1) * radius, 1);
-					glm::vec4 p3(cosf(theta2) * r2, sinf(theta2) * r2, sinf(phi2) * radius, 1);
-					glm::vec4 p4(cosf(theta1) * r2, sinf(theta1) * r2, sinf(phi2) * radius, 1);
+					glm::vec3 p1(mat * glm::vec4(cosf(theta1) * r1, sinf(theta1) * r1, sinf(phi1) * radius, 1));
+					glm::vec3 p2(mat * glm::vec4(cosf(theta2) * r1, sinf(theta2) * r1, sinf(phi1) * radius, 1));
+					glm::vec3 p3(mat * glm::vec4(cosf(theta2) * r2, sinf(theta2) * r2, sinf(phi2) * radius, 1));
+					glm::vec3 p4(mat * glm::vec4(cosf(theta1) * r2, sinf(theta1) * r2, sinf(phi2) * radius, 1));
 
-					glm::vec4 n1(cosf(phi1) * cosf(theta1), cosf(phi1) * sinf(theta1), sinf(phi1), 0);
-					glm::vec4 n2(cosf(phi1) * cosf(theta2), cosf(phi1) * sinf(theta2), sinf(phi1), 0);
-					glm::vec4 n3(cosf(phi2) * cosf(theta2), cosf(phi2) * sinf(theta2), sinf(phi2), 0);
-					glm::vec4 n4(cosf(phi2) * cosf(theta1), cosf(phi2) * sinf(theta1), sinf(phi2), 0);
+					glm::vec3 n1(mat * glm::vec4(cosf(phi1) * cosf(theta1), cosf(phi1) * sinf(theta1), sinf(phi1), 0));
+					glm::vec3 n2(mat * glm::vec4(cosf(phi1) * cosf(theta2), cosf(phi1) * sinf(theta2), sinf(phi1), 0));
+					glm::vec3 n3(mat * glm::vec4(cosf(phi2) * cosf(theta2), cosf(phi2) * sinf(theta2), sinf(phi2), 0));
+					glm::vec3 n4(mat * glm::vec4(cosf(phi2) * cosf(theta1), cosf(phi2) * sinf(theta1), sinf(phi2), 0));
 
-					p1 = mat * p1;
-					p2 = mat * p2;
-					p3 = mat * p3;
-					p4 = mat * p4;
-					n1 = mat * n1;
-					n2 = mat * n2;
-					n3 = mat * n3;
-					n4 = mat * n4;
+					vertices.push_back(Vertex(p1, n1, color));
+					vertices.push_back(Vertex(p2, n2, color, 1));
+					vertices.push_back(Vertex(p3, n3, color));
 
-					vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-					vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color, 1));
-					vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n3), color));
-
-					vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-					vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n3), color));
-					vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n4), color, 1));
+					vertices.push_back(Vertex(p1, n1, color));
+					vertices.push_back(Vertex(p3, n3, color));
+					vertices.push_back(Vertex(p4, n4, color, 1));
 				}
 			}
 		}
@@ -946,42 +851,23 @@ namespace kinematics {
 					float theta1 = M_PI * 2.0 * (float)j / slices;
 					float theta2 = M_PI * 2.0 * (float)(j + 1) / slices;
 
-					/*
-					float x_base1 = cosf(theta1) * r1;
-					float y_base1 = sinf(theta1) * r2;
-					float r_base1 = sqrt(x_base1 * x_base1 + y_base1 * y_base1);
+					glm::vec3 p1(mat * glm::vec4(cosf(phi1) * cosf(theta1) * r1, cosf(phi1) * sinf(theta1) * r2, sinf(phi1) * r3, 1));
+					glm::vec3 p2(mat * glm::vec4(cosf(phi1) * cosf(theta2) * r1, cosf(phi1) * sinf(theta2) * r2, sinf(phi1) * r3, 1));
+					glm::vec3 p3(mat * glm::vec4(cosf(phi2) * cosf(theta2) * r1, cosf(phi2) * sinf(theta2) * r2, sinf(phi2) * r3, 1));
+					glm::vec3 p4(mat * glm::vec4(cosf(phi2) * cosf(theta1) * r1, cosf(phi2) * sinf(theta1) * r2, sinf(phi2) * r3, 1));
 
-					float x_base2 = cosf(theta2) * r1;
-					float y_base2 = sinf(theta2) * r2;
-					float r_base2 = sqrt(x_base2 * x_base2 + y_base2 * y_base2);
-					*/
+					glm::vec3 n1(mat * glm::vec4(cosf(phi1) * cosf(theta1), cosf(phi1) * sinf(theta1), sinf(phi1), 0));
+					glm::vec3 n2(mat * glm::vec4(cosf(phi1) * cosf(theta2), cosf(phi1) * sinf(theta2), sinf(phi1), 0));
+					glm::vec3 n3(mat * glm::vec4(cosf(phi2) * cosf(theta2), cosf(phi2) * sinf(theta2), sinf(phi2), 0));
+					glm::vec3 n4(mat * glm::vec4(cosf(phi2) * cosf(theta1), cosf(phi2) * sinf(theta1), sinf(phi2), 0));
 
-					glm::vec4 p1(cosf(phi1) * cosf(theta1) * r1, cosf(phi1) * sinf(theta1) * r2, sinf(phi1) * r3, 1);
-					glm::vec4 p2(cosf(phi1) * cosf(theta2) * r1, cosf(phi1) * sinf(theta2) * r2, sinf(phi1) * r3, 1);
-					glm::vec4 p3(cosf(phi2) * cosf(theta2) * r1, cosf(phi2) * sinf(theta2) * r2, sinf(phi2) * r3, 1);
-					glm::vec4 p4(cosf(phi2) * cosf(theta1) * r1, cosf(phi2) * sinf(theta1) * r2, sinf(phi2) * r3, 1);
+					vertices.push_back(Vertex(p1, n1, color));
+					vertices.push_back(Vertex(p2, n2, color, 1));
+					vertices.push_back(Vertex(p3, n3, color));
 
-					glm::vec4 n1(cosf(phi1) * cosf(theta1), cosf(phi1) * sinf(theta1), sinf(phi1), 0);
-					glm::vec4 n2(cosf(phi1) * cosf(theta2), cosf(phi1) * sinf(theta2), sinf(phi1), 0);
-					glm::vec4 n3(cosf(phi2) * cosf(theta2), cosf(phi2) * sinf(theta2), sinf(phi2), 0);
-					glm::vec4 n4(cosf(phi2) * cosf(theta1), cosf(phi2) * sinf(theta1), sinf(phi2), 0);
-
-					p1 = mat * p1;
-					p2 = mat * p2;
-					p3 = mat * p3;
-					p4 = mat * p4;
-					n1 = mat * n1;
-					n2 = mat * n2;
-					n3 = mat * n3;
-					n4 = mat * n4;
-
-					vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-					vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color, 1));
-					vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n3), color));
-
-					vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-					vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n3), color));
-					vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n4), color, 1));
+					vertices.push_back(Vertex(p1, n1, color));
+					vertices.push_back(Vertex(p3, n3, color));
+					vertices.push_back(Vertex(p4, n4, color, 1));
 				}
 			}
 		}
@@ -996,27 +882,20 @@ namespace kinematics {
 				float theta1 = M_PI * 2.0 * (float)i / slices;
 				float theta2 = M_PI * 2.0 * (float)(i + 1) / slices;
 
-				glm::vec4 p1(0, cosf(theta1) * radius1, sinf(theta1) * radius1, 1);
-				glm::vec4 p2(0, cosf(theta2) * radius1, sinf(theta2) * radius1, 1);
-				glm::vec4 p3(h, cosf(theta2) * radius2, sinf(theta2) * radius2, 1);
-				glm::vec4 p4(h, cosf(theta1) * radius2, sinf(theta1) * radius2, 1);
-				glm::vec4 n1(sinf(phi), cosf(theta1) * cosf(phi), sinf(theta1) * cosf(phi), 0);
-				glm::vec4 n2(sinf(phi), cosf(theta2) * cosf(phi), sinf(theta2) * cosf(phi), 0);
+				glm::vec3 p1(mat * glm::vec4(0, cosf(theta1) * radius1, sinf(theta1) * radius1, 1));
+				glm::vec3 p2(mat * glm::vec4(0, cosf(theta2) * radius1, sinf(theta2) * radius1, 1));
+				glm::vec3 p3(mat * glm::vec4(h, cosf(theta2) * radius2, sinf(theta2) * radius2, 1));
+				glm::vec3 p4(mat * glm::vec4(h, cosf(theta1) * radius2, sinf(theta1) * radius2, 1));
+				glm::vec3 n1(mat * glm::vec4(sinf(phi), cosf(theta1) * cosf(phi), sinf(theta1) * cosf(phi), 0));
+				glm::vec3 n2(mat * glm::vec4(sinf(phi), cosf(theta2) * cosf(phi), sinf(theta2) * cosf(phi), 0));
 
-				p1 = mat * p1;
-				p2 = mat * p2;
-				p3 = mat * p3;
-				p4 = mat * p4;
-				n1 = mat * n1;
-				n2 = mat * n2;
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p2, n2, color, 1));
+				vertices.push_back(Vertex(p3, n2, color));
 
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color, 1));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-				vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n1), color, 1));
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p3, n2, color));
+				vertices.push_back(Vertex(p4, n1, color, 1));
 			}
 		}
 
@@ -1030,27 +909,20 @@ namespace kinematics {
 				float theta1 = M_PI * 2.0 * (float)i / slices;
 				float theta2 = M_PI * 2.0 * (float)(i + 1) / slices;
 
-				glm::vec4 p1(cosf(theta1) * radius1, 0, sinf(theta1) * radius1, 1);
-				glm::vec4 p2(cosf(theta2) * radius1, 0, sinf(theta2) * radius1, 1);
-				glm::vec4 p3(cosf(theta2) * radius2, h, sinf(theta2) * radius2, 1);
-				glm::vec4 p4(cosf(theta1) * radius2, h, sinf(theta1) * radius2, 1);
-				glm::vec4 n1(cosf(theta1) * cosf(phi), sinf(phi), sinf(theta1) * cosf(phi), 0);
-				glm::vec4 n2(cosf(theta2) * cosf(phi), sinf(phi), sinf(theta2) * cosf(phi), 0);
+				glm::vec3 p1(mat * glm::vec4(cosf(theta1) * radius1, 0, sinf(theta1) * radius1, 1));
+				glm::vec3 p2(mat * glm::vec4(cosf(theta2) * radius1, 0, sinf(theta2) * radius1, 1));
+				glm::vec3 p3(mat * glm::vec4(cosf(theta2) * radius2, h, sinf(theta2) * radius2, 1));
+				glm::vec3 p4(mat * glm::vec4(cosf(theta1) * radius2, h, sinf(theta1) * radius2, 1));
+				glm::vec3 n1(mat * glm::vec4(cosf(theta1) * cosf(phi), sinf(phi), sinf(theta1) * cosf(phi), 0));
+				glm::vec3 n2(mat * glm::vec4(cosf(theta2) * cosf(phi), sinf(phi), sinf(theta2) * cosf(phi), 0));
 
-				p1 = mat * p1;
-				p2 = mat * p2;
-				p3 = mat * p3;
-				p4 = mat * p4;
-				n1 = mat * n1;
-				n2 = mat * n2;
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p2, n2, color, 1));
+				vertices.push_back(Vertex(p3, n2, color));
 
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color, 1));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-				vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n1), color, 1));
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p3, n2, color));
+				vertices.push_back(Vertex(p4, n1, color, 1));
 			}
 		}
 
@@ -1064,27 +936,20 @@ namespace kinematics {
 				float theta1 = M_PI * 2.0 * (float)i / slices;
 				float theta2 = M_PI * 2.0 * (float)(i + 1) / slices;
 
-				glm::vec4 p1(cosf(theta1) * radius1, sinf(theta1) * radius2, 0, 1);
-				glm::vec4 p2(cosf(theta2) * radius1, sinf(theta2) * radius2, 0, 1);
-				glm::vec4 p3(cosf(theta2) * radius3, sinf(theta2) * radius4, h, 1);
-				glm::vec4 p4(cosf(theta1) * radius3, sinf(theta1) * radius4, h, 1);
-				glm::vec4 n1(cosf(theta1) * cosf(phi), sinf(theta1) * cosf(phi), sinf(phi), 0);
-				glm::vec4 n2(cosf(theta2) * cosf(phi), sinf(theta2) * cosf(phi), sinf(phi), 0);
+				glm::vec3 p1(mat * glm::vec4(cosf(theta1) * radius1, sinf(theta1) * radius2, 0, 1));
+				glm::vec3 p2(mat * glm::vec4(cosf(theta2) * radius1, sinf(theta2) * radius2, 0, 1));
+				glm::vec3 p3(mat * glm::vec4(cosf(theta2) * radius3, sinf(theta2) * radius4, h, 1));
+				glm::vec3 p4(mat * glm::vec4(cosf(theta1) * radius3, sinf(theta1) * radius4, h, 1));
+				glm::vec3 n1(mat * glm::vec4(cosf(theta1) * cosf(phi), sinf(theta1) * cosf(phi), sinf(phi), 0));
+				glm::vec3 n2(mat * glm::vec4(cosf(theta2) * cosf(phi), sinf(theta2) * cosf(phi), sinf(phi), 0));
 
-				p1 = mat * p1;
-				p2 = mat * p2;
-				p3 = mat * p3;
-				p4 = mat * p4;
-				n1 = mat * n1;
-				n2 = mat * n2;
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p2, n2, color, 1));
+				vertices.push_back(Vertex(p3, n2, color));
 
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p2), glm::vec3(n2), color, 1));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-
-				vertices.push_back(Vertex(glm::vec3(p1), glm::vec3(n1), color));
-				vertices.push_back(Vertex(glm::vec3(p3), glm::vec3(n2), color));
-				vertices.push_back(Vertex(glm::vec3(p4), glm::vec3(n1), color, 1));
+				vertices.push_back(Vertex(p1, n1, color));
+				vertices.push_back(Vertex(p3, n2, color));
+				vertices.push_back(Vertex(p4, n1, color, 1));
 			}
 
 			if (top_face) {
@@ -1108,15 +973,10 @@ namespace kinematics {
 			// side faces
 			for (int i = 0; i < points.size(); i++) {
 				int next = (i + 1) % points.size();
-				glm::vec3 p1(points[i], 0);
-				glm::vec3 p2(points[next], 0);
-				glm::vec3 p3(points[next], h);
-				glm::vec3 p4(points[i], h);
-
-				p1 = glm::vec3(mat * glm::vec4(p1, 1));
-				p2 = glm::vec3(mat * glm::vec4(p2, 1));
-				p3 = glm::vec3(mat * glm::vec4(p3, 1));
-				p4 = glm::vec3(mat * glm::vec4(p4, 1));
+				glm::vec3 p1(mat * glm::vec4(points[i], 0, 1));
+				glm::vec3 p2(mat * glm::vec4(points[next], 0, 1));
+				glm::vec3 p3(mat * glm::vec4(points[next], h, 1));
+				glm::vec3 p4(mat * glm::vec4(points[i], h, 1));
 
 				glm::vec3 n = glm::cross(p2 - p1, p3 - p2);
 				n /= glm::length(n);
@@ -1143,15 +1003,10 @@ namespace kinematics {
 			// side faces
 			for (int i = 0; i < points.size(); i++) {
 				int next = (i + 1) % points.size();
-				glm::vec3 p1(points[i], 0);
-				glm::vec3 p2(points[next], 0);
-				glm::vec3 p3(points[next], h);
-				glm::vec3 p4(points[i], h);
-
-				p1 = glm::vec3(mat * glm::vec4(p1, 1));
-				p2 = glm::vec3(mat * glm::vec4(p2, 1));
-				p3 = glm::vec3(mat * glm::vec4(p3, 1));
-				p4 = glm::vec3(mat * glm::vec4(p4, 1));
+				glm::vec3 p1(mat * glm::vec4(points[i], 0, 1));
+				glm::vec3 p2(mat * glm::vec4(points[next], 0, 1));
+				glm::vec3 p3(mat * glm::vec4(points[next], h, 1));
+				glm::vec3 p4(mat * glm::vec4(points[i], h, 1));
 
 				glm::vec3 n = glm::cross(p2 - p1, p3 - p2);
 				n /= glm::length(n);
@@ -1182,15 +1037,10 @@ namespace kinematics {
 			// side faces
 			for (int i = 0; i < bottom_points.size(); i++) {
 				int next = (i + 1) % bottom_points.size();
-				glm::vec3 p1(bottom_points[i], 0);
-				glm::vec3 p2(bottom_points[next], 0);
-				glm::vec3 p3(top_points[next], h);
-				glm::vec3 p4(top_points[i], h);
-
-				p1 = glm::vec3(mat * glm::vec4(p1, 1));
-				p2 = glm::vec3(mat * glm::vec4(p2, 1));
-				p3 = glm::vec3(mat * glm::vec4(p3, 1));
-				p4 = glm::vec3(mat * glm::vec4(p4, 1));
+				glm::vec3 p1(mat * glm::vec4(bottom_points[i], 0, 1));
+				glm::vec3 p2(mat * glm::vec4(bottom_points[next], 0, 1));
+				glm::vec3 p3(mat * glm::vec4(top_points[next], h, 1));
+				glm::vec3 p4(mat * glm::vec4(top_points[i], h, 1));
 
 				glm::vec3 n = glm::cross(p2 - p1, p3 - p2);
 				n /= glm::length(n);
@@ -1206,8 +1056,8 @@ namespace kinematics {
 		}
 
 		/**
-		 * Create a prism with holes
-		 */
+			* Create a prism with holes
+			*/
 		void drawPrismWithHoles(std::vector<glm::dvec2> points, std::vector<std::vector<glm::dvec2>> holes, double h, const glm::vec4& color, const glm::mat4& mat, std::vector<Vertex>& vertices) {
 			correct(points);
 			for (int i = 0; i < holes.size(); i++) {
@@ -1223,15 +1073,10 @@ namespace kinematics {
 			// side faces
 			for (int i = 0; i < points.size(); i++) {
 				int next = (i + 1) % points.size();
-				glm::vec3 p1(points[i], 0);
-				glm::vec3 p2(points[next], 0);
-				glm::vec3 p3(points[next], h);
-				glm::vec3 p4(points[i], h);
-
-				p1 = glm::vec3(mat * glm::vec4(p1, 1));
-				p2 = glm::vec3(mat * glm::vec4(p2, 1));
-				p3 = glm::vec3(mat * glm::vec4(p3, 1));
-				p4 = glm::vec3(mat * glm::vec4(p4, 1));
+				glm::vec3 p1(mat * glm::vec4(points[i], 0, 1));
+				glm::vec3 p2(mat * glm::vec4(points[next], 0, 1));
+				glm::vec3 p3(mat * glm::vec4(points[next], h, 1));
+				glm::vec3 p4(mat * glm::vec4(points[i], h, 1));
 
 				glm::vec3 n = glm::cross(p2 - p1, p3 - p2);
 				n /= glm::length(n);
@@ -1250,15 +1095,10 @@ namespace kinematics {
 				reverse(holes[i].begin(), holes[i].end());
 				for (int j = 0; j < holes[i].size(); j++) {
 					int next = (j + 1) % holes[i].size();
-					glm::vec3 p1(holes[i][j], 0);
-					glm::vec3 p2(holes[i][next], 0);
-					glm::vec3 p3(holes[i][next], h);
-					glm::vec3 p4(holes[i][j], h);
-
-					p1 = glm::vec3(mat * glm::vec4(p1, 1));
-					p2 = glm::vec3(mat * glm::vec4(p2, 1));
-					p3 = glm::vec3(mat * glm::vec4(p3, 1));
-					p4 = glm::vec3(mat * glm::vec4(p4, 1));
+					glm::vec3 p1(mat * glm::vec4(holes[i][j], 0, 1));
+					glm::vec3 p2(mat * glm::vec4(holes[i][next], 0, 1));
+					glm::vec3 p3(mat * glm::vec4(holes[i][next], h, 1));
+					glm::vec3 p4(mat * glm::vec4(holes[i][j], h, 1));
 
 					glm::vec3 n = glm::cross(p2 - p1, p3 - p2);
 					n /= glm::length(n);
@@ -1369,7 +1209,7 @@ namespace kinematics {
 					glm::vec3 p1 = glm::vec3(modelMat1 * p) + points[i + 1] - points[i];
 					glm::vec3 p2 = glm::vec3(modelMat2 * p);
 					glm::vec3 pp = (p1 + p2) * 0.5f;
-			
+				
 					circle_normals2[k] = glm::normalize(pp - points[i + 1]);
 					circle_points2[k] = circle_normals2[k] * radius + points[i + 1];
 				}
