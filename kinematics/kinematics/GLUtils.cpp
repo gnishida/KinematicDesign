@@ -957,7 +957,7 @@ namespace kinematics {
 			}
 
 			if (bottom_face) {
-				drawCircle(radius3, radius4, color, glm::rotate(mat, (float)M_PI, glm::vec3(1, 0, 0)), vertices, slices);
+				drawCircle(radius1, radius2, color, glm::rotate(mat, (float)M_PI, glm::vec3(1, 0, 0)), vertices, slices);
 			}
 		}
 
