@@ -396,10 +396,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>pushButtonOK</tabstop>
-  <tabstop>pushButtonCancel</tabstop>
-  <tabstop>pushButtonSmall</tabstop>
-  <tabstop>pushButtonLarge</tabstop>
+  <tabstop>lineEditBodyMargin</tabstop>
   <tabstop>lineEditGap</tabstop>
   <tabstop>lineEditLinkWidth</tabstop>
   <tabstop>lineEditLinkDepth</tabstop>
@@ -410,6 +407,13 @@
   <tabstop>lineEditJointCapDepth</tabstop>
   <tabstop>lineEditSliderGuideWidth</tabstop>
   <tabstop>lineEditSliderGuideDepth</tabstop>
+  <tabstop>lineEditBodyDepth</tabstop>
+  <tabstop>pushButtonOK</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>pushButtonSmall</tabstop>
+  <tabstop>pushButtonLarge</tabstop>
+  <tabstop>pushButtonHalf</tabstop>
+  <tabstop>pushButtonTwice</tabstop>
  </tabstops>
  <resources/>
  <connections/>

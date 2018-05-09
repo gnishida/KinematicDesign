@@ -159,10 +159,7 @@ public:
         lineEditBodyDepth = new QLineEdit(groupBox_2);
         lineEditBodyDepth->setObjectName(QStringLiteral("lineEditBodyDepth"));
         lineEditBodyDepth->setGeometry(QRect(120, 20, 113, 20));
-        QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
-        QWidget::setTabOrder(pushButtonCancel, pushButtonSmall);
-        QWidget::setTabOrder(pushButtonSmall, pushButtonLarge);
-        QWidget::setTabOrder(pushButtonLarge, lineEditGap);
+        QWidget::setTabOrder(lineEditBodyMargin, lineEditGap);
         QWidget::setTabOrder(lineEditGap, lineEditLinkWidth);
         QWidget::setTabOrder(lineEditLinkWidth, lineEditLinkDepth);
         QWidget::setTabOrder(lineEditLinkDepth, lineEditHoleRadius);
@@ -172,6 +169,13 @@ public:
         QWidget::setTabOrder(lineEditJointCapRadius2, lineEditJointCapDepth);
         QWidget::setTabOrder(lineEditJointCapDepth, lineEditSliderGuideWidth);
         QWidget::setTabOrder(lineEditSliderGuideWidth, lineEditSliderGuideDepth);
+        QWidget::setTabOrder(lineEditSliderGuideDepth, lineEditBodyDepth);
+        QWidget::setTabOrder(lineEditBodyDepth, pushButtonOK);
+        QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
+        QWidget::setTabOrder(pushButtonCancel, pushButtonSmall);
+        QWidget::setTabOrder(pushButtonSmall, pushButtonLarge);
+        QWidget::setTabOrder(pushButtonLarge, pushButtonHalf);
+        QWidget::setTabOrder(pushButtonHalf, pushButtonTwice);
 
         retranslateUi(OptionDialog);
 
