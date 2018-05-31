@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.0
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -389,75 +389,75 @@ public:
 
     void retranslateUi(QMainWindow *MainWindowClass)
     {
-        MainWindowClass->setWindowTitle(QApplication::translate("MainWindowClass", "Kinematic Design", 0));
-        actionExit->setText(QApplication::translate("MainWindowClass", "Exit", 0));
-        actionSelect->setText(QApplication::translate("MainWindowClass", "Select", 0));
-        actionFixedRectangle->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
-        actionFixedCircle->setText(QApplication::translate("MainWindowClass", "Circle", 0));
-        actionFixedPolygon->setText(QApplication::translate("MainWindowClass", "Polygon", 0));
-        actionNew->setText(QApplication::translate("MainWindowClass", "New", 0));
-        actionNew->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+N", 0));
-        actionCopy->setText(QApplication::translate("MainWindowClass", "Copy", 0));
-        actionCopy->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+C", 0));
-        actionSelectAll->setText(QApplication::translate("MainWindowClass", "Select All", 0));
-        actionSelectAll->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+A", 0));
-        actionDelete->setText(QApplication::translate("MainWindowClass", "Delete", 0));
-        actionDelete->setShortcut(QApplication::translate("MainWindowClass", "Del", 0));
-        actionPaste->setText(QApplication::translate("MainWindowClass", "Paste", 0));
-        actionPaste->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+V", 0));
-        actionUndo->setText(QApplication::translate("MainWindowClass", "Undo", 0));
-        actionUndo->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+Z", 0));
-        actionRedo->setText(QApplication::translate("MainWindowClass", "Redo", 0));
-        actionRedo->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+Y", 0));
-        actionOpen->setText(QApplication::translate("MainWindowClass", "Open", 0));
-        actionOpen->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+O", 0));
-        actionSave->setText(QApplication::translate("MainWindowClass", "Save", 0));
-        actionSave->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+S", 0));
-        actionAddLayer->setText(QApplication::translate("MainWindowClass", "Add Layer", 0));
-        actionInsertLayer->setText(QApplication::translate("MainWindowClass", "Insert Layer", 0));
-        actionDeleteLayer->setText(QApplication::translate("MainWindowClass", "Delete Layer", 0));
-        actionGenerateLinkage->setText(QApplication::translate("MainWindowClass", "Generate Linkage", 0));
-        actionCollisionCheck->setText(QApplication::translate("MainWindowClass", "Collision Check", 0));
-        actionLinkageRegion->setText(QApplication::translate("MainWindowClass", "Linkage Region", 0));
-        actionKinematics->setText(QApplication::translate("MainWindowClass", "Kinematics", 0));
-        actionRun->setText(QApplication::translate("MainWindowClass", "Run", 0));
-        actionRunBackward->setText(QApplication::translate("MainWindowClass", "Run Backward", 0));
-        actionStop->setText(QApplication::translate("MainWindowClass", "Stop", 0));
-        actionStepForward->setText(QApplication::translate("MainWindowClass", "Step Forward", 0));
-        actionStepForward->setShortcut(QApplication::translate("MainWindowClass", "Right", 0));
-        actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", 0));
-        actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", 0));
-        actionGenerateSliderCrank->setText(QApplication::translate("MainWindowClass", "Generate Slider Crank", 0));
-        actionShowSolutions->setText(QApplication::translate("MainWindowClass", "Show Solutions", 0));
-        actionRenderBasic->setText(QApplication::translate("MainWindowClass", "Basic", 0));
-        actionRenderSSAO->setText(QApplication::translate("MainWindowClass", "SSAO", 0));
-        actionRenderLine->setText(QApplication::translate("MainWindowClass", "Line", 0));
-        actionRenderHatching->setText(QApplication::translate("MainWindowClass", "Hatching", 0));
-        actionSaveSTL->setText(QApplication::translate("MainWindowClass", "Save STL", 0));
-        actionExportSTL->setText(QApplication::translate("MainWindowClass", "STL", 0));
-        actionExportSCAD->setText(QApplication::translate("MainWindowClass", "SCAD", 0));
-        actionOptions->setText(QApplication::translate("MainWindowClass", "Options", 0));
-        actionMovingRectangle->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
-        actionMovingCircle->setText(QApplication::translate("MainWindowClass", "Circle", 0));
-        actionMovingPolygon->setText(QApplication::translate("MainWindowClass", "Polygon", 0));
-        actionFixedRectangle_2->setText(QApplication::translate("MainWindowClass", "Rectangle", 0));
-        actionAho->setText(QApplication::translate("MainWindowClass", "Aho", 0));
-        actionLinkageAvoidance->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", 0));
-        actionGenerateWattI->setText(QApplication::translate("MainWindowClass", "Generate Watt I", 0));
-        actionShowGridLines->setText(QApplication::translate("MainWindowClass", "Show Grid Lines", 0));
-        actionShowInputPoses->setText(QApplication::translate("MainWindowClass", "Show Input Poses", 0));
-        actionSaveImage->setText(QApplication::translate("MainWindowClass", "Save Image", 0));
-        actionSaveImage->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+P", 0));
-        actionRestrictMotionRange->setText(QApplication::translate("MainWindowClass", "Restrict Motion Range", 0));
-        menuFile->setTitle(QApplication::translate("MainWindowClass", "File", 0));
-        menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", 0));
-        menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", 0));
-        menuFixed_Body->setTitle(QApplication::translate("MainWindowClass", "Fixed Body", 0));
-        menuMovingBody->setTitle(QApplication::translate("MainWindowClass", "Moving Body", 0));
-        menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", 0));
-        menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", 0));
-        menuKinematics->setTitle(QApplication::translate("MainWindowClass", "Kinematics", 0));
-        menuView->setTitle(QApplication::translate("MainWindowClass", "View", 0));
+        MainWindowClass->setWindowTitle(QApplication::translate("MainWindowClass", "Kinematic Design", Q_NULLPTR));
+        actionExit->setText(QApplication::translate("MainWindowClass", "Exit", Q_NULLPTR));
+        actionSelect->setText(QApplication::translate("MainWindowClass", "Select", Q_NULLPTR));
+        actionFixedRectangle->setText(QApplication::translate("MainWindowClass", "Rectangle", Q_NULLPTR));
+        actionFixedCircle->setText(QApplication::translate("MainWindowClass", "Circle", Q_NULLPTR));
+        actionFixedPolygon->setText(QApplication::translate("MainWindowClass", "Polygon", Q_NULLPTR));
+        actionNew->setText(QApplication::translate("MainWindowClass", "New", Q_NULLPTR));
+        actionNew->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+N", Q_NULLPTR));
+        actionCopy->setText(QApplication::translate("MainWindowClass", "Copy", Q_NULLPTR));
+        actionCopy->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+C", Q_NULLPTR));
+        actionSelectAll->setText(QApplication::translate("MainWindowClass", "Select All", Q_NULLPTR));
+        actionSelectAll->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+A", Q_NULLPTR));
+        actionDelete->setText(QApplication::translate("MainWindowClass", "Delete", Q_NULLPTR));
+        actionDelete->setShortcut(QApplication::translate("MainWindowClass", "Del", Q_NULLPTR));
+        actionPaste->setText(QApplication::translate("MainWindowClass", "Paste", Q_NULLPTR));
+        actionPaste->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+V", Q_NULLPTR));
+        actionUndo->setText(QApplication::translate("MainWindowClass", "Undo", Q_NULLPTR));
+        actionUndo->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+Z", Q_NULLPTR));
+        actionRedo->setText(QApplication::translate("MainWindowClass", "Redo", Q_NULLPTR));
+        actionRedo->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+Y", Q_NULLPTR));
+        actionOpen->setText(QApplication::translate("MainWindowClass", "Open", Q_NULLPTR));
+        actionOpen->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+O", Q_NULLPTR));
+        actionSave->setText(QApplication::translate("MainWindowClass", "Save", Q_NULLPTR));
+        actionSave->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+S", Q_NULLPTR));
+        actionAddLayer->setText(QApplication::translate("MainWindowClass", "Add Layer", Q_NULLPTR));
+        actionInsertLayer->setText(QApplication::translate("MainWindowClass", "Insert Layer", Q_NULLPTR));
+        actionDeleteLayer->setText(QApplication::translate("MainWindowClass", "Delete Layer", Q_NULLPTR));
+        actionGenerateLinkage->setText(QApplication::translate("MainWindowClass", "Generate Linkage", Q_NULLPTR));
+        actionCollisionCheck->setText(QApplication::translate("MainWindowClass", "Collision Check", Q_NULLPTR));
+        actionLinkageRegion->setText(QApplication::translate("MainWindowClass", "Linkage Region", Q_NULLPTR));
+        actionKinematics->setText(QApplication::translate("MainWindowClass", "Kinematics", Q_NULLPTR));
+        actionRun->setText(QApplication::translate("MainWindowClass", "Run", Q_NULLPTR));
+        actionRunBackward->setText(QApplication::translate("MainWindowClass", "Run Backward", Q_NULLPTR));
+        actionStop->setText(QApplication::translate("MainWindowClass", "Stop", Q_NULLPTR));
+        actionStepForward->setText(QApplication::translate("MainWindowClass", "Step Forward", Q_NULLPTR));
+        actionStepForward->setShortcut(QApplication::translate("MainWindowClass", "Right", Q_NULLPTR));
+        actionStepBackward->setText(QApplication::translate("MainWindowClass", "Step Backward", Q_NULLPTR));
+        actionStepBackward->setShortcut(QApplication::translate("MainWindowClass", "Left", Q_NULLPTR));
+        actionGenerateSliderCrank->setText(QApplication::translate("MainWindowClass", "Generate Slider Crank", Q_NULLPTR));
+        actionShowSolutions->setText(QApplication::translate("MainWindowClass", "Show Solutions", Q_NULLPTR));
+        actionRenderBasic->setText(QApplication::translate("MainWindowClass", "Basic", Q_NULLPTR));
+        actionRenderSSAO->setText(QApplication::translate("MainWindowClass", "SSAO", Q_NULLPTR));
+        actionRenderLine->setText(QApplication::translate("MainWindowClass", "Line", Q_NULLPTR));
+        actionRenderHatching->setText(QApplication::translate("MainWindowClass", "Hatching", Q_NULLPTR));
+        actionSaveSTL->setText(QApplication::translate("MainWindowClass", "Save STL", Q_NULLPTR));
+        actionExportSTL->setText(QApplication::translate("MainWindowClass", "STL", Q_NULLPTR));
+        actionExportSCAD->setText(QApplication::translate("MainWindowClass", "SCAD", Q_NULLPTR));
+        actionOptions->setText(QApplication::translate("MainWindowClass", "Options", Q_NULLPTR));
+        actionMovingRectangle->setText(QApplication::translate("MainWindowClass", "Rectangle", Q_NULLPTR));
+        actionMovingCircle->setText(QApplication::translate("MainWindowClass", "Circle", Q_NULLPTR));
+        actionMovingPolygon->setText(QApplication::translate("MainWindowClass", "Polygon", Q_NULLPTR));
+        actionFixedRectangle_2->setText(QApplication::translate("MainWindowClass", "Rectangle", Q_NULLPTR));
+        actionAho->setText(QApplication::translate("MainWindowClass", "Aho", Q_NULLPTR));
+        actionLinkageAvoidance->setText(QApplication::translate("MainWindowClass", "Linkage Avoidance Region", Q_NULLPTR));
+        actionGenerateWattI->setText(QApplication::translate("MainWindowClass", "Generate Watt I", Q_NULLPTR));
+        actionShowGridLines->setText(QApplication::translate("MainWindowClass", "Show Grid Lines", Q_NULLPTR));
+        actionShowInputPoses->setText(QApplication::translate("MainWindowClass", "Show Input Poses", Q_NULLPTR));
+        actionSaveImage->setText(QApplication::translate("MainWindowClass", "Save Image", Q_NULLPTR));
+        actionSaveImage->setShortcut(QApplication::translate("MainWindowClass", "Ctrl+P", Q_NULLPTR));
+        actionRestrictMotionRange->setText(QApplication::translate("MainWindowClass", "Restrict Motion Range", Q_NULLPTR));
+        menuFile->setTitle(QApplication::translate("MainWindowClass", "File", Q_NULLPTR));
+        menuExport->setTitle(QApplication::translate("MainWindowClass", "Export", Q_NULLPTR));
+        menuMode->setTitle(QApplication::translate("MainWindowClass", "Mode", Q_NULLPTR));
+        menuFixed_Body->setTitle(QApplication::translate("MainWindowClass", "Fixed Body", Q_NULLPTR));
+        menuMovingBody->setTitle(QApplication::translate("MainWindowClass", "Moving Body", Q_NULLPTR));
+        menuEdit->setTitle(QApplication::translate("MainWindowClass", "Edit", Q_NULLPTR));
+        menuLayer->setTitle(QApplication::translate("MainWindowClass", "Layer", Q_NULLPTR));
+        menuKinematics->setTitle(QApplication::translate("MainWindowClass", "Kinematics", Q_NULLPTR));
+        menuView->setTitle(QApplication::translate("MainWindowClass", "View", Q_NULLPTR));
     } // retranslateUi
 
 };

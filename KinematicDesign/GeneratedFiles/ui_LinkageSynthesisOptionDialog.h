@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'LinkageSynthesisOptionDialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.0
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -216,35 +216,35 @@ public:
 
     void retranslateUi(QDialog *LinkageSynthesisOptionDialog)
     {
-        LinkageSynthesisOptionDialog->setWindowTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Synthesis Options", 0));
-        label->setText(QApplication::translate("LinkageSynthesisOptionDialog", "# Samples:", 0));
-        checkBoxAvoidBranchDefect->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Avoid branch/poor transmission angle defect", 0));
-        pushButtonOK->setText(QApplication::translate("LinkageSynthesisOptionDialog", "OK", 0));
-        pushButtonCancel->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Cancel", 0));
-        groupBox->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Pose tolerance", 0));
-        label_2->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", 0));
-        label_6->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", 0));
-        label_7->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", 0));
-        label_8->setText(QApplication::translate("LinkageSynthesisOptionDialog", "1st pose:", 0));
-        label_9->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", 0));
-        label_10->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Intermediate poses:", 0));
-        label_11->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", 0));
-        label_12->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Last pose:", 0));
-        label_13->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", 0));
-        groupBox_2->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Weights", 0));
-        label_3->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Position error:", 0));
-        label_4->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Smoothness of trajectory:", 0));
-        label_5->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage size:", 0));
-        label_14->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Orientation error:", 0));
-        label_15->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage location:", 0));
-        label_18->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage depth:", 0));
-        groupBox_3->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Partile filter", 0));
-        label_16->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#particles:", 0));
-        label_17->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#iterations:", 0));
-        checkBoxRecordFile->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Record cost evolution to a file", 0));
-        label_19->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Min. transmission angle:", 0));
-        checkBox4RLinkage->setText(QApplication::translate("LinkageSynthesisOptionDialog", "4R four-bar linkage", 0));
-        checkBoxSliderCrank->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Slider crank", 0));
+        LinkageSynthesisOptionDialog->setWindowTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Synthesis Options", Q_NULLPTR));
+        label->setText(QApplication::translate("LinkageSynthesisOptionDialog", "# Samples:", Q_NULLPTR));
+        checkBoxAvoidBranchDefect->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Avoid branch/poor transmission angle defect", Q_NULLPTR));
+        pushButtonOK->setText(QApplication::translate("LinkageSynthesisOptionDialog", "OK", Q_NULLPTR));
+        pushButtonCancel->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Cancel", Q_NULLPTR));
+        groupBox->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Pose tolerance", Q_NULLPTR));
+        label_2->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", Q_NULLPTR));
+        label_6->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", Q_NULLPTR));
+        label_7->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for position:", Q_NULLPTR));
+        label_8->setText(QApplication::translate("LinkageSynthesisOptionDialog", "1st pose:", Q_NULLPTR));
+        label_9->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", Q_NULLPTR));
+        label_10->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Intermediate poses:", Q_NULLPTR));
+        label_11->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", Q_NULLPTR));
+        label_12->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Last pose:", Q_NULLPTR));
+        label_13->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Stdev for orientation:", Q_NULLPTR));
+        groupBox_2->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Weights", Q_NULLPTR));
+        label_3->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Position error:", Q_NULLPTR));
+        label_4->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Smoothness of trajectory:", Q_NULLPTR));
+        label_5->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage size:", Q_NULLPTR));
+        label_14->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Orientation error:", Q_NULLPTR));
+        label_15->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage location:", Q_NULLPTR));
+        label_18->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Linkage depth:", Q_NULLPTR));
+        groupBox_3->setTitle(QApplication::translate("LinkageSynthesisOptionDialog", "Partile filter", Q_NULLPTR));
+        label_16->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#particles:", Q_NULLPTR));
+        label_17->setText(QApplication::translate("LinkageSynthesisOptionDialog", "#iterations:", Q_NULLPTR));
+        checkBoxRecordFile->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Record cost evolution to a file", Q_NULLPTR));
+        label_19->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Min. transmission angle:", Q_NULLPTR));
+        checkBox4RLinkage->setText(QApplication::translate("LinkageSynthesisOptionDialog", "4R four-bar linkage", Q_NULLPTR));
+        checkBoxSliderCrank->setText(QApplication::translate("LinkageSynthesisOptionDialog", "Slider crank", Q_NULLPTR));
     } // retranslateUi
 
 };
