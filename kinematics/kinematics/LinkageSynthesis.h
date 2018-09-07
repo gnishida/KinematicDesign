@@ -13,7 +13,7 @@ namespace kinematics {
 	class LinkageSynthesis {
 	protected:
 		std::vector<Object25D> fixed_bodies;
-		std::vector<std::pair<double, double>> sigmas;
+		std::pair<double, double> sigmas;
 		bool avoid_branch_defect;
 		double min_transmission_angle;
 		double min_link_length;
@@ -25,7 +25,7 @@ namespace kinematics {
 	public:
 		static void calculateStatistics(const std::vector<double>& values, double& mean, double& sd);
 		static bool compare(const Solution& s1, const Solution& s2);
-		static std::vector<glm::dmat3x3> perturbPoses(const std::vector<glm::dmat3x3>& poses, std::vector<std::pair<double, double>>& sigmas, double& position_error, double& orientation_error);
+		static std::vector<glm::dmat3x3> perturbPoses(const std::vector<glm::dmat3x3>& poses, std::pair<double, double>& sigmas, double& position_error, double& orientation_error);
 		static std::vector<glm::dvec2> enlargePolygon(const std::vector<glm::dvec2>& polygon, const glm::dvec2& center, double scale);
 		static void createDistanceMapForLinkageRegion(const std::vector<glm::dvec2>& linkage_region_pts, double scale, BBox& dist_map_bbox, cv::Mat& dist_map);
 		void particleFilter(std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, int num_particles, int num_iterations, bool record_file);

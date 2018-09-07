@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>647</height>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>290</y>
+     <y>150</y>
      <width>251</width>
      <height>17</height>
     </rect>
@@ -53,7 +53,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>600</y>
+     <y>440</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>600</y>
+     <y>440</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -81,135 +81,40 @@
      <x>20</x>
      <y>70</y>
      <width>311</width>
-     <height>211</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="title">
     <string>Pose tolerance</string>
    </property>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>40</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stdev for position:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditStdDevPositionFirst">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>40</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>100</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stdev for position:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditStdDevPositionMiddle">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>100</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>160</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stdev for position:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditStdDevPositionLast">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>160</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
       <y>20</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1st pose:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>60</y>
-      <width>131</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Stdev for orientation:</string>
+     <string>Stdev for position:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditStdDevOrientationFirst">
+   <widget class="QLineEdit" name="lineEditStdDevPosition">
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>60</y>
+      <y>20</y>
       <width>101</width>
       <height>20</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>80</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Intermediate poses:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>120</y>
+      <y>40</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -218,47 +123,11 @@
      <string>Stdev for orientation:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditStdDevOrientationMiddle">
+   <widget class="QLineEdit" name="lineEditStdDevOrientation">
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>120</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_12">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Last pose:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_13">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>180</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stdev for orientation:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditStdDevOrientationLast">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>180</y>
+      <y>40</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -269,9 +138,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
+     <y>190</y>
      <width>311</width>
-     <height>151</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -304,7 +173,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>80</y>
+      <y>60</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -317,7 +186,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>80</y>
+      <y>60</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -327,7 +196,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>100</y>
+      <y>80</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -340,30 +209,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>100</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_14">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Orientation error:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEditOrientationErrorWeight">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>40</y>
+      <y>80</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -373,7 +219,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>60</y>
+      <y>40</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -386,7 +232,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>60</y>
+      <y>40</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -396,7 +242,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>120</y>
+      <y>100</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -406,7 +252,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>120</y>
+      <y>100</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -420,7 +266,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>490</y>
+     <y>330</y>
      <width>311</width>
      <height>91</height>
     </rect>
@@ -492,7 +338,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>310</y>
+     <y>170</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -502,7 +348,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>310</y>
+     <y>170</y>
      <width>131</width>
      <height>16</height>
     </rect>

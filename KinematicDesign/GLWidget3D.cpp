@@ -525,7 +525,7 @@ void GLWidget3D::update3DGeometryFromKinematics() {
 	renderManager.updateShadowMap(this, light_dir, light_mvpMatrix);
 }
 
-void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::vector<std::pair<double, double>>& sigmas, bool avoid_branch_defect, double min_transmission_angle, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
+void GLWidget3D::calculateSolutions(int linkage_type, int num_samples, std::pair<double, double>& sigmas, bool avoid_branch_defect, double min_transmission_angle, const std::vector<double>& weights, int num_particles, int num_iterations, bool record_file) {
 	mainWin->ui.statusBar->showMessage("Please wait for a moment...");
 
 	// change the mode to kinematics

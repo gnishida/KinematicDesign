@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'OptionDialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.8.0
+** Created by: Qt User Interface Compiler version 5.6.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -184,27 +184,27 @@ public:
 
     void retranslateUi(QDialog *OptionDialog)
     {
-        OptionDialog->setWindowTitle(QApplication::translate("OptionDialog", "OptionDialog", Q_NULLPTR));
-        groupBox->setTitle(QApplication::translate("OptionDialog", "Parameters for linkage", Q_NULLPTR));
-        label->setText(QApplication::translate("OptionDialog", "Link width:", Q_NULLPTR));
-        label_2->setText(QApplication::translate("OptionDialog", "Link depth:", Q_NULLPTR));
-        label_3->setText(QApplication::translate("OptionDialog", "Joint radius:", Q_NULLPTR));
-        label_4->setText(QApplication::translate("OptionDialog", "Joint cap radius1:", Q_NULLPTR));
-        label_5->setText(QApplication::translate("OptionDialog", "Joint cap radius 2:", Q_NULLPTR));
-        label_6->setText(QApplication::translate("OptionDialog", "Joint cap depth:", Q_NULLPTR));
-        label_7->setText(QApplication::translate("OptionDialog", "Hole radius:", Q_NULLPTR));
-        label_8->setText(QApplication::translate("OptionDialog", "Slider guide width:", Q_NULLPTR));
-        label_10->setText(QApplication::translate("OptionDialog", "Slider guide depth:", Q_NULLPTR));
-        label_12->setText(QApplication::translate("OptionDialog", "Gap:", Q_NULLPTR));
-        pushButtonLarge->setText(QApplication::translate("OptionDialog", "Large", Q_NULLPTR));
-        pushButtonSmall->setText(QApplication::translate("OptionDialog", "Small", Q_NULLPTR));
-        pushButtonTwice->setText(QApplication::translate("OptionDialog", "x 2", Q_NULLPTR));
-        pushButtonHalf->setText(QApplication::translate("OptionDialog", "x 0.5", Q_NULLPTR));
-        label_13->setText(QApplication::translate("OptionDialog", "Body margin:", Q_NULLPTR));
-        pushButtonOK->setText(QApplication::translate("OptionDialog", "OK", Q_NULLPTR));
-        pushButtonCancel->setText(QApplication::translate("OptionDialog", "Cancel", Q_NULLPTR));
-        groupBox_2->setTitle(QApplication::translate("OptionDialog", "Parameters for body", Q_NULLPTR));
-        label_14->setText(QApplication::translate("OptionDialog", "Body depth:", Q_NULLPTR));
+        OptionDialog->setWindowTitle(QApplication::translate("OptionDialog", "OptionDialog", 0));
+        groupBox->setTitle(QApplication::translate("OptionDialog", "Parameters for linkage", 0));
+        label->setText(QApplication::translate("OptionDialog", "Link width:", 0));
+        label_2->setText(QApplication::translate("OptionDialog", "Link depth:", 0));
+        label_3->setText(QApplication::translate("OptionDialog", "Joint radius:", 0));
+        label_4->setText(QApplication::translate("OptionDialog", "Joint cap radius1:", 0));
+        label_5->setText(QApplication::translate("OptionDialog", "Joint cap radius 2:", 0));
+        label_6->setText(QApplication::translate("OptionDialog", "Joint cap depth:", 0));
+        label_7->setText(QApplication::translate("OptionDialog", "Hole radius:", 0));
+        label_8->setText(QApplication::translate("OptionDialog", "Slider guide width:", 0));
+        label_10->setText(QApplication::translate("OptionDialog", "Slider guide depth:", 0));
+        label_12->setText(QApplication::translate("OptionDialog", "Gap:", 0));
+        pushButtonLarge->setText(QApplication::translate("OptionDialog", "Large", 0));
+        pushButtonSmall->setText(QApplication::translate("OptionDialog", "Small", 0));
+        pushButtonTwice->setText(QApplication::translate("OptionDialog", "x 2", 0));
+        pushButtonHalf->setText(QApplication::translate("OptionDialog", "x 0.5", 0));
+        label_13->setText(QApplication::translate("OptionDialog", "Body margin:", 0));
+        pushButtonOK->setText(QApplication::translate("OptionDialog", "OK", 0));
+        pushButtonCancel->setText(QApplication::translate("OptionDialog", "Cancel", 0));
+        groupBox_2->setTitle(QApplication::translate("OptionDialog", "Parameters for body", 0));
+        label_14->setText(QApplication::translate("OptionDialog", "Body depth:", 0));
     } // retranslateUi
 
 };
