@@ -61,11 +61,11 @@ namespace kinematics {
 			//       for the particle filter, the initial joints are used to optimize, so we want to differentiate these two cases.
 			//points[1] = points[3];
 
-			if (!optimizeCandidate(perturbed_poses, linkage_region_pts, bbox, points)) continue;
+			if (!optimizeCandidate(perturbed_poses, points)) continue;
 
 			// check hard constraints
 			std::vector<std::vector<int>> zorder;
-			if (!checkHardConstraints(points, perturbed_poses, linkage_region_pts, linkage_avoidance_pts, moving_body, zorder)) continue;
+			if (!checkHardConstraints(points, perturbed_poses, linkage_avoidance_pts, moving_body, zorder)) continue;
 				
 			solutions.push_back(Solution(1, points, position_error, orientation_error, perturbed_poses, zorder));
 			cnt++;
@@ -77,23 +77,14 @@ namespace kinematics {
 	* Optimize the linkage parameter based on the rigidity constraints.
 	* If it fails to opotimize, return false.
 	*/
-	bool LinkageSynthesisRRRP::optimizeCandidate(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, std::vector<glm::dvec2>& points) {
-		if (poses.size() == 2) {
-			if (!optimizeLinkForTwoPoses(poses, linkage_region_pts, points[0], points[2])) return false;
-		}
-		else if (poses.size() == 3) {
-			if (!optimizeLinkForThreePoses(poses, linkage_region_pts, points[0], points[2])) return false;
-		}
-		else {
-			if (!optimizeLink(poses, linkage_region_pts, bbox, points[0], points[2])) return false;
-		}
-
-		if (!optimizeSlider(poses, linkage_region_pts, bbox, points[1], points[3])) return false;
+	bool LinkageSynthesisRRRP::optimizeCandidate(const std::vector<glm::dmat3x3>& poses, std::vector<glm::dvec2>& points) {
+		if (!optimizeLink(poses, points[0], points[2])) return false;
+		if (!optimizeSlider(poses, points[1], points[3])) return false;
 
 		return true;
 	}
 
-	bool LinkageSynthesisRRRP::optimizeLink(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, glm::dvec2& A0, glm::dvec2& A1) {
+	bool LinkageSynthesisRRRP::optimizeLink(const std::vector<glm::dmat3x3>& poses, glm::dvec2& A0, glm::dvec2& A1) {
 		// setup the initial parameters for optimization
 		column_vector starting_point(4);
 		starting_point(0, 0) = A0.x;
@@ -108,10 +99,6 @@ namespace kinematics {
 			A0.y = starting_point(1, 0);
 			A1.x = starting_point(2, 0);
 			A1.y = starting_point(3, 0);
-
-			// if the joints are outside the valid region, discard it.
-			if (!withinPolygon(linkage_region_pts, A0)) return false;
-			if (!withinPolygon(linkage_region_pts, A1)) return false;
 		}
 		catch (std::exception& e) {
 			return false;
@@ -120,49 +107,7 @@ namespace kinematics {
 		return true;
 	}
 
-	bool LinkageSynthesisRRRP::optimizeLinkForThreePoses(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, glm::dvec2& A0, glm::dvec2& A1) {
-		// calculate the local coordinate of A1
-		glm::dvec2 a = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(A1, 1));
-
-		glm::dvec2 A2(poses[1] * glm::dvec3(a, 1));
-		glm::dvec2 A3(poses[2] * glm::dvec3(a, 1));
-
-		try {
-			A0 = circleCenterFromThreePoints(A1, A2, A3);
-
-			// if the center point is outside the valid region, discard it.
-			if (!withinPolygon(linkage_region_pts, A0)) return false;
-
-			// if the moving point is outside the valid region, discard it.
-			//if (!withinPolygon(linkage_region_pts, A1)) return false;
-		}
-		catch (char* ex) {
-			return false;
-		}
-
-		return true;
-	}
-
-	bool LinkageSynthesisRRRP::optimizeLinkForTwoPoses(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, glm::dvec2& A0, glm::dvec2& A1) {
-		// calculate the local coordinate of A1
-		glm::dvec2 a = glm::dvec2(glm::inverse(poses[0]) * glm::dvec3(A1, 1));
-
-		glm::dvec2 A2(poses[1] * glm::dvec3(a, 1));
-
-		glm::dvec2 M = (A1 + A2) * 0.5;
-		glm::dvec2 v = A1 - A2;
-		v /= glm::length(v);
-		glm::dvec2 h(-v.y, v.x);
-
-		A0 = M + h * glm::dot(A0 - M, h);
-
-		// if the center point is outside the valid region, discard it.
-		if (!withinPolygon(linkage_region_pts, A0)) return false;
-
-		return true;
-	}
-
-	bool LinkageSynthesisRRRP::optimizeSlider(const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const BBox& bbox, glm::dvec2& A0, glm::dvec2& A1) {		
+	bool LinkageSynthesisRRRP::optimizeSlider(const std::vector<glm::dmat3x3>& poses, glm::dvec2& A0, glm::dvec2& A1) {		
 		// setup the initial parameters for optimization
 		column_vector starting_point(4);
 		starting_point(0, 0) = A0.x;
@@ -175,9 +120,6 @@ namespace kinematics {
 
 			A1.x = starting_point(2, 0);
 			A1.y = starting_point(3, 0);
-
-			// if the moving point is outside the valid region, discard it.
-			if (!withinPolygon(linkage_region_pts, A1)) return false;
 		}
 		catch (std::exception& e) {
 			return false;
@@ -206,16 +148,13 @@ namespace kinematics {
 
 		A0 = A1 - v1;
 
-		// if the sampled point is outside the valid region, discard it.
-		if (!withinPolygon(linkage_region_pts, A0)) return false;
-
 		return true;
 	}
 
-	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const std::vector<glm::dvec2>& linkage_region_pts, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, int num_particles, int num_iterations, bool record_file) {
+	Solution LinkageSynthesisRRRP::findBestSolution(const std::vector<glm::dmat3x3>& poses, std::vector<Solution>& solutions, const cv::Mat& dist_map, const BBox& dist_map_bbox, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, int num_particles, int num_iterations, bool record_file) {
 		// select the best solution based on the objective function
 		if (solutions.size() > 0) {
-			particleFilter(solutions, linkage_region_pts, dist_map, dist_map_bbox, linkage_avoidance_pts, moving_body, num_particles, num_iterations, record_file);
+			particleFilter(poses, solutions, dist_map, dist_map_bbox, linkage_avoidance_pts, moving_body, num_particles, num_iterations, record_file);
 			return solutions[0];
 		}
 		else {
@@ -287,7 +226,7 @@ namespace kinematics {
 		kin.diagram.addBody(kin.diagram.joints[2], kin.diagram.joints[3], moving_body);
 	}
 
-	bool LinkageSynthesisRRRP::checkHardConstraints(std::vector<glm::dvec2>& points, const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_region_pts, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, std::vector<std::vector<int>>& zorder) {
+	bool LinkageSynthesisRRRP::checkHardConstraints(std::vector<glm::dvec2>& points, const std::vector<glm::dmat3x3>& poses, const std::vector<glm::dvec2>& linkage_avoidance_pts, const Object25D& moving_body, std::vector<std::vector<int>>& zorder) {
 		glm::dvec2 slider_dir = points[3] - points[1];
 
 		// check hard constraints
@@ -305,8 +244,6 @@ namespace kinematics {
 		// locate the two endpoints of the bar
 		points[1] = slider_end_pos1 - slider_dir * 2.0;
 		points[4] = slider_end_pos2 + slider_dir * 2.0;
-		if (!withinPolygon(linkage_region_pts, points[1])) return false;
-		if (!withinPolygon(linkage_region_pts, points[4])) return false;
 
 		// record collision between connectors
 		Kinematics kin = recordCollisionForConnectors(poses, points, fixed_bodies, moving_body);
